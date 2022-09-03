@@ -103,8 +103,9 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 
 - Comando adaptado para o meu ambiente local no Minikube:
+    kubectl exec etcd-minikube -n kube-system -- etcdctl get / --prefix --keys-only
 
-kubectl exec etcd-minikube -n kube-system -- etcdctl get / --prefix --keys-only
+- ERRO:
 
 ~~~~bash
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ kubectl exec etcd-minikube -n kube-system -- etcdctl get / --prefix --keys-only
@@ -116,5 +117,62 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 
 
+-NÑOK
+alias etcdctl_mini="MY_IP=$(hostname -I |awk '{print $1}'|tr -d ' '); \
+    ETCDCTL_API=3; \
+    etcdctl --endpoints ${MY_IP}:2379 \
+    --cacert='/var/lib/minikube/certs/etcd/ca.crt' \
+    --cert='/var/lib/minikube/certs/etcd/peer.crt' \
+    --key='/var/lib/minikube/certs/etcd/peer.key'"
+etcdctl_mini put foo bar
+
+
+
+- SOLUÇÃO:
+- Fonte:
+<https://stackoverflow.com/questions/47807892/how-to-access-kubernetes-keys-in-etcd>
+
+kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' put foo bar
+
+
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' put foo bar
+OK
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+
+
+
+kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get foo
+
+
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get foo
+foo
+bar
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+
+
+
+kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get / --prefix --keys-only
+
+
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get / --prefix --keys-only
+/registry/apiregistration.k8s.io/apiservices/v1.
+/registry/apiregistration.k8s.io/apiservices/v1.admissionregistration.k8s.io
+/registry/apiregistration.k8s.io/apiservices/v1.apiextensions.k8s.io
+/registry/apiregistration.k8s.io/apiservices/v1.apps
+/registry/apiregistration.k8s.io/apiservices/v1.authentication.k8s.io
+/registry/apiregistration.k8s.io/apiservices/v1.authorization.k8s.io
+[..................]
+/registry/services/endpoints/kube-system/k8s.io-minikube-hostpath
+/registry/services/endpoints/kube-system/kube-dns
+/registry/services/specs/default/kubernetes
+/registry/services/specs/kube-system/kube-dns
+/registry/storageclasses/standard
+fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+
+
+
+
 # PENDENTE
-- Verificar porque ocorre erro no meu comando de listar as keys no etcd
+- Aula continua aos 02:29
+- Efetuar KB sobre a solução do meu problema no comando no Pod do etcd.
