@@ -5,7 +5,7 @@
 # push
 git status
 git add .
-git commit -m "Aula 13 - ETCD in Kubernetes"
+git commit -m "Aula 13 - ETCD in Kubernetes."
 eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
@@ -252,3 +252,14 @@ ExecStart=/usr/local/bin/etcd \\
 --data-dir=/var/lib/etcd
 etcd.service
 ~~~~
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 13 - ETCD in Kubernetes. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
