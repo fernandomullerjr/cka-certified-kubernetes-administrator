@@ -5,7 +5,7 @@
 # push
 git status
 git add .
-git commit -m "Aula 14 - ETCD commands."
+git commit -m "Aula 15 - Kube api Server. pt1"
 eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
