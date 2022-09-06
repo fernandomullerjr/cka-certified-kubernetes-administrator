@@ -1,4 +1,21 @@
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# push
+git status
+git add .
+git commit -m "Aula 13 - ETCD in Kubernetes"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
 
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
 # ETCD in Kubernetes
 
 - O ETCD Datastore armazena informações a respeito do Cluster, como:
@@ -16,6 +33,10 @@
 - Todas informações obtidas a partir do comando "kubectl get" é obtida do ETCD server.
 
 
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
 # Setup - Manual
 
 ~~~~bash
@@ -87,6 +108,8 @@ kubectl exec etcd-master –n kube-system etcdctl get / --prefix –keys-only
 
 
 - Exemplo do meu Minikube:
+tem um Pod com etcd
+tem um Pod com apiserver
 
 ~~~~bash
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ kubectl get pods -n kube-system
@@ -132,27 +155,37 @@ etcdctl_mini put foo bar
 - Fonte:
 <https://stackoverflow.com/questions/47807892/how-to-access-kubernetes-keys-in-etcd>
 
+- Comando corrigido:
+
+~~~~bash
 kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' put foo bar
+~~~~
 
 
+- Efetuando put de um registro no etcd:
+
+~~~~bash
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' put foo bar
 OK
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+~~~~
 
 
+- Efetuando get no etcd:
 
+~~~~bash
 kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get foo
-
 
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get foo
 foo
 bar
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
+~~~~
 
 
-
+- Trazendo todas as chaves:
+~~~~bash
 kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get / --prefix --keys-only
-
 
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-minikube -n kube-system -- etcdctl --cacert='/var/lib/minikube/certs/etcd/ca.crt' --cert='/var/lib/minikube/certs/etcd/peer.crt' --key='/var/lib/minikube/certs/etcd/peer.key' get / --prefix --keys-only
@@ -169,10 +202,53 @@ fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$ kubectl -it exec etcd-miniku
 /registry/services/specs/kube-system/kube-dns
 /registry/storageclasses/standard
 fernando@debian10x64:/tmp/etcd-v3.3.11-linux-amd64$
-
+~~~~
 
 
 
 # PENDENTE
 - Aula continua aos 02:29
 - Efetuar KB sobre a solução do meu problema no comando no Pod do etcd.
+
+
+
+# Dia 05/09/2022
+
+Registry 
+    minions
+    pods
+    replicasets
+    deployments
+    roles
+    secrets
+
+
+<https://blog.marcelocavalcante.net/conhecendo-o-kubernetes-clusters-de-containers/>
+
+
+
+
+# ETCD in HA Environment
+2379
+
+~~~~bash
+ExecStart=/usr/local/bin/etcd \\
+--name ${ETCD_NAME} \\
+--cert-file=/etc/etcd/kubernetes.pem \\
+--key-file=/etc/etcd/kubernetes-key.pem \\
+--peer-cert-file=/etc/etcd/kubernetes.pem \\
+--peer-key-file=/etc/etcd/kubernetes-key.pem \\
+--trusted-ca-file=/etc/etcd/ca.pem \\
+--peer-trusted-ca-file=/etc/etcd/ca.pem \\
+--peer-client-cert-auth \\
+--client-cert-auth \\
+--initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
+--listen-peer-urls https://${INTERNAL_IP}:2380 \\
+--listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
+--advertise-client-urls https://${INTERNAL_IP}:2379 \\
+--initial-cluster-token etcd-cluster-0 \\
+--initial-cluster controller-0=https://${CONTROLLER0_IP}:2380,controller-1=https://${CONTROLLER1_IP}:2380 \\
+--initial-cluster-state new \\
+--data-dir=/var/lib/etcd
+etcd.service
+~~~~
