@@ -17,21 +17,27 @@ git status
 # ##############################################################################################################################################################
 # ##############################################################################################################################################################
 # kube-controller-manager
-Watch Status
-Remediate Situation
 
 Watch Status
 Remediate Situation
 
-Node-Controller kube-apiserver
-UNREACHABLE
+Watch Status
+Remediate Situation
+
+# Node-Controller 
+O Node-Controller se comunica com o kube-apiserver.
+Ele marca o node com status "UNREACHABLE" após 40s sem comunicação.
+Ele comunica a cada 5s.
+O node é removido do cluster após 5min com problemas
 
 Node Monitor Period = 5s
 Node Monitor Grace Period = 40s
 POD Eviction Timeout = 5m
 
 
+
 kubectl get nodes
+
 Ready NAME STATUS ROLES AGE VERSION
 worker-1 Ready <none> 8d v1.13.0
 worker-2 NotReady <none> 8d v1.13.0
@@ -67,6 +73,7 @@ O kube-controller-manager baseia-se no servidor API para supervisionar o estado 
 # Installing kube-controller-manager
 wget https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kube-controller-manager
 
+~~~~bash
 ExecStart=/usr/local/bin/kube-controller-manager \\
 --address=0.0.0.0 \\
 --cluster-cidr=10.200.0.0/16 \\
@@ -80,6 +87,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \\
 --service-cluster-ip-range=10.32.0.0/24 \\
 --use-service-account-credentials=true \\
 --v=2
+~~~~
 
 kube-controller-manager.service
 Node Monitor Period = 5s
@@ -104,8 +112,7 @@ Mas podem ser selecionados poucos, caso queira.
 
 
 
-Installing
-kube controller manager
+# Installing kube controller manager
 --
 controllers stringSlice Default: [*]
 A list of controllers to enable. '*' enables all on
@@ -126,6 +133,8 @@ by default controllers: bootstrapsigner , tokencleaner
 
 # View kube-controller-manager - kubeadm
 
+- Se o Kube-controller-manager foi deployado via Kubeadm, ele tem 1 pod chamado "kube-controller-manager-master" que é o nosso 
+
 kubectl get pods -n kube-system
 
 NAMESPACE NAME READY STATUS RESTARTS AGE
@@ -145,7 +154,91 @@ kube-system weave-net-snmdl 2/2 Running 1 16m
 # push
 git status
 git add .
-git commit -m "Aula 16 - kube-controller-manager. pt1"
+git commit -m "Aula 16 - kube-controller-manager. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
+
+
+
+
+# Dia 10/09/2022
+
+
+# View kube-controller-manager options - Para clusters que foram instalados via Kubeadm
+
+- Para verificar as opções do kube-controller-manager no kubeadm:
+
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml
+
+~~~~yaml
+spec:
+containers:
+- command:
+- kube-controller-manager
+- --address=127.0.0.1
+- --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+- --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+- --controllers=*,bootstrapsigner,tokencleaner
+- --kubeconfig=/etc/kubernetes/controller-manager.conf
+- --leader-elect=true
+- --root-ca-file=/etc/kubernetes/pki/ca.crt
+- --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+- --use-service-account-credentials=true
+~~~~
+
+
+
+#  View controller-manager options - Para clusters que não foram instalados via Kubeadm
+
+cat /etc/systemd/system/kube-controller-manager.service
+
+~~~~bash
+[Service]
+ExecStart=/usr/local/bin/kube-controller-manager \\
+--address=0.0.0.0 \\
+--cluster-cidr=10.200.0.0/16 \\
+--cluster-name=kubernetes \\
+--cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
+--cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
+--kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+--leader-elect=true \\
+--root-ca-file=/var/lib/kubernetes/ca.pem \\
+--service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem \\
+--service-cluster-ip-range=10.32.0.0/24 \\
+--use-service-account-credentials=true \\
+--v=2
+Restart=on-failure
+RestartSec=5
+~~~~
+
+
+
+
+
+
+# View controller-manager options
+
+- Verificando o processo do kube-controller-manager em execução no node Master:
+
+~~~~bash
+ps -aux | grep kube-controller-manager
+root 1994 2.7 5.1 154360 105024 ? Ssl 06:45 1:25 kube-controller-manager --
+address=127.0.0.1 --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt --cluster-signingkey-
+file=/etc/kubernetes/pki/ca.key --controllers=*,bootstrapsigner,tokencleaner --
+kubeconfig=/etc/kubernetes/controller-manager.conf --leader-elect=true --root-cafile=/
+etc/kubernetes/pki/ca.crt --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+--use-service-account-credentials=true
+~~~~
+
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 16 - kube-controller-manager. pt3. Finalizando"
 eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
