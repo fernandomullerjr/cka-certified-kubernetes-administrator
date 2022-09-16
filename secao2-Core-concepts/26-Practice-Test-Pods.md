@@ -1,4 +1,23 @@
-26. Practice Test - Pods
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# push
+git status
+git add .
+git commit -m "Aula 26. Practice Test - Pods. pt1"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
+
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# 26. Practice Test - Pods
 
 
 
@@ -66,3 +85,43 @@ Name: redis
 Image Name: redis
 
 <https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#edit>
+
+
+- Editando o Pod
+kubectl edit pod redis
+
+
+
+controlplane ~ ✖ kubectl edit pod redis
+pod/redis edited
+
+controlplane ~ ➜  kubectl get pods 
+NAME                    READY   STATUS             RESTARTS       AGE
+nginx-8f458dc5b-p4brz   1/1     Running            0              19m
+newpods-lnxj7           1/1     Running            1 (2m7s ago)   18m
+newpods-ptnfc           1/1     Running            1 (2m7s ago)   18m
+newpods-wq8l5           1/1     Running            1 (2m7s ago)   18m
+redis                   0/1     ImagePullBackOff   0              3m46s
+
+controlplane ~ ➜  kubectl get pods 
+NAME                    READY   STATUS    RESTARTS        AGE
+nginx-8f458dc5b-p4brz   1/1     Running   0               19m
+newpods-lnxj7           1/1     Running   1 (2m11s ago)   18m
+newpods-ptnfc           1/1     Running   1 (2m11s ago)   18m
+newpods-wq8l5           1/1     Running   1 (2m11s ago)   18m
+redis                   1/1     Running   0               3m50s
+
+controlplane ~ ➜  
+
+
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 26. Practice Test - Pods. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
