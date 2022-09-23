@@ -19,28 +19,19 @@ git status
 # ##############################################################################################################################################################
 # 26. Practice Test - Pods
 
-
-
-
+- Respondendo as questões.
+- Rascunho
 
 controlplane ~ ➜  kubectl get pods -A
 NAMESPACE     NAME                                      READY   STATUS             RESTARTS   AGE
 kube-system   local-path-provisioner-7b7dc8d6f5-zbbrh   1/1     Running            0          20m
 
-
-
-A coluna READY indica o número de containers up e o total de containers.
-
-
-
-
-
-
+- A coluna READY indica o número de containers up e o total de containers.
 
 
 # pods
 
-- DICA
+- DICA DA QUESTÃO
 Create a pod definition YAML file and use it to create a pod. Alternatively, use the kubectl run command to create a pod definition YAML file and kubectl create -f command to create a resource from the manifest file.
 
 apiVersion: v1
@@ -54,7 +45,7 @@ spec:
 
 
 
-
+- Criando pod do Redis:
 
 controlplane ~ ➜  vi pod.yaml
 
@@ -89,7 +80,6 @@ Image Name: redis
 
 - Editando o Pod
 kubectl edit pod redis
-
 
 
 controlplane ~ ✖ kubectl edit pod redis
