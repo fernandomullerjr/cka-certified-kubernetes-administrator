@@ -159,10 +159,9 @@ spec:
 What is the deal with Labels and Selectors? Why do we label pods and objects in kubernetes?
 
 
-How to scale replicaset
+# How to scale replicaset
     There are multiple ways to scale replicaset
         First way is to update the number of replicas in the replicaset-definition.yaml definition file. E.g replicas: 6 and then run
-
 
 ~~~~yaml
 apiVersion: apps/v1
@@ -188,3 +187,23 @@ apiVersion: apps/v1
       matchLabels:
        type: front-end
 ~~~~
+
+- Aplicando o replicaset criado:
+kubectl apply -f replicaset-definition.yaml
+
+- Second way is to use kubectl scale command.
+kubectl scale --replicas=6 -f replicaset-definition.yaml
+
+- Third way is to use kubectl scale command with type and name
+kubectl scale --replicas=6 replicaset myapp-replicaset
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 28. Recap - ReplicaSets. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
