@@ -134,16 +134,57 @@ spec:
 
 
 
-ReplicaSet requires a selector definition when compare to Replication Controller.
+- ReplicaSet requires a selector definition when compare to Replication Controller.
 
-    To Create the replicaset
+- To Create the replicaset
+    kubectl create -f replicaset-definition.yaml
 
-     kubectl create -f replicaset-definition.yaml
+- To list all the replicaset
+    kubectl get replicaset
 
-    To list all the replicaset
+- To list pods that are launch by the replicaset
+    kubectl get pods
 
-     kubectl get replicaset
 
-    To list pods that are launch by the replicaset
 
-     kubectl get pods
+# ReplicaSet
+- O ReplicaSet precisa do Selector.
+- Precisam ser especificados os Labels que vão dar match, que devem estar conforme o bloco de código sobre Pod.
+
+
+
+
+
+# Labels and Selectors
+What is the deal with Labels and Selectors? Why do we label pods and objects in kubernetes?
+
+
+How to scale replicaset
+    There are multiple ways to scale replicaset
+        First way is to update the number of replicas in the replicaset-definition.yaml definition file. E.g replicas: 6 and then run
+
+
+~~~~yaml
+apiVersion: apps/v1
+   kind: ReplicaSet
+   metadata:
+     name: myapp-replicaset
+     labels:
+       app: myapp
+       type: front-end
+   spec:
+    template:
+       metadata:
+         name: myapp-pod
+         labels:
+           app: myapp
+           type: front-end
+       spec:
+        containers:
+        - name: nginx-container
+          image: nginx
+    replicas: 6
+    selector:
+      matchLabels:
+       type: front-end
+~~~~
