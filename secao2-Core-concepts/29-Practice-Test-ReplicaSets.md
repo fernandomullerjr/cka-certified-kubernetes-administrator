@@ -42,6 +42,11 @@ controlplane ~ ➜
 
 
 
+
+- Obter a imagem usada para criar o Pod:
+kubectl describe replicaset new-replica-set
+
+
 What is the image used to create the pods in the new-replica-set?
 
 
@@ -160,6 +165,52 @@ controlplane ~ ➜
 
 
 
+
+kubectl explain replicaset
+Traz detalhes sobre o tipo de recurso e os campos que vão nele
+
+~~~~bash
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl explain replicaset
+KIND:     ReplicaSet
+VERSION:  apps/v1
+
+DESCRIPTION:
+     ReplicaSet ensures that a specified number of pod replicas are running at
+     any given time.
+
+FIELDS:
+   apiVersion   <string>
+     APIVersion defines the versioned schema of this representation of an
+     object. Servers should convert recognized schemas to the latest internal
+     value, and may reject unrecognized values. More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+   kind <string>
+     Kind is a string value representing the REST resource this object
+     represents. Servers may infer this from the endpoint the client submits
+     requests to. Cannot be updated. In CamelCase. More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+   metadata     <Object>
+     If the Labels of a ReplicaSet are empty, they are defaulted to be the same
+     as the Pod(s) that the ReplicaSet manages. Standard objects metadata. More
+     info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+
+   spec <Object>
+     Spec defines the specification of the desired behavior of the ReplicaSet.
+     More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+   status       <Object>
+     Status is the most recently observed status of the ReplicaSet. This data
+     may be out of date by some window of time. Populated by the system.
+     Read-only. More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+fernando@debian10x64:~$
+~~~~
 
 
 
@@ -318,3 +369,38 @@ new-replica-set-7lldh   1/1     Running   0          92s
 new-replica-set-zccmc   1/1     Running   0          5s
 
 controlplane ~ ➜  
+
+
+
+
+Now scale the ReplicaSet down to 2 PODs.
+
+Use the kubectl scale command or edit the replicaset using kubectl edit replicaset.
+
+kubectl scale --replicas=2 replicaset new-replica-set
+kubectl edit replicaset new-replica-set
+
+
+controlplane ~ ➜  kubectl edit replicaset new-replica-set
+replicaset.apps/new-replica-set edited
+
+controlplane ~ ➜  kubectl get pods
+NAME                    READY   STATUS        RESTARTS   AGE
+new-replica-set-8xhm6   1/1     Running       0          2m57s
+new-replica-set-9c75t   1/1     Running       0          2m40s
+new-replica-set-mm924   1/1     Terminating   0          2m47s
+new-replica-set-7lldh   1/1     Terminating   0          2m33s
+new-replica-set-zccmc   1/1     Terminating   0          66s
+
+controlplane ~ ➜  
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 29 - Practice Test - ReplicaSets. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
