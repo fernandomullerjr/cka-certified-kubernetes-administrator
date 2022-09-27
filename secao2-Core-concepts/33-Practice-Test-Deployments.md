@@ -229,3 +229,159 @@ spec:
 
 
 controlplane ~ ➜  
+
+
+controlplane ~ ➜  vi /root/deployment-definition-1.yaml
+
+controlplane ~ ➜  cat /root/deployment-definition-1.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: busybox-pod
+  template:
+    metadata:
+      labels:
+        name: busybox-pod
+    spec:
+      containers:
+      - name: busybox-container
+        image: busybox
+        command:
+        - sh
+        - "-c"
+        - echo Hello Kubernetes! && sleep 3600
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl create -f /root/deployment-definition-1.yaml 
+deployment.apps/deployment-1 created
+
+controlplane ~ ➜  kubectl get deployment
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+frontend-deployment   0/4     4            0           5m23s
+deployment-1          2/2     2            2           5s
+
+controlplane ~ ➜  
+
+
+
+Ajustado o nome do kind.
+Ajustada a imagem busybox.
+
+
+
+
+
+
+
+# Create a new Deployment with the below attributes using your own deployment definition file.
+
+Name: httpd-frontend;
+Replicas: 3;
+Image: httpd:2.4-alpine
+
+    Name: httpd-frontend
+
+    Replicas: 3
+
+    Image: httpd:2.4-alpine
+
+
+
+controlplane ~ ➜  kubectl create deployment --dry-run=client -o yaml --replicas=3 --name=httpd-frontend --image=httpd:2.4-alpine
+error: unknown flag: --name
+See 'kubectl create deployment --help' for usage.
+
+controlplane ~ ✖ 
+
+
+kubectl create deployment --dry-run=client -o yaml --replicas=3 httpd-frontend --image=httpd:2.4-alpine
+
+
+
+controlplane ~ ✖ kubectl create deployment --dry-run=client -o yaml --replicas=3 httpd-frontend --image=httpd:2.4-alpine
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: httpd-frontend
+  name: httpd-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: httpd-frontend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: httpd-frontend
+    spec:
+      containers:
+      - image: httpd:2.4-alpine
+        name: httpd
+        resources: {}
+status: {}
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl create deployment --dry-run=client -o yaml --replicas=3 httpd-frontend --image=httpd:2.4-alpine > deploy.yaml
+
+controlplane ~ ➜  kubectl apply -f deploy.yaml
+deployment.apps/httpd-frontend created
+
+controlplane ~ ➜  kubectl get deployment
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+frontend-deployment   0/4     4            0           9m47s
+deployment-1          2/2     2            2           4m29s
+httpd-frontend        0/3     3            0           4s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get deployment
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment-1          2/2     2            2           4m58s
+httpd-frontend        3/3     3            3           33s
+frontend-deployment   0/4     4            0           10m
+
+controlplane ~ ➜  kubectl get pods
+NAME                                   READY   STATUS             RESTARTS   AGE
+deployment-1-7c65c4d9dd-96pqt          1/1     Running            0          5m3s
+deployment-1-7c65c4d9dd-8vg7s          1/1     Running            0          5m3s
+frontend-deployment-6d8c45b946-sffx7   0/1     ImagePullBackOff   0          10m
+frontend-deployment-6d8c45b946-cz9t9   0/1     ImagePullBackOff   0          10m
+frontend-deployment-6d8c45b946-jpbmb   0/1     ImagePullBackOff   0          10m
+frontend-deployment-6d8c45b946-csqbm   0/1     ImagePullBackOff   0          10m
+httpd-frontend-6f67496c45-p8k5z        1/1     Running            0          38s
+httpd-frontend-6f67496c45-ppmt7        1/1     Running            0          38s
+httpd-frontend-6f67496c45-lbbm4        1/1     Running            0          38s
+
+controlplane ~ ➜  
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 33. Practice Test - Deployments. pt2"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
