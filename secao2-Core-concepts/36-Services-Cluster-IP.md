@@ -66,7 +66,12 @@ K8s Reference Docs:
 
 
 
-# importantes
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# importante
 - O tipo padrão de service é o ClusterIP, se não for especificado um tipo, o Kubernetes assume automaticamente que é um ClusterIP!
 - O tipo padrão de service é o ClusterIP, se não for especificado um tipo, o Kubernetes assume automaticamente que é um ClusterIP!
 - O tipo padrão de service é o ClusterIP, se não for especificado um tipo, o Kubernetes assume automaticamente que é um ClusterIP!
