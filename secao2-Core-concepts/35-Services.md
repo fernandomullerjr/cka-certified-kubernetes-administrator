@@ -166,7 +166,7 @@ spec:
 
 
 
-- O traço no começo da declaração das portas, indica que é um array.
+- O traço no começo da declaração das portas, indica que é um Array de portas.
 
  - targetPort: 80
    port: 80
@@ -189,3 +189,79 @@ eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
 git status
+
+
+
+
+# #################################################
+# #################################################
+# #################################################
+# L4 Round Robin Load Balancing with kube-proxy
+<https://blog.getambassador.io/load-balancing-strategies-in-kubernetes-l4-round-robin-l7-round-robin-ring-hash-and-more-6a5b81595d6c>
+In a typical Kubernetes cluster, requests that are sent to a Kubernetes Service are routed by a component named kube-proxy. Somewhat confusingly, kube-proxy isn’t a proxy in the classic sense, but a process that implements a virtual IP for a service via iptables rules. This architecture adds additional complexity to routing. A small amount of latency is introduced for each request which increases as the number of services grows.
+
+Moreover, kube-proxy routes at Layer 4 (L4), i.e., TCP, which doesn’t necessarily fit well with today’s application-centric protocols. For example, imagine two gRPC clients connecting to your backend Pods. In L4 load balancing, each client would be sent to a different backend Pod using round robin load balancing. This is true even if one client is sending 1 request per minute, while the other client is sending 100 requests per second.
+
+So why use kube-proxy at all? In one word: simplicity. The entire round robin load balancing process is delegated to Kubernetes, the default strategy. Thus, whether you’re sending a request via Ambassador Edge Stack or via another service, you’re going through the same load balancing mechanism.
+
+
+
+
+
+
+
+# #################################################
+# #################################################
+# #################################################
+# Load balancing in Kubernetes Services
+
+<https://learnk8s.io/kubernetes-long-lived-connections>
+
+Kubernetes Services don't exist.
+
+There's no process listening on the IP address and port of the Service.
+
+    You can check that this is the case by accessing any node in your Kubernetes cluster and executing netstat -ntlp.
+
+Even the IP address can't be found anywhere.
+
+The IP address for a Service is allocated by the control plane in the controller manager and stored in the database — etcd.
+
+That same IP address is then used by another component: kube-proxy.
+
+Kube-proxy reads the list of IP addresses for all Services and writes a collection of iptables rules in every node.
+
+The rules are meant to say: "if you see this Service IP address, instead rewrite the request and pick one of the Pod as the destination".
+
+The Service IP address is used only as a placeholder — that's why there is no process listening on the IP address or port.
+
+    Consider a cluster with three Nodes. Each Node has a Pod deployed.
+    1/8
+
+    Consider a cluster with three Nodes. Each Node has a Pod deployed.
+    Next 
+
+Does iptables use round-robin?
+
+No, iptables is primarily used for firewalls, and it is not designed to do load balancing.
+
+However, you could craft a smart set of rules that could make iptables behave like a load balancer.
+
+And this is precisely what happens in Kubernetes.
+
+If you have three Pods, kube-proxy writes the following rules:
+
+    select Pod 1 as the destination with a likelihood of 33%. Otherwise, move to the next rule
+    choose Pod 2 as the destination with a probability of 50%. Otherwise, move to the following rule
+    select Pod 3 as the destination (no probability)
+
+The compound probability is that Pod 1, Pod 2 and Pod 3 have all have a one-third chance (33%) to be selected.
+iptables rules for three Pods
+
+Also, there's no guarantee that Pod 2 is selected after Pod 1 as the destination.
+
+# importante
+Iptables use the statistic module with random mode. So the load balancing algorithm is random.
+Iptables use the statistic module with random mode. So the load balancing algorithm is random.
+Iptables use the statistic module with random mode. So the load balancing algorithm is random.
+Iptables use the statistic module with random mode. So the load balancing algorithm is random.
