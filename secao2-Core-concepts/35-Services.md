@@ -130,3 +130,62 @@ eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
 git status
+
+
+
+- continua em
+8:15
+
+
+
+# #################################################
+# #################################################
+# #################################################
+# O que é um serviço do Kubernetes?
+
+Um Service agrupa um conjunto de endpoints de pod em um único recurso. É possível configurar várias maneiras de acessar o agrupamento. Por padrão, você recebe um endereço IP de cluster estável que os clientes dentro do cluster podem usar para contatar pods no serviço. Um cliente envia uma solicitação ao endereço IP estável e a solicitação é encaminhada a um dos pods no serviço.
+
+Um serviço identifica seus pods membro com um seletor. Para que um pod seja membro do serviço, ele precisa ter todos os rótulos especificados no seletor. Um rótulo é um par de chave-valor arbitrário anexado a um objeto.
+
+O manifesto de serviço a seguir tem um seletor que especifica dois rótulos. O campo selector diz que qualquer pod que tenha o rótulo app: metrics e o rótulo department:engineering é membro deste serviço.
+
+~~~~yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: metrics
+    department: engineering
+  ports:
+  ...
+~~~~
+
+
+
+
+
+- O traço no começo da declaração das portas, indica que é um array.
+
+ - targetPort: 80
+   port: 80
+   nodePort: 30008
+
+
+
+- O range de portas do NodePort:
+TCP	Inbound	30000-32767	NodePort Services†
+
+
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 35. Kubernetes Services. pt3"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
