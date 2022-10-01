@@ -265,3 +265,16 @@ Iptables use the statistic module with random mode. So the load balancing algori
 Iptables use the statistic module with random mode. So the load balancing algorithm is random.
 Iptables use the statistic module with random mode. So the load balancing algorithm is random.
 Iptables use the statistic module with random mode. So the load balancing algorithm is random.
+
+
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 35. Kubernetes Services. pt4"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
