@@ -38,3 +38,14 @@ kube-public
 
 
 
+
+- Direto, no mesmo Namespace:
+mysql.connect("db-service")
+
+
+- Para poder comunicar com os services, é necessário o nome completo do Service, quando não está no mesmo Namespace
+<service>.<namespace>.svc.cluster.local	 
+mysql.connect("db-service.dev.svc.cluster.local")
+
+ServiceName.Namespace.Service.domain
+
