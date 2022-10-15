@@ -100,4 +100,68 @@ controlplane ~ ➜
 
 
 # Which namespace has the blue pod in it?
+marketing
 
+
+
+
+
+
+# Access the Blue web application using the link above your terminal!!
+
+From the UI you can ping other services.
+
+
+
+
+
+
+
+
+
+
+# What DNS name should the Blue application use to access the database db-service in its own namespace - marketing?
+
+You can try it in the web application UI. Use port 6379.
+
+
+kubectl get all -n marketing
+
+
+controlplane ~ ➜  kubectl get all -n marketing
+NAME           READY   STATUS    RESTARTS   AGE
+pod/redis-db   1/1     Running   0          15m
+pod/blue       1/1     Running   0          15m
+
+NAME                   TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/blue-service   NodePort   10.43.167.93   <none>        8080:30082/TCP   15m
+service/db-service     NodePort   10.43.244.10   <none>        6379:30741/TCP   15m
+
+controlplane ~ ➜  
+
+
+
+- resposta:
+db-service
+
+
+
+
+
+
+
+
+# What DNS name should the Blue application use to access the database db-service in the dev namespace?
+
+You can try it in the web application UI. Use port 6379.
+
+kubectl get all -n dev
+
+controlplane ~ ➜  kubectl get all -n dev
+NAME           READY   STATUS    RESTARTS   AGE
+pod/redis-db   1/1     Running   0          18m
+
+NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+service/db-service   ClusterIP   10.43.83.84   <none>        6379/TCP   18m
+
+controlplane ~ ➜  
