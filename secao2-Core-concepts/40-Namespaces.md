@@ -179,3 +179,78 @@ eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
 git status
+
+
+
+- By default, we will be in a default namespace. To switch to a particular namespace permenently run the below command.
+
+$ kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+
+- Testando a mudança de contexto para um Namespace especifico:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/secao2-Core-concepts/40-namespace-dev.yml
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/secao2-Core-concepts/40-pod-no-namespace.yaml
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+
+~~~~bash
+fernando@debian10x64:~$ kubectl config get-contexts
+CURRENT   NAME                                                  CLUSTER                                               AUTHINFO                                              NAMESPACE
+          arn:aws:eks:us-east-1:816678621138:cluster/k8s-demo   arn:aws:eks:us-east-1:816678621138:cluster/k8s-demo   arn:aws:eks:us-east-1:816678621138:cluster/k8s-demo
+*         minikube                                              minikube                                              minikube                                              dev
+fernando@debian10x64:~$
+~~~~
+
+
+~~~~bash
+fernando@debian10x64:~$ kubectl config current-context
+minikube
+fernando@debian10x64:~$
+~~~~
+
+
+
+To view pods in all namespaces
+~~~~bash
+$ kubectl get pods --all-namespaces
+~~~~
+
+
+
+# RESOURCE QUOTAS
+    To limit resources in a namespace, create a resource quota. To create one start with ResourceQuota definition file.
+
+~~~~yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+~~~~
+
+
+~~~~bash
+$ kubectl create -f compute-quota.yaml
+~~~~
+
+kubectl create -f /home/fernando/cursos/cka-certified-kubernetes-administrator/secao2-Core-concepts/40-ResourceQuota-compute-quota.yaml
+
+
+~~~~bash
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl create -f /home/fernando/cursos/cka-certified-kubernetes-administrator/secao2-Core-concepts/40-ResourceQuota-compute-quota.yaml
+resourcequota/compute-quota created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get resourcequota -A
+NAMESPACE   NAME            AGE   REQUEST                                                 LIMIT
+dev         compute-quota   2s    pods: 1/10, requests.cpu: 0/4, requests.memory: 0/5Gi   limits.cpu: 0/10, limits.memory: 0/10Gi
+fernando@debian10x64:~$
+~~~~
