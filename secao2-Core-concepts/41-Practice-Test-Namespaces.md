@@ -165,3 +165,20 @@ NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 service/db-service   ClusterIP   10.43.83.84   <none>        6379/TCP   18m
 
 controlplane ~ ➜  
+
+
+
+
+<service>.<namespace>.svc.cluster.local
+db-service.dev.svc.cluster.local
+
+
+
+# push
+git status
+git add .
+git commit -m "Aula 41. Practice Test - Namespaces.  "
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
