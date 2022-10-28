@@ -50,7 +50,13 @@ Either use imperative commands to create the pod with the labels. Or else use im
 
     Labels: tier=db
 
+- Resposta:
 kubectl run redis --image=redis:alpine --labels tier=db
+
+
+- Exemplo adicional
+  # Start a hazelcast pod and set labels "app=hazelcast" and "env=prod" in the container
+  kubectl run hazelcast --image=hazelcast/hazelcast --labels="app=hazelcast,env=prod"
 
 
 
@@ -165,8 +171,13 @@ Use imperative commands.
 
 kubectl expose pod redis --port=6379 --name redis-service
 
+(This will automatically use the pod's labels as selectors)
+(This will automatically use the pod's labels as selectors)
+(This will automatically use the pod's labels as selectors)
 
-
+OBS: O Comando expose detecta os labels automaticamente!
+OBS: O Comando expose detecta os labels automaticamente!
+OBS: O Comando expose detecta os labels automaticamente!
 
 
 
@@ -250,3 +261,8 @@ Try to do this with as few steps as possible.
 
 kubectl run httpd --image=httpd:alpine -n default
 kubectl expose pod httpd --type=ClusterIP --port=80 --name=httpd
+
+
+- Opção que faz tudo em 1 comando
+adicionar a opção "--expose=true" ao primeiro comando
+kubectl run httpd --image=httpd:alpine -n default --expose=true
