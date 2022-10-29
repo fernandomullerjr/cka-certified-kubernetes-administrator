@@ -142,7 +142,8 @@ controlplane ~ ➜
 
 
 
-
+- Motivo do Pod não ser "schedulado":
+Não há 1 pod do kube-scheduler no namespace kube-system
 
 
 
@@ -338,3 +339,16 @@ spec:
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/52-pod-manual-scheduling2.yaml
 
 vi pod3.yaml
+
+
+
+
+
+
+
+
+
+
+# RESUMO
+- Motivo do Pod não ser "schedulado":
+Não há 1 pod do kube-scheduler no namespace kube-system
