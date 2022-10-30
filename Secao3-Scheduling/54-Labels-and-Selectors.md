@@ -320,10 +320,17 @@ spec:
 
 
 - Once the pod is created, to select the pod with labels run the below command
-
+~~~~bash
 $ kubectl get pods --selector app=App1
 
+kubectl apply -f 54-pod-with-labels.yaml
+kubectl delete -f 54-pod-with-labels.yaml
 
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling$ kubectl get pods --selector app=App1
+NAME            READY   STATUS         RESTARTS   AGE
+simple-webapp   0/1     ErrImagePull   0          47s
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling$
+~~~~
 
 
 - ReplicaSet
