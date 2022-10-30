@@ -333,6 +333,12 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao3-Sche
 ~~~~
 
 
+
+
+
+
+- Kubernetes uses labels to connect different objects together
+
 - ReplicaSet
 
 ````yaml
@@ -358,5 +364,60 @@ template:
     - name: simple-webapp
       image: simple-webapp  
 ````
+
+
+
+
+- For services
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+ name: my-service
+spec:
+ selector:
+   app: App1
+ ports:
+ - protocol: TCP
+   port: 80
+   targetPort: 9376 
+```
+
+
+
+
+
+
+# Annotations
+
+    While labels and selectors are used to group objects, annotations are used to record other details for informative purpose.
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: simple-webapp
+  labels:
+    app: App1
+    function: Front-end
+  annotations:
+     buildversion: 1.34
+spec:
+ replicas: 3
+ selector:
+   matchLabels:
+    app: App1
+template:
+  metadata:
+    labels:
+      app: App1
+      function: Front-end
+  spec:
+    containers:
+    - name: simple-webapp
+      image: simple-webapp   
+```
+
 
 
