@@ -177,3 +177,9 @@ contaminar-se
 # OBSERVAÇÃO
 - Taints são setados nos Nodes.
 - Tolerations são setados nos Pods.
+
+
+
+
+- Valores dos Tolerations no YAML, precisam estar entre aspas duplas
+continua em 6:15
