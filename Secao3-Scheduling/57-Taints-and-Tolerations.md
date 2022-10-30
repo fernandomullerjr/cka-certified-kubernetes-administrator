@@ -86,3 +86,94 @@ In this section, we will take a look at taints and tolerations.
 #### K8s Reference Docs
 - https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 
+
+
+
+
+
+
+
+
+
+
+# Traduções de taint
+Classe gramatical	Tradução	Traduções reversas	Frequência
+help_outline
+substantivo
+	
+a mancha
+	
+
+    spot, stain, blot, taint, blemish, tarnish
+
+	
+a mácula
+	
+
+    stain, taint, defilement, blot, scar, smirch
+
+	
+a nódoa
+	
+
+    stain, spot, taint, blur, splotch, soil
+
+	
+o defeito
+	
+
+    defect, fault, blemish, flaw, bug, taint
+
+	
+verbo
+	
+manchar
+	
+
+    stain, taint, sully, smudge, soil, besmirch
+
+	
+contaminar
+	
+
+    contaminate, infect, taint, inoculate, vitiate, attaint
+
+	
+corromper
+	
+
+    corrupt, defile, bribe, taint, spoil, pervert
+
+	
+apodrecer
+	
+
+    rot, fester, decay, putrefy, moulder, taint
+
+	
+viciar
+	
+
+    vitiate, addict, taint, debauch
+
+	
+infectar
+	
+
+    infect, disease, taint, inoculate
+
+	
+contaminar-se
+	
+
+    taint
+
+
+
+
+
+
+
+# OBSERVAÇÃO
+- Taints são setados nos Nodes.
+- Tolerations são setados nos Pods.
