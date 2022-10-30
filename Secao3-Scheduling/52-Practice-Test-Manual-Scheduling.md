@@ -299,9 +299,15 @@ controlplane ~ ➜
 
 
 
+Observação:
+poderia ter sido usado o replace, para não precisar fazer o delete e apply do Pod, por exemplo:
+kubectl replace --force -f nginx.yaml
+kubectl replace --force -f pod2.yaml
 
 
 
+  # Force replace, delete and then re-create the resource
+  kubectl replace --force -f ./pod.json
 
 
 
@@ -351,4 +357,6 @@ vi pod3.yaml
 
 # RESUMO
 - Motivo do Pod não ser "schedulado":
-Não há 1 pod do kube-scheduler no namespace kube-system
+    Não há 1 pod do kube-scheduler no namespace kube-system
+-poderia ter sido usado o replace, para não precisar fazer o delete e apply do Pod, por exemplo:
+    kubectl replace --force -f nginx.yaml
