@@ -30,7 +30,6 @@ In this section, we will take a look at taints and tolerations.
 #### Taints and Tolerations are used to set restrictions on what pods can be scheduled on a node. 
 - Only pods which are tolerant to the particular taint on a node will get scheduled on that node.
 
-  ![tandt](../../images/tandt.PNG)
   
 ## Taints
 - Use **`kubectl taint nodes`** command to taint a node.
@@ -51,11 +50,10 @@ In this section, we will take a look at taints and tolerations.
   - **`PreferNoSchedule`**
   - **`NoExecute`**
   
-  ![tn](../../images/tn.PNG)
   
 ## Tolerations
    - Tolerations are added to pods by adding a **`tolerations`** section in pod definition.
-     ```
+     ```yaml
      apiVersion: v1
      kind: Pod
      metadata:
@@ -71,16 +69,15 @@ In this section, we will take a look at taints and tolerations.
         effect: "NoSchedule"
      ```
     
-  ![tp](../../images/tp.PNG)
+
     
 
 #### Taints and Tolerations do not tell the pod to go to a particular node. Instead, they tell the node to only accept pods with certain tolerations.
 - To see this taint, run the below command
-  ```
-  $ kubectl describe node kubemaster |grep Taint
+  ```bash
+  $ kubectl describe node kubemaster | grep Taint
   ```
  
- ![tntm](../../images/tntm.PNG)
   
      
 #### K8s Reference Docs
