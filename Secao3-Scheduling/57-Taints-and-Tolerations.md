@@ -192,4 +192,22 @@ continua em 6:15
 # ##############################################################################################################################################################
 # ##############################################################################################################################################################
 # ##############################################################################################################################################################
-# #
+# # Taints
+
+
+kubectl describe node kubemaster | grep Taint
+kubectl describe node minikube | grep Taint
+
+fernando@debian10x64:~$ kubectl describe node minikube | grep Taint
+Taints:             <none>
+fernando@debian10x64:~$
+
+
+
+
+<https://blog.kubecost.com/blog/kubernetes-taints/>
+    NoSchedule—The pod will not get scheduled to the node without a matching toleration.
+
+    NoExecute—This will immediately evict all the pods without the matching toleration from the node.
+
+    PerferNoSchedule—This is a softer version of NoSchedule where the controller will not try to schedule a pod with the tainted node. However, it is not a strict requirement.
