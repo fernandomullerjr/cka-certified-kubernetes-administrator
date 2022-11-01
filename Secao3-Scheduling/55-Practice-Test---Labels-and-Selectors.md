@@ -240,6 +240,23 @@ controlplane ~ ➜
 
 
 
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: front-end
+template:
+  metadata:
+    labels:
+      tier: nginx
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
 
 controlplane ~ ➜  vi replicaset-definition-1.yaml 
 
@@ -247,3 +264,152 @@ controlplane ~ ➜  kubectl apply -f replicaset-definition-1.yaml
 error: error validating "replicaset-definition-1.yaml": error validating data: ValidationError(ReplicaSet): unknown field "template" in io.k8s.api.apps.v1.ReplicaSet; if you choose to ignore these errors, turn validation off with --validate=false
 
 controlplane ~ ✖ 
+
+
+
+
+
+
+
+
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+  labels:
+    tier: nginx
+    tier: front-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: nginx
+      tier: front-end
+template:
+  metadata:
+    labels:
+      tier: nginx
+      tier: front-end
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
+
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+  labels:
+    tier: nginx
+    tier: front-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: nginx
+      tier: front-end
+template:
+  metadata:
+    labels:
+      tier: nginx
+      tier: front-end
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
+
+
+controlplane ~ ✖ vi replicaset-definition-1.yaml 
+
+controlplane ~ ➜  kubectl apply -f replicaset-definition-1.yaml 
+error: error validating "replicaset-definition-1.yaml": error validating data: ValidationError(ReplicaSet): unknown field "template" in io.k8s.api.apps.v1.ReplicaSet; if you choose to ignore these errors, turn validation off with --validate=false
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+
+controlplane ~ ✖ vi replicaset-definition-1.yaml 
+
+controlplane ~ ➜  kubectl apply -f replicaset-definition-1.yaml 
+replicaset.apps/frontend created
+
+controlplane ~ ➜  
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+controlplane ~ ➜  vi replicaset-definition-1.yaml 
+
+controlplane ~ ➜  kubectl apply -f replicaset-definition-1.yaml 
+replicaset.apps/replicaset-1 created
+
+controlplane ~ ➜  
+
+
+
+  # Dry run; print the corresponding API objects without creating them
+  kubectl run nginx --image=nginx --dry-run=client

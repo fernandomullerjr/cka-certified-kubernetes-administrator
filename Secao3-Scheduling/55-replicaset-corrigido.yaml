@@ -15,3 +15,76 @@ template:
     containers:
       - name: nginx
         image: nginx
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+  labels:
+    tier: nginx
+    tier: front-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: nginx
+      tier: front-end
+template:
+  metadata:
+    labels:
+      tier: nginx
+      tier: front-end
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx
+  labels:
+    app: App1
+    function: Front-end
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: App1
+template:
+  metadata:
+    labels:
+      app: App1
+      function: Front-end
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
