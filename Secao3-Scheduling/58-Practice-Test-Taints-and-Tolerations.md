@@ -368,3 +368,113 @@ Node:         node01/10.5.139.9
 
 
 # Do you see any taints on controlplane node?
+
+
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   20m   v1.24.0
+node01         Ready    <none>          20m   v1.24.0
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe node controlplane
+Name:               controlplane
+Roles:              control-plane
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=controlplane
+                    kubernetes.io/os=linux
+                    node-role.kubernetes.io/control-plane=
+                    node.kubernetes.io/exclude-from-external-load-balancers=
+Annotations:        flannel.alpha.coreos.com/backend-data: {"VNI":1,"VtepMAC":"9e:c1:32:42:24:c3"}
+                    flannel.alpha.coreos.com/backend-type: vxlan
+                    flannel.alpha.coreos.com/kube-subnet-manager: true
+                    flannel.alpha.coreos.com/public-ip: 10.5.139.6
+                    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Wed, 02 Nov 2022 03:25:48 +0000
+Taints:             node-role.kubernetes.io/control-plane:NoSchedule
+Unschedulable:      false
+Lease:
+  HolderIdentity:  controlplane
+  AcquireTime:     <unset>
+  RenewTime:       Wed, 02 Nov 2022 03:46:48 +0000
+
+
+
+
+
+
+
+
+# Remove the taint on controlplane, which currently has the taint effect of NoSchedule.
+
+    Node name: controlplane
+
+
+  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists
+  kubectl taint nodes foo dedicated:NoSchedule-
+
+  # Remove from node 'foo' all the taints with key 'dedicated'
+  kubectl taint nodes foo dedicated-
+
+
+
+kubectl taint nodes controlplane control-plane:NoSchedule-
+
+controlplane ~ ✖ kubectl taint nodes controlplane control-plane:NoSchedule-
+error: taint "control-plane:NoSchedule" not found
+
+controlplane ~ ✖ 
+
+
+kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+
+controlplane ~ ✖ kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+node/controlplane untainted
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+# What is the state of the pod mosquito now?
+lplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+bee        1/1     Running   0          6m13s
+mosquito   1/1     Running   0          13m
+nginx      1/1     Running   0          7m47s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+# Which node is the POD mosquito on now?
+
+controlplane ~ ➜  kubectl describe pod mosquito | grep Node
+Node:         controlplane/10.5.139.6
+Node-Selectors:              <none>
+
+controlplane ~ ➜  
