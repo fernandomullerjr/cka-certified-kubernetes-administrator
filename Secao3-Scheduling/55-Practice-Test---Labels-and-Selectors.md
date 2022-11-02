@@ -65,6 +65,10 @@ db-1-zpcsj    1/1     Running   0          4m
 
 controlplane ~ ➜  
 
+kubectl get pods --selector app=App1
+kubectl get pods --selector env=dev
+
+
 
 - RESPOSTA:
 7
