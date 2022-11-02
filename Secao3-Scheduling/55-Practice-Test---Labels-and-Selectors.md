@@ -155,6 +155,9 @@ default     replicaset.apps/db-2    1         1         1       10m
 controlplane ~ ➜  
 
 
+- Resposta pode ser obtida ocultando os headers da saída do comando:
+kubectl get all -A -l env=prod --no-headers | wc -l
+
 - RESPOSTA:
 7
 
