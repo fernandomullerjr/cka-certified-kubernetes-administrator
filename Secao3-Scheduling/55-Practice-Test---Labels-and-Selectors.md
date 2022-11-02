@@ -70,6 +70,7 @@ kubectl get pods --selector env=dev
 
 
 
+
 - RESPOSTA:
 7
 
@@ -417,3 +418,64 @@ controlplane ~ ➜
 
   # Dry run; print the corresponding API objects without creating them
   kubectl run nginx --image=nginx --dry-run=client
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# push
+
+git status
+git add .
+git commit -m "Aula 56. Solution : Labels and Selectors"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
+
+
+
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# # 56. Solution : Labels and Selectors : (Optional)
+# Dia 01/11/2022
+
+- Usando a opção "--no-headers" para remover os cabeçalhos e facilitar a contagem de Pods, ou outros recursos
+
+fernando@debian10x64:~$ kubectl get pods -A --no-headers
+kube-system   coredns-78fcd69978-zbfqb           1/1   Running   1 (2m ago)    25h
+kube-system   etcd-minikube                      1/1   Running   1 (2m ago)    25h
+kube-system   kube-apiserver-minikube            1/1   Running   1 (2m ago)    25h
+kube-system   kube-controller-manager-minikube   1/1   Running   1 (2m ago)    25h
+kube-system   kube-proxy-2r8hf                   1/1   Running   1 (2m ago)    25h
+kube-system   kube-scheduler-minikube            1/1   Running   1 (2m ago)    25h
+kube-system   storage-provisioner                1/1   Running   2 (26s ago)   25h
+fernando@debian10x64:~$
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A --no-headers | wc
+      7      56     595
+fernando@debian10x64:~$ kubectl get pods -A --no-headers | wc -l
+7
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
