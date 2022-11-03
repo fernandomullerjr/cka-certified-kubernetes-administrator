@@ -23,7 +23,6 @@ git status
 # ##############################################################################################################################################################
 # 58. Practice Test - Taints and Tolerations
 
-
 # How many nodes exist on the system?
 
 Including the controlplane node.
