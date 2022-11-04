@@ -442,3 +442,110 @@ we will compare taints and tolerations and node affinity.
 # ##############################################################################################################################################################
 # ##############################################################################################################################################################
 # 61. Node Affinity
+
+
+- Pode ser usada uma lista de valores como parametro no Node Affinity:
+como Large, Medium, etc
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: data-processor
+      image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: size
+                operator: In
+                values:
+                  - Large
+                  - Medium
+~~~~
+
+
+
+
+- Exemplo de Pod que procura por um Node que não tenha a Label "Small"
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: data-processor
+      image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: size
+                operator: NotIn
+                values:
+                  - Small
+~~~~
+
+
+
+You could use the node in operator to say something like, size not in small, where node affinity will match the nodes with a size not set to small.
+We know that we have only set the label size to large and medium nodes.
+The smaller nodes don't even have the label set so we don't really have to even check the value of the label.
+
+As long as we are sure we don't set a label size to the smaller node, using the exist operator will give us the same result.
+The exist operator will simply check if the label size exists on the nodes, and you don't need the value section for that as it does not compare the values.
+
+- Este exemplo abaixo, usando o operador [Exists], ele verifica somente a chave, não considera os valores, para ele não é necessário:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: data-processor
+      image: data-processor
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: size
+                operator: Exists
+~~~~
+
+
+
+
+
+
+
+
+
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# Node Affinity types
+
+<https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity>
+<https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/>
+<https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/>
+
+
+    requiredDuringSchedulingIgnoredDuringExecution: The scheduler can't schedule the Pod unless the rule is met. This functions like nodeSelector, but with a more expressive syntax.
+    preferredDuringSchedulingIgnoredDuringExecution: The scheduler tries to find a node that meets the rule. If a matching node is not available, the scheduler still schedules the Pod.
+
+“IgnoredDuringExecution”
+significa que se uma alteração for realizada sobre Node Affinity durante o tempo em que o Pod está correndo, não vai afetar ele.
+
+preferredDuringSchedulingIgnoredDuringExecution
+prefere que o Node tenha a Label, mas se tiver 1 node disponivel que não tenha a Label e o node com a Label esperada não esteja disponível, vai ser usado este mesmo, sem problemas.
