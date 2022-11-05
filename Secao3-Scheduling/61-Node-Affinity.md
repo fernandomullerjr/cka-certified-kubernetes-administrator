@@ -543,13 +543,20 @@ spec:
     requiredDuringSchedulingIgnoredDuringExecution: The scheduler can't schedule the Pod unless the rule is met. This functions like nodeSelector, but with a more expressive syntax.
     preferredDuringSchedulingIgnoredDuringExecution: The scheduler tries to find a node that meets the rule. If a matching node is not available, the scheduler still schedules the Pod.
 
+# “IgnoredDuringExecution”
 “IgnoredDuringExecution”
 significa que se uma alteração for realizada sobre Node Affinity durante o tempo em que o Pod está correndo, não vai afetar ele.
 “IgnoredDuringExecution” means that the pod will still run if labels on a node change and affinity rules are no longer met.
 
-preferredDuringSchedulingIgnoredDuringExecution
+# "preferredDuringSchedulingIgnoredDuringExecution"
+"preferredDuringSchedulingIgnoredDuringExecution"
 prefere que o Node tenha a Label, mas se tiver 1 node disponivel que não tenha a Label e o node com a Label esperada não esteja disponível, vai ser usado este mesmo, sem problemas.
 
 
+
+# "requiredDuringSchedulingRequiredDuringExecution"
 "requiredDuringSchedulingRequiredDuringExecution"
  There are future plans to offer requiredDuringSchedulingRequiredDuringExecution which will evict pods from nodes as soon as they don’t satisfy the node affinity rule(s).
+
+Observação:
+neste type ele tem required nos 2 casos(DuringScheduling e DuringExecution)
