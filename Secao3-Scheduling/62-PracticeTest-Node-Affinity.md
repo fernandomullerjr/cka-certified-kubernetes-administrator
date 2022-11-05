@@ -1015,3 +1015,21 @@ default       red       2/2     2            2           5s
 kube-system   coredns   2/2     2            2           63m
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# PENDENTE
+PodAffinity vs NodeAffinity
+reforçar
