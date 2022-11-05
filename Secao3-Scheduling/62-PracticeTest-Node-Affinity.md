@@ -207,3 +207,510 @@ Examples:
   # Create a deployment named my-dep that runs the busybox image and expose port 5701
   kubectl create deployment my-dep --image=busybox --port=5701
 
+
+kubectl create deployment blue --image=nginx --replicas=3
+
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deployments
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+kube-system   coredns   2/2     2            2           28m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl create deployment blue --image=nginx --replicas=3
+deployment.apps/blue created
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      0/3     3            0           2s
+kube-system   coredns   2/2     2            2           28m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           10s
+kube-system   coredns   2/2     2            2           28m
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+# Which nodes can the pods for the blue deployment be placed on?
+
+Make sure to check taints on both nodes!
+
+
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE
+default       blue-795455cfcb-6drfs                  1/1     Running   0          45s
+default       blue-795455cfcb-kkbrd                  1/1     Running   0          45s
+default       blue-795455cfcb-x6sdz                  1/1     Running   0          45s
+kube-system   coredns-6d4b75cb6d-52k7s               1/1     Running   0          29m
+kube-system   coredns-6d4b75cb6d-96c9q               1/1     Running   0          29m
+kube-system   etcd-controlplane                      1/1     Running   0          29m
+kube-system   kube-apiserver-controlplane            1/1     Running   0          29m
+kube-system   kube-controller-manager-controlplane   1/1     Running   0          29m
+kube-system   kube-flannel-ds-njs64                  1/1     Running   0          29m
+kube-system   kube-flannel-ds-tzr64                  1/1     Running   0          28m
+kube-system   kube-proxy-79hzx                       1/1     Running   0          29m
+kube-system   kube-proxy-8ppqf                       1/1     Running   0          28m
+kube-system   kube-scheduler-controlplane            1/1     Running   0          29m
+
+controlplane ~ ➜  kubectl describe pod blue-795455cfcb-6drfs
+Name:         blue-795455cfcb-6drfs
+Namespace:    default
+Priority:     0
+Node:         node01/10.39.133.9
+Start Time:   Sat, 05 Nov 2022 17:44:14 +0000
+Labels:       app=blue
+              pod-template-hash=795455cfcb
+Annotations:  <none>
+Status:       Running
+IP:           10.244.1.2
+IPs:
+  IP:           10.244.1.2
+Controlled By:  ReplicaSet/blue-795455cfcb
+Containers:
+  nginx:
+    Container ID:   containerd://1ba677a987ebcad5f7a7d855b63ed3568ec76ca14701b078b2cd5a585a03dfd2
+    Image:          nginx
+    Image ID:       docker.io/library/nginx@sha256:943c25b4b66b332184d5ba6bb18234273551593016c0e0ae906bab111548239f
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Sat, 05 Nov 2022 17:44:21 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-q6dlw (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  kube-api-access-q6dlw:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  51s   default-scheduler  Successfully assigned default/blue-795455cfcb-6drfs to node01
+  Normal  Pulling    50s   kubelet            Pulling image "nginx"
+  Normal  Pulled     45s   kubelet            Successfully pulled image "nginx" in 5.397849455s
+  Normal  Created    45s   kubelet            Created container nginx
+  Normal  Started    44s   kubelet            Started container nginx
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe pod blue-795455cfcb-6drfs | grep Taint
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   29m   v1.24.0
+node01         Ready    <none>          29m   v1.24.0
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe node node01 | grep Taint
+Taints:             <none>
+
+controlplane ~ ➜  kubectl describe node controlplane | grep Taint
+Taints:             <none>
+
+controlplane ~ ➜  
+
+
+
+- RESPOSTA:
+ambos nodes, pois eles não tem Taint
+
+
+
+
+
+
+
+
+
+# Set Node Affinity to the deployment to place the pods on node01 only.
+
+    Name: blue
+
+    Replicas: 3
+
+    Image: nginx
+
+    NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+
+    Key: color
+
+    value: blue
+
+kubectl create deployment blue --image=nginx --replicas=3 --dry-run=client -o yaml > deployment.yaml
+
+
+
+
+controlplane ~ ➜  kubectl create deployment blue --image=nginx --replicas=3 --dry-run=client -o yaml > deployment.yaml
+
+controlplane ~ ➜  ls
+deployment.yaml  sample.yaml
+
+controlplane ~ ➜  cat deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+    NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+
+    Key: color
+
+    value: blue
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: color
+                operator: Equal
+                values:
+                - blue
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+
+
+- ANTES:
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           11m
+kube-system   coredns   2/2     2            2           40m
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  vi deployment-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+error: error validating "deployment-editado.yaml": error validating data: ValidationError(Deployment.spec): unknown field "affinity" in io.k8s.api.apps.v1.DeploymentSpec; if you choose to ignore these errors, turn validation off with --validate=false
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+- Editando denovo
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: color
+                operator: Equal
+                values:
+                - blue
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+
+
+controlplane ~ ✖ vi deployment-editado.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+error: error validating "deployment-editado.yaml": error validating data: ValidationError(Deployment.spec.template.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0]): missing required field "topologyKey" in io.k8s.api.core.v1.PodAffinityTerm; if you choose to ignore these errors, turn validation off with --validate=false
+
+controlplane ~ ✖ 
+
+
+
+
+<https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/>
+You express the topology domain (X) using a topologyKey, which is the key for the node label that the system uses to denote the domain. For examples, see Well-Known Labels, Annotations and Taints.
+Note: Pod anti-affinity requires nodes to be consistently labelled, in other words, every node in the cluster must have an appropriate label matching topologyKey. If some or all nodes are missing the specified topologyKey label, it can lead to unintended behavior.
+
+In principle, the topologyKey can be any allowed label key with the following exceptions for performance and security reasons:
+
+    For Pod affinity and anti-affinity, an empty topologyKey field is not allowed in both requiredDuringSchedulingIgnoredDuringExecution and preferredDuringSchedulingIgnoredDuringExecution.
+    For requiredDuringSchedulingIgnoredDuringExecution Pod anti-affinity rules, the admission controller LimitPodHardAntiAffinityTopology limits topologyKey to kubernetes.io/hostname. You can modify or disable the admission controller if you want to allow custom topologies.
+
+In addition to labelSelector and topologyKey, you can optionally specify a list of namespaces which the labelSelector should match against using the namespaces field at the same level as labelSelector and topologyKey. If omitted or empty, namespaces defaults to the namespace of the Pod where the affinity/anti-affinity definition appears.
+Names
+
+
+
+
+
+- Editando denovo pt3
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: color
+                operator: Equal
+                values:
+                - blue
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+
+
+controlplane ~ ✖ vi deployment-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+Warning: resource deployments/blue is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+The Deployment "blue" is invalid: spec.template.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions[0].operator: Invalid value: "Equal": not a valid selector operator
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+
+kubectl delete deployment blue
+
+
+controlplane ~ ✖ kubectl delete deployment blue
+deployment.apps "blue" deleted
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+The Deployment "blue" is invalid: spec.template.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions[0].operator: Invalid value: "Equal": not a valid selector operator
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+- Editando denovo pt4
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: color
+                operator: In
+                values:
+                - blue
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+
+
+
+controlplane ~ ✖ vi deployment-editado.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+deployment.apps/blue created
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+- PODS NÃO FICARAM OK
+- PODS NÃO FICARAM OK
+- PODS NÃO FICARAM OK
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      0/3     3            0           19s
+kube-system   coredns   2/2     2            2           47m
+
+controlplane ~ ➜  
+
+
+
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  112s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match pod affinity rules. preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.
+
+controlplane ~ ➜  
