@@ -714,3 +714,226 @@ Events:
   Warning  FailedScheduling  112s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match pod affinity rules. preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+- Outro exemplo, testar:
+
+<https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/>
+
+For example, if we want to require scheduling on a node that is in the us-central1-a GCE zone of a multi-zone Kubernetes cluster, we can specify the following affinity rule as part of the Pod spec:
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: "failure-domain.beta.kubernetes.io/zone"
+              operator: In
+              values: ["us-central1-a"]
+
+
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: color
+                  operator: In
+                  values: 
+                  - blue
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+
+
+
+
+
+
+controlplane ~ ➜  vi deployment-editado.yaml 
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  cat deployment-editado.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: color
+                  operator: In
+                  values: 
+                  - blue
+      containers:
+      - image: nginx
+        name: nginx
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml 
+deployment.apps/blue created
+
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   57m   v1.24.0
+node01         Ready    <none>          56m   v1.24.0
+
+controlplane ~ ➜  kubectl get deployment -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           11s
+kube-system   coredns   2/2     2            2           57m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE
+default       blue-6d7486c96b-b7lgb                  1/1     Running   0          17s
+default       blue-6d7486c96b-sf6qf                  1/1     Running   0          17s
+default       blue-6d7486c96b-vn7pf                  1/1     Running   0          17s
+kube-system   coredns-6d4b75cb6d-52k7s               1/1     Running   0          57m
+kube-system   coredns-6d4b75cb6d-96c9q               1/1     Running   0          57m
+kube-system   etcd-controlplane                      1/1     Running   0          57m
+kube-system   kube-apiserver-controlplane            1/1     Running   0          57m
+kube-system   kube-controller-manager-controlplane   1/1     Running   0          57m
+kube-system   kube-flannel-ds-njs64                  1/1     Running   0          57m
+kube-system   kube-flannel-ds-tzr64                  1/1     Running   0          57m
+kube-system   kube-proxy-79hzx                       1/1     Running   0          57m
+kube-system   kube-proxy-8ppqf                       1/1     Running   0          57m
+kube-system   kube-scheduler-controlplane            1/1     Running   0          57m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Which nodes are the pods placed on now?
+
+
+controlplane ~ ➜  kubectl describe pods blue-6d7486c96b-b7lgb
+Name:         blue-6d7486c96b-b7lgb
+Namespace:    default
+Priority:     0
+Node:         node01/10.39.133.9
+Start Time:   Sat, 05 Nov 2022 18:12:
+
+
+controlplane ~ ➜  kubectl describe pods blue-6d7486c96b-sf6qf | head
+Name:         blue-6d7486c96b-sf6qf
+Namespace:    default
+Priority:     0
+Node:         node01/10.39.133.9
+Start Time:   Sat, 05 Nov 2022 18:12:51 +0000
+Labels:       app=blue
+              pod-template-hash=6d7486c96b
+Annotations:  <none>
+Status:       Running
+IP:           10.244.1.5
+
+controlplane ~ ➜  kubectl describe pods blue-6d7486c96b-vn7pf | head
+Name:         blue-6d7486c96b-vn7pf
+Namespace:    default
+Priority:     0
+Node:         node01/10.39.133.9
+Start Time:   Sat, 05 Nov 2022 18:12:51 +0000
+Labels:       app=blue
+              pod-template-hash=6d7486c96b
+Annotations:  <none>
+Status:       Running
+IP:           10.244.1.6
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+# Create a new deployment named red with the nginx image and 2 replicas, and ensure it gets placed on the controlplane node only.
+
+Use the label key - node-role.kubernetes.io/control-plane - which is already set on the controlplane node.
+
+    Name: red
+
+    Replicas: 2
+
+    Image: nginx
+
+    NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+
+    Key: node-role.kubernetes.io/control-plane
+
+    Use the right operator
