@@ -545,8 +545,11 @@ spec:
 
 “IgnoredDuringExecution”
 significa que se uma alteração for realizada sobre Node Affinity durante o tempo em que o Pod está correndo, não vai afetar ele.
+“IgnoredDuringExecution” means that the pod will still run if labels on a node change and affinity rules are no longer met.
 
 preferredDuringSchedulingIgnoredDuringExecution
 prefere que o Node tenha a Label, mas se tiver 1 node disponivel que não tenha a Label e o node com a Label esperada não esteja disponível, vai ser usado este mesmo, sem problemas.
 
 
+"requiredDuringSchedulingRequiredDuringExecution"
+ There are future plans to offer requiredDuringSchedulingRequiredDuringExecution which will evict pods from nodes as soon as they don’t satisfy the node affinity rule(s).
