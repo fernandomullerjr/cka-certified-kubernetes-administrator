@@ -140,3 +140,70 @@ controlplane ~ ➜
 
 - RESPOSTA:
 5
+
+
+
+
+
+
+
+
+# What is the value set to the label key beta.kubernetes.io/arch on node01?
+
+- RESPOSTA:
+amd64
+
+
+
+
+
+
+# Apply a label color=blue to node node01
+    color = blue
+
+kubectl label nodes node01 color=blue
+
+
+controlplane ~ ➜  kubectl describe node node01 | grep color
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl label nodes node01 color=blue
+node/node01 labeled
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe node node01 | grep color
+                    color=blue
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+# Create a new deployment named blue with the nginx image and 3 replicas.
+
+    Name: blue
+
+    Replicas: 3
+
+    Image: nginx
+
+
+Examples:
+  # Create a deployment named my-dep that runs the busybox image
+  kubectl create deployment my-dep --image=busybox
+
+  # Create a deployment with a command
+  kubectl create deployment my-dep --image=busybox -- date
+
+  # Create a deployment named my-dep that runs the nginx image with 3 replicas
+  kubectl create deployment my-dep --image=nginx --replicas=3
+
+  # Create a deployment named my-dep that runs the busybox image and expose port 5701
+  kubectl create deployment my-dep --image=busybox --port=5701
+
