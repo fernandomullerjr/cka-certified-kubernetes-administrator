@@ -937,3 +937,81 @@ Use the label key - node-role.kubernetes.io/control-plane - which is already set
     Key: node-role.kubernetes.io/control-plane
 
     Use the right operator
+
+
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           5m41s
+kube-system   coredns   2/2     2            2           62m
+
+controlplane ~ ➜  
+
+
+
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: red
+  name: red
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: red
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: red
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
+      containers:
+      - image: nginx
+        name: nginx
+~~~~
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           5m41s
+kube-system   coredns   2/2     2            2           62m
+
+controlplane ~ ➜  vi deployment-red.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f deployment-red.yaml
+deployment.apps/red created
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           6m24s
+default       red       1/2     2            1           2s
+kube-system   coredns   2/2     2            2           63m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           6m27s
+default       red       2/2     2            2           5s
+kube-system   coredns   2/2     2            2           63m
+
+controlplane ~ ➜  
