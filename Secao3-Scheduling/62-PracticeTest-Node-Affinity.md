@@ -1032,6 +1032,7 @@ controlplane ~ ➜
   - Reforçando aula 63 - Solution - Node Affinity (Optional)
 
 
+
 # PENDENTE
 PodAffinity vs NodeAffinity
 reforçar
