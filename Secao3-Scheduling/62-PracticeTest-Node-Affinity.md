@@ -1027,7 +1027,9 @@ controlplane ~ ➜
 
 
 
-
+# Dia 04/12/2022
+  
+  - Reforçando aula 63 - Solution - Node Affinity (Optional)
 
 
 # PENDENTE
