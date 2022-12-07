@@ -21,7 +21,9 @@ git status
 # ##############################################################################################################################################################
 # 68. Practice Test - Resource Requirements and Limits
 
+Practice Test - Resource Requirements and Limits
 
+Practice Test: https://uklabs.kodekloud.com/topic/practice-test-resource-limits-2/
 
 
 
@@ -171,3 +173,5 @@ spec:
    26  kubectl get pods
    27  kubectl describe pod elephant 
    28  history 
+
+
