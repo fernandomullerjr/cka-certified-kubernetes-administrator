@@ -300,3 +300,16 @@ kube-system   kube-flannel-ds   1         1         1       1            1      
 kube-system   kube-proxy        1         1         1       1            1           kubernetes.io/os=linux   25m
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+- Outra maneira de criar este manifesto para o DaemonSet, é criando um manifesto para um Deployment via dry-run, já que os 2 tem estruturas parecidas.
+
+kubectl create deployment elasticsearch --image=k8s.gcr.io/fluentd-elasticsearch:1.20 -n kube-system --dry-run=client -o yaml > fluentd.yaml
+
+- Observação:
+o DaemonSet não utiliza replicas.
