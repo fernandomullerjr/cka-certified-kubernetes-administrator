@@ -502,3 +502,11 @@ kube-system   kube-proxy-wsfmh                       1/1     Running   0        
 kube-system   kube-scheduler-controlplane            1/1     Running   0          50m
 
 controlplane ~ ➜  
+
+
+
+- RESPOSTA
+para resolver esta questão, foi necessário entrar no node01, deletar o Container usando o crictl.
+Voltar ao node controlplane, deletar o Pod "static-greenbox-node01".
+usando comandos obtidos no site:
+https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/
