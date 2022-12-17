@@ -152,6 +152,7 @@ Note: Static pods do not support ephemeral containers.
 # IMPORTANTE / RESUMO
 
 - O Kubelet consegue operar um node de forma autonoma, sem ter o etcd cluster, Scheduler, Kube-api-server, etc
+- O Kube-API-Server não gerencia o Pod do tipo "Static Pod".
 - O Kubelet consegue apenas criar Pods.
 - Os manifestos precisam ser editados/criados na pasta "/etc/kubernetes/manifests".
 - Os "Static Pods" e os "DaemonSets" são ignorados pelo "Kube-Scheduler".

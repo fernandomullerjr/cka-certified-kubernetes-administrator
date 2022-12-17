@@ -271,6 +271,7 @@ image: k8s.gcr.io/kube-apiserver:v1.24.0
 
 
 - Script que faz a criação:
+partindo do pressuposto que você esteja conectado ao node desejado
 
 ~~~~bash
 cat <<EOF >/etc/kubernetes/manifests/static-busybox.yaml
