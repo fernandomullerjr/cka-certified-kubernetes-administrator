@@ -1,3 +1,4 @@
+# resposta
 cat <<EOF >/etc/kubernetes/manifests/static-busybox.yaml
 apiVersion: v1
 kind: Pod

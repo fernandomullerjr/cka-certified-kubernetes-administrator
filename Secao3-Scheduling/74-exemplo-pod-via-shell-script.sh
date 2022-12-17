@@ -1,4 +1,4 @@
-# Create multiple YAML objects from stdin
+# Create multiple YAML objects from stdin.
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Pod
