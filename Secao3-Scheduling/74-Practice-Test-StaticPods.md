@@ -24,8 +24,6 @@ git status
 # ##############################################################################################################################################################
 # 74. Practice Test - Static Pods
 
-
-
 # How many static pods exist in this cluster in all namespaces?
 
 
