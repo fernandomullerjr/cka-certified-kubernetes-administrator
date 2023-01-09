@@ -116,3 +116,58 @@ In this section, we will take a look at multiple schedulers
 01:38
 
 
+
+
+# KubeSchedulerConfiguration
+- O nome do Scheduler padrão "default-scheduler" é definido num KubeSchedulerConfiguration
+
+- Exemplo:
+
+~~~~yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: default-scheduler
+~~~~
+
+
+
+
+- Criando arquivos separados para o KubeSchedulerConfiguration de nossos outros Scheduler:
+
+~~~~yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: my-scheduler
+~~~~
+
+~~~~yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: my-scheduler-2
+~~~~
+
+
+
+
+
+
+## Deploy additional scheduler
+- Download the binary
+  ```
+  $ wget https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-scheduler
+  ```
+
+
+
+
+
+
+# PENDENTE
+- Video continua em:
+2:33
+- Ver sobre a config do Scheduler.
+- Analisar material adicional:
+<https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1597959153627-06_06_Setting%20up%20the%20Kubernetes%20Scheduler.pdf>
