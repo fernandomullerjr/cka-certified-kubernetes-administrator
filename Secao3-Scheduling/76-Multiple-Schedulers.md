@@ -105,8 +105,14 @@ In this section, we will take a look at multiple schedulers
 #  76. Multiple Schedulers
 
 - Caso necessário, é possivel ter Scheduler personalizado.
-- É possível ter vários Schedulers.
+- É possível ter vários Schedulers, conforme a necessidade.
 
 - O Kubernetes tem um Scheduler padrão, chamado "default-scheduler".
 
 <https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+
+
+
+01:38
+
+
