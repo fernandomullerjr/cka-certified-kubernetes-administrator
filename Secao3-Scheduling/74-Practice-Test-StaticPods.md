@@ -21,11 +21,13 @@ git status
 
 
 
+
 # ##############################################################################################################################################################
 # 74. Practice Test - Static Pods
 
-# How many static pods exist in this cluster in all namespaces?
 
+
+# How many static pods exist in this cluster in all namespaces?
 
 controlplane ~ ➜  kubectl get pods -A
 NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE
@@ -330,6 +332,8 @@ controlplane ~ ➜
 # Edit the image on the static pod to use busybox:1.28.4
 
 
+- Para ajustar a imagem no Static-Pod, é necessário ajustaro  YAML:
+/etc/kubernetes/manifests/static-busybox.yaml 
 
 controlplane ~ ✖ vi /etc/kubernetes/manifests/static-busybox.yaml 
 

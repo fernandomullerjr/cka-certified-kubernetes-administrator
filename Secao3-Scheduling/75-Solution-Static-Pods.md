@@ -142,6 +142,16 @@ observação:
 - Verificando no Minikube:
 
 ~~~~bash
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get nodes -A
+NAME       STATUS   ROLES                  AGE    VERSION
+minikube   Ready    control-plane,master   7d7h   v1.22.2
+fernando@debian10x64:~$ docker ps
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED        STATUS         PORTS                                                                                                                                  NAMES
+68ac6cef7ccb   gcr.io/k8s-minikube/kicbase:v0.0.27   "/usr/local/bin/entr…"   2 months ago   Up 3 minutes   127.0.0.1:49157->22/tcp, 127.0.0.1:49156->2376/tcp, 127.0.0.1:49155->5000/tcp, 127.0.0.1:49154->8443/tcp, 127.0.0.1:49153->32443/tcp   minikube
+fernando@debian10x64:~$ docker container exec -ti minikube sh
+
 docker@minikube:~$ sudo ls /var/lib/kubelet/
 config.yaml  cpu_manager_state  device-plugins  kubeadm-flags.env  memory_manager_state  pki  plugins  plugins_registry  pod-resources  pods
 docker@minikube:~$
@@ -452,6 +462,7 @@ Não colocar nada ao final do comando dry-run, após os 2 traços do --command, 
 jogando para um arquivo:
 kubectl run static-busybox --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > static-busybox.yaml
 
+~~~~bash
 fernando@debian10x64:~$ cat static-busybox.yaml
 apiVersion: v1
 kind: Pod
@@ -472,10 +483,13 @@ spec:
   restartPolicy: Always
 status: {}
 fernando@debian10x64:~$
+~~~~
+
 
 
 - Conectar no Node desejado e aplicar o manifesto.
 
+~~~~bash
 cat <<EOF >/etc/kubernetes/manifests/static-busybox.yaml
 apiVersion: v1
 kind: Pod
@@ -496,10 +510,13 @@ spec:
   restartPolicy: Always
 status: {}
 EOF
+~~~~
 
 
 
 - ANTES:
+
+~~~~bash
 fernando@debian10x64:~$ kubectl get pods -A
 NAMESPACE     NAME                               READY   STATUS    RESTARTS       AGE
 kube-system   coredns-78fcd69978-zbfqb           1/1     Running   5 (71m ago)    46d
@@ -514,11 +531,12 @@ fernando@debian10x64:~$
 docker@minikube:~$ ls /etc/kubernetes/manifests
 etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
 docker@minikube:~$
-
+~~~~
 
 
 - DEPOIS:
 
+~~~~bash
 root@minikube:/home/docker# ls /etc/kubernetes/manifests
 etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml  static-busybox.yaml
 root@minikube:/home/docker#
@@ -534,6 +552,7 @@ kube-system   kube-proxy-2r8hf                   1/1     Running   5 (75m ago)  
 kube-system   kube-scheduler-minikube            1/1     Running   5 (75m ago)    46d
 kube-system   storage-provisioner                1/1     Running   10 (74m ago)   46d
 fernando@debian10x64:~$
+~~~~
 
 
 foi criado o "Static Pod" no node "minikube".
@@ -545,3 +564,188 @@ foi criado o "Static Pod" no node "minikube".
 
 # PENDENTE
 - Video continua em 08:32
+
+
+
+
+# DIA 08/01/2023
+
+- Testando Pod estático / Static Pod.
+
+
+- ANTES:
+
+~~~~bash
+
+fernando@debian10x64:~$ kubectl get pods -A
+NAMESPACE       NAME                                                              READY   STATUS    RESTARTS        AGE
+kube-system     coredns-78fcd69978-5xcpp                                          1/1     Running   4 (44h ago)     7d7h
+kube-system     etcd-minikube                                                     1/1     Running   17 (44h ago)    7d7h
+kube-system     kube-apiserver-minikube                                           1/1     Running   16 (44h ago)    7d7h
+kube-system     kube-controller-manager-minikube                                  1/1     Running   17 (44h ago)    7d7h
+kube-system     kube-proxy-5pc9k                                                  1/1     Running   4 (44h ago)     7d7h
+kube-system     kube-scheduler-minikube                                           1/1     Running   13 (44h ago)    7d7h
+kube-system     storage-provisioner                                               1/1     Running   9 (8m39s ago)   7d7h
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f82hp89   1/1     Running   1 (44h ago)     45h
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f8xpg5v   1/1     Running   1 (44h ago)     44h
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep static
+fernando@debian10x64:~$
+
+root@minikube:/#
+root@minikube:/# ls /etc/kubernetes/manifests/
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+root@minikube:/#
+root@minikube:/#
+root@minikube:/# ls -lhasp /etc/kubernetes/manifests/
+total 28K
+4.0K drwxr-xr-x 1 root root 4.0K Jan  8 23:13 ./
+8.0K drwxr-xr-x 1 root root 4.0K Jan  8 23:13 ../
+4.0K -rw------- 1 root root 2.3K Jan  8 23:13 etcd.yaml
+4.0K -rw------- 1 root root 4.0K Jan  8 23:13 kube-apiserver.yaml
+4.0K -rw------- 1 root root 3.4K Jan  8 23:13 kube-controller-manager.yaml
+4.0K -rw------- 1 root root 1.5K Jan  8 23:13 kube-scheduler.yaml
+root@minikube:/#
+root@minikube:/#
+root@minikube:/#
+
+~~~~
+
+
+
+
+- criando o Static-Pod:
+
+~~~~bash
+root@minikube:/#
+root@minikube:/# cat <<EOF >/etc/kubernetes/manifests/static-busybox.yaml
+> apiVersion: v1
+  name: static-busybox
+spec:
+  containers:
+  - command:
+    - sleep
+> kind: Pod
+> metadata:
+>   creationTimestamp: null
+>   labels:
+>     run: static-busybox
+>   name: static-busybox
+> spec:
+>   containers:
+>   - command:
+>     - sleep
+>     - "1000"
+>     image: busybox
+>     name: static-busybox
+>     resources: {}
+>   dnsPolicy: ClusterFirst
+>   restartPolicy: Always
+> status: {}
+> EOF
+root@minikube:/#
+~~~~
+
+
+
+
+
+- DEPOIS:
+
+~~~~bash
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep static
+default         static-busybox-minikube                                           1/1     Running   0               10s
+fernando@debian10x64:~$
+
+~~~~
+
+
+
+
+
+- Removendo o Static-Pod:
+
+~~~~bash
+root@minikube:/# rm -f /etc/kubernetes/manifests/static-busybox.yaml
+root@minikube:/#
+
+fernando@debian10x64:~$ kubectl get pods -A | grep static
+default         static-busybox-minikube                                           1/1     Running   0               10s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep static
+default         static-busybox-minikube                                           1/1     Running   0              2m15s
+fernando@debian10x64:~$ kubectl delete pod static-busybox-minikube
+pod "static-busybox-minikube" deleted
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+
+
+
+
+# PENDENTE
+- Video continua em 08:32
+
+
+
+
+
+
+
+
+
+
+
+
+# We just created a new static pod named static-greenbox. Find it and delete it.
+
+This question is a bit tricky. But if you use the knowledge you gained in the previous questions in this lab, you should be able to find the answer to it.
+
+
+- Averiguar o arquivo de configuração do Kubelet, pois não há manifesto na pasta "/etc/kubernetes/manifests" do node01:
+
+~~~~bash
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   46m   v1.24.0
+node01         Ready    <none>          45m   v1.24.0
+
+controlplane ~ ➜  ssh node01
+
+root@node01 ~ ➜  
+
+
+root@node01 /etc/kubernetes ✖ ls /etc/kubernetes/manifests
+~~~~
+
+
+
+- Pegando no Minikube um exemplo, só para pegar a idéia, pois o ambiente do LAB não tá montado agora.
+- Idéia é que no LAB de Static-Pod, ao invés de ter sido deletado o Pod "static-greenbox-node01" via crictl dentro do Node, que fosse removido o manifesto no path onde o Kubelet guarda os manifestos.
+- No meu Minikube o path tá o padrão, mas no video da solução da questão tá um path maluco, por isto tava vazio o "/etc/kubernetes/manifests", Kubelet do LAB carregava os manifestos de outro path.
+
+~~~~bash
+root@minikube:/# cat /var/lib/kubelet/config.yaml | grep -i path
+staticPodPath: /etc/kubernetes/manifests
+root@minikube:/#
+~~~~
+
+
+- Outro detalhe é que no LAB eu deletei o Pod dentro do Node usando o crictl e depois usei o comando "delete pod" do kubectl, para deletar o Pod, porém não era necessário, pois o Pod é deletado sozinho um tempo depois.
+- No video é mostrado o uso do get pods usando o parametro "--watch", que fica acompanhando e o terminate do Pod ocorre na sequencia, sem precisar deletar o Pod manualmente.
+
+
+
+# RESUMO
+- Editando o manifesto do Static-Pod dentro do Node ou deletando ele, o Pod será afetado automaticamente.
