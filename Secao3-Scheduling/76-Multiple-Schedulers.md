@@ -301,3 +301,210 @@ kind: KubeSchedulerConfiguration
 profiles:
   - schedulerName: my-scheduler
 ~~~~
+
+
+
+
+- Ajustado novamente o manifesto para o Pod do Scheduler, adicionando o parametro --config, que aponta para a configuração personalizada para o Scheduler:
+versão2
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v2.yaml
+
+~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-custom-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-scheduler
+    - --master=http://127.0.0.1
+    - --kubeconfig=/etc/kubernetes/scheduler.conf
+    - --config=/etc/kubernetes/config/my-scheduler-config.yaml
+
+    image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+    name: kube-scheduler
+~~~
+
+
+
+
+
+
+- Config do Scheduler, ajustada, incluindo a configuração de Leader Election:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-my-scheduler-config_v2.yaml
+
+~~~~yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: my-scheduler
+leaderElection:
+  leaderElect: true
+  resourceNamespace: kube-system
+  resourceName: lock-object-my-scheduler
+~~~~
+
+
+
+
+- A configuração de Leader define quem vai definer aonde o Pod vai ser provisionado.
+
+
+
+
+
+- É possível criar o Config do Scheduler localmente e passar para o Pod como um Volume.
+- Exemplo da documentação do Kubernetes:
+<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+
+~~~~yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-scheduler
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: my-scheduler-as-kube-scheduler
+subjects:
+- kind: ServiceAccount
+  name: my-scheduler
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:kube-scheduler
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: my-scheduler-as-volume-scheduler
+subjects:
+- kind: ServiceAccount
+  name: my-scheduler
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:volume-scheduler
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-scheduler-config
+  namespace: kube-system
+data:
+  my-scheduler-config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1beta2
+    kind: KubeSchedulerConfiguration
+    profiles:
+      - schedulerName: my-scheduler
+    leaderElection:
+      leaderElect: false    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: scheduler
+    tier: control-plane
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      component: scheduler
+      tier: control-plane
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: scheduler
+        tier: control-plane
+        version: second
+    spec:
+      serviceAccountName: my-scheduler
+      containers:
+      - command:
+        - /usr/local/bin/kube-scheduler
+        - --config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml
+        image: gcr.io/my-gcp-project/my-kube-scheduler:1.0
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 10259
+            scheme: HTTPS
+          initialDelaySeconds: 15
+        name: kube-second-scheduler
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 10259
+            scheme: HTTPS
+        resources:
+          requests:
+            cpu: '0.1'
+        securityContext:
+          privileged: false
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/kubernetes/my-scheduler
+      hostNetwork: false
+      hostPID: false
+      volumes:
+        - name: config-volume
+          configMap:
+            name: my-scheduler-config
+~~~~
+
+
+
+
+
+
+
+
+
+
+- To create a scheduler pod
+
+kubectl create -f my-custom-scheduler.yaml
+
+kubectl create -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v2.yaml
+
+
+
+View Schedulers
+
+    To list the scheduler pods
+
+    $ kubectl get pods -n kube-system
+
+Use the Custom Scheduler
+
+    Create a pod definition file and add new section called schedulerName and specify the name of the new scheduler
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+      schedulerName: my-custom-scheduler
+
+
+
+
+# PENDENTE
+- Necessário efetuar o deploy de um Pod que tenha o Scheduler. O Pod tem um arquivo de config, que no video do Udemy não mostra como ele busca a config, o certo seria fazer um mapeamento de um Volume, ao estilo da DOC do Kubernetes.
+- Testar deploy do Pod usando um volume que aponte pro ConfigMap da config, seguir o DOC:
+<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+- Continuar o video em 7:33, validando que a solução ficou igual ao video.
