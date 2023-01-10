@@ -171,3 +171,133 @@ profiles:
 - Ver sobre a config do Scheduler.
 - Analisar material adicional:
 <https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1597959153627-06_06_Setting%20up%20the%20Kubernetes%20Scheduler.pdf>
+
+
+
+
+
+# OBSERVAÇÃO
+- Os arquivos YAML de config dos Scheduler ficam na pasta:
+/etc/kubernetes/config
+
+
+
+
+
+- Exemplo de criação do SystemD Service do kube-scheduler
+
+Create the kube-scheduler systemd unit file:
+
+~~~~bash
+cat << EOF | sudo tee /etc/systemd/system/kube-scheduler.service
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/kubernetes/kubernetes
+[Service]
+ExecStart=/usr/local/bin/kube-scheduler \\
+--config=/etc/kubernetes/config/kube-scheduler.yaml \\
+--v=2
+Restart=on-failure
+RestartSec=5
+[Install]
+WantedBy=multi-user.target
+EOF
+~~~~
+
+
+
+
+
+my-custom-scheduler.yaml
+
+~~~~bash
+$ cat /etc/kubernetes/manifests/kube-scheduler.yaml
+~~~~
+
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - command: 
+    - kube-scheduler
+    - --address=127.0.0.127
+    - --kubeconfig=/etc/kubernetes/scheduler.--kubeconfig
+    - --leader-elect=true
+    image: k8s.gcr.io/kube-scheduler-amd64:v1:18.6
+    name: kube-scheduler
+~~~~
+
+
+
+
+
+- Outro exemplo de Pod de kube-scheduler:
+
+And kube-scheduler:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  labels:
+    component: kube-scheduler
+    tier: control-plane
+  name: kube-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-scheduler
+    - --master=http://127.0.0.1:8080
+    image: gcr.io/google_containers/kube-scheduler-amd64:v1.9.6
+    name: kube-scheduler
+  hostNetwork: true
+~~~~
+
+
+
+
+
+
+
+- Ajustado, conforme video no minuto 3:10:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler.yaml
+
+~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-custom-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-scheduler
+    - --master=http://127.0.0.1
+    - --kubeconfig=/etc/kubernetes/scheduler.conf
+
+    image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+    name: kube-scheduler
+~~~
+
+
+
+
+- Config do Scheduler:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-my-scheduler-config.yaml
+
+~~~~yaml
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: my-scheduler
+~~~~
