@@ -802,3 +802,94 @@ fernando@debian10x64:~$
 fernando@debian10x64:~$  kubectl logs my-custom-scheduler -n kube-system
 stat /etc/kubernetes/scheduler.conf: no such file or directory
 fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+
+
+
+
+# PLANO B
+
+<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+
+In the above manifest, you use a KubeSchedulerConfiguration to customize the behavior of your scheduler implementation. This configuration has been passed to the kube-scheduler during initialization with the --config option. The my-scheduler-config ConfigMap stores the configuration file. The Pod of themy-scheduler Deployment mounts the my-scheduler-config ConfigMap as a volume.
+
+- Usar o manifesto fornecido pelo DOC da Kubernetes.
+criado ele por inteiro aqui:
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler.yaml
+
+- Aplicando:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler.yaml
+
+~$
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler.yaml
+serviceaccount/my-scheduler created
+clusterrolebinding.rbac.authorization.k8s.io/my-scheduler-as-kube-scheduler created
+clusterrolebinding.rbac.authorization.k8s.io/my-scheduler-as-volume-scheduler created
+configmap/my-scheduler-config created
+deployment.apps/my-scheduler created
+fernando@debian10x64:~$
+
+
+- ERRO
+ImagePullBackOff
+
+fernando@debian10x64:~$ kubectl get pods --namespace=kube-system
+NAME                               READY   STATUS             RESTARTS        AGE
+coredns-78fcd69978-5xcpp           1/1     Running            19 (142m ago)   27d
+etcd-minikube                      1/1     Running            32 (142m ago)   27d
+kube-apiserver-minikube            1/1     Running            31 (142m ago)   27d
+kube-controller-manager-minikube   1/1     Running            32 (142m ago)   27d
+kube-proxy-5pc9k                   1/1     Running            19 (142m ago)   27d
+kube-scheduler-minikube            1/1     Running            28 (142m ago)   27d
+my-scheduler-7c5bb49889-2bgmq      0/1     ImagePullBackOff   0               50s
+storage-provisioner                1/1     Running            37 (140m ago)   27d
+fernando@debian10x64:~$
+
+
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  79s                default-scheduler  Successfully assigned kube-system/my-scheduler-7c5bb49889-2bgmq to minikube
+  Normal   Pulling    32s (x3 over 79s)  kubelet            Pulling image "gcr.io/my-gcp-project/my-kube-scheduler:1.0"
+  Warning  Failed     30s (x3 over 76s)  kubelet            Failed to pull image "gcr.io/my-gcp-project/my-kube-scheduler:1.0": rpc error: code = Unknown desc = Error response from daemon: Head "https://gcr.io/v2/my-gcp-project/my-kube-scheduler/manifests/1.0": unknown: Service 'containerregistry.googleapis.com' is not enabled for consumer 'project:my-gcp-project'.
+  Warning  Failed     30s (x3 over 76s)  kubelet            Error: ErrImagePull
+  Normal   BackOff    3s (x4 over 76s)   kubelet            Back-off pulling image "gcr.io/my-gcp-project/my-kube-scheduler:1.0"
+  Warning  Failed     3s (x4 over 76s)   kubelet            Error: ImagePullBackOff
+fernando@debian10x64:~$
+
+
+
+de:
+image: gcr.io/my-gcp-project/my-kube-scheduler:1.0
+
+para:
+gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+
+
+- Aplicando:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler.yaml
+
+
+novo erro
+
+
+fernando@debian10x64:~$ kubectl get pods --namespace=kube-system
+NAME                               READY   STATUS             RESTARTS        AGE
+coredns-78fcd69978-5xcpp           1/1     Running            19 (144m ago)   27d
+etcd-minikube                      1/1     Running            32 (144m ago)   27d
+kube-apiserver-minikube            1/1     Running            31 (144m ago)   27d
+kube-controller-manager-minikube   1/1     Running            32 (144m ago)   27d
+kube-proxy-5pc9k                   1/1     Running            19 (144m ago)   27d
+kube-scheduler-minikube            1/1     Running            28 (144m ago)   27d
+my-scheduler-6bf9c88d55-656qc      0/1     CrashLoopBackOff   1 (10s ago)     12s
+my-scheduler-7c5bb49889-2bgmq      0/1     ImagePullBackOff   0               2m53s
+storage-provisioner                1/1     Running            37 (142m ago)   27d
+fernando@debian10x64:~$
