@@ -893,3 +893,95 @@ my-scheduler-6bf9c88d55-656qc      0/1     CrashLoopBackOff   1 (10s ago)     12
 my-scheduler-7c5bb49889-2bgmq      0/1     ImagePullBackOff   0               2m53s
 storage-provisioner                1/1     Running            37 (142m ago)   27d
 fernando@debian10x64:~$
+
+
+
+fernando@debian10x64:~$ kubectl describe pod my-scheduler-6bf9c88d55-656qc --namespace=kube-system
+
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  55s                default-scheduler  Successfully assigned kube-system/my-scheduler-6bf9c88d55-656qc to minikube
+  Warning  Unhealthy  32s                kubelet            Readiness probe failed: Get "https://172.17.0.4:10259/healthz": dial tcp 172.17.0.4:10259: connect: connection refused
+  Normal   Pulled     11s (x4 over 54s)  kubelet            Container image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" already present on machine
+  Normal   Created    11s (x4 over 54s)  kubelet            Created container kube-second-scheduler
+  Normal   Started    11s (x4 over 54s)  kubelet            Started container kube-second-scheduler
+  Warning  BackOff    4s (x10 over 52s)  kubelet            Back-off restarting failed container
+fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+- Comentadas as linhas sobre readiness e liveness
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v2.yaml
+
+- Novo erro:
+
+Events:
+  Type     Reason     Age               From               Message
+  ----     ------     ----              ----               -------
+  Normal   Scheduled  19s               default-scheduler  Successfully assigned kube-system/my-scheduler-5888957757-z7w6q to minikube
+  Normal   Pulled     4s (x3 over 19s)  kubelet            Container image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" already present on machine
+  Normal   Created    4s (x3 over 18s)  kubelet            Created container kube-second-scheduler
+  Normal   Started    4s (x3 over 18s)  kubelet            Started container kube-second-scheduler
+  Warning  BackOff    3s (x3 over 16s)  kubelet            Back-off restarting failed container
+
+fernando@debian10x64:~$ kubectl logs my-scheduler-5888957757-z7w6q --namespace=kube-system
+no kind "KubeSchedulerConfiguration" is registered for version "kubescheduler.config.k8s.io/v1beta2"
+fernando@debian10x64:~$
+
+
+
+
+- Ajustado version
+de:
+kubescheduler.config.k8s.io/v1beta2
+
+para:
+kubescheduler.config.k8s.io/v1
+
+aplicando:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v2.yaml
+
+fernando@debian10x64:~$ kubectl get pods --namespace=kube-system
+NAME                               READY   STATUS             RESTARTS        AGE
+coredns-78fcd69978-5xcpp           1/1     Running            19 (156m ago)   27d
+etcd-minikube                      1/1     Running            32 (156m ago)   27d
+kube-apiserver-minikube            1/1     Running            31 (156m ago)   27d
+kube-controller-manager-minikube   1/1     Running            32 (156m ago)   27d
+kube-proxy-5pc9k                   1/1     Running            19 (156m ago)   27d
+kube-scheduler-minikube            1/1     Running            28 (156m ago)   27d
+my-scheduler-5888957757-8k22f      0/1     Error              2 (19s ago)     22s
+my-scheduler-6bf9c88d55-2n98z      0/1     CrashLoopBackOff   1 (8s ago)      11s
+storage-provisioner                1/1     Running            37 (155m ago)   27d
+fernando@debian10x64:~$ kubectl get deploy -n kube-system
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+coredns        1/1     1            1           27d
+my-scheduler   0/1     1            0           15m
+fernando@debian10x64:~$
+
+
+
+
+# ANOTAÇÕES ANTERIORES
+
+# PENDENTE
+- Necessário efetuar o deploy de um Pod que tenha o Scheduler. O Pod tem um arquivo de config, que no video do Udemy não mostra como ele busca a config, o certo seria fazer um mapeamento de um Volume, ao estilo da DOC do Kubernetes.
+- Testar deploy do Pod usando um volume que aponte pro ConfigMap da config, seguir o DOC:
+<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+- Continuar o video em 7:33, validando que a solução ficou igual ao video.
+
+
+# PENDENTE 2
+- Verificar motivo de falha seguindo DOC do Kubernetes:
+<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+- Provável questão com os paths da imagem Docker, que foi modificada(a disponível no manifesto deles não existe a imagem no registry).
+- Verificar erro de Readiness probe .
+- Buildar uma imagem própria do Kube-scheduler e adicionar ao meu Docker Registry:
+https://blog.searce.com/create-custom-scheduler-on-gke-for-pod-spreading-a23c1641a840
+<https://blog.searce.com/create-custom-scheduler-on-gke-for-pod-spreading-a23c1641a840>
