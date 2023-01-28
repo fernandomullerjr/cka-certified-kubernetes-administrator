@@ -508,3 +508,297 @@ Use the Custom Scheduler
 - Testar deploy do Pod usando um volume que aponte pro ConfigMap da config, seguir o DOC:
 <https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
 - Continuar o video em 7:33, validando que a solução ficou igual ao video.
+
+
+
+
+
+
+- Exemplo do DOC do Kubernetes, traz 1 caso com uma imagem Docker para um Pod que servirá como Scheduler, mas também traz um exemplo completão, que faz o deploy de um Deployment, entre outros elementos do Kubernetes:
+https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/
+
+- No exemplo do curso CKA, a idéia mais ao final do video é fazer o deploy de um Pod que é o Scheduler personalizado, usando uma imagem Docker. Também criar um Pod que vai ser provisionado com base neste scheduler.
+
+
+- Manifestos:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-custom-scheduler
+  namespace: kube-system
+spec:
+  containers:
+    - command:
+        - kube-scheduler
+        - --address=http://127.0.0.1
+        - --kubeconfig=/etc/kubernetes/scheduler.conf
+        - --leader-elect=true
+        - --scheduler-name=my-custom-scheduler
+        - --lock-object-name=my-custom-scheduler
+
+      image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+      name: kube-scheduler
+
+~~~~
+
+
+
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-Pod-usando-scheduler-personalizado.yaml
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+  schedulerName: my-custom-scheduler
+~~~~
+
+
+
+
+
+- Aplicando
+
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+pod/my-custom-scheduler created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A
+NAMESPACE       NAME                                                              READY   STATUS              RESTARTS        AGE
+default         minhaapi-api-deployment-6586d4f7bc-6vcsx                          1/1     Running             0               93m
+default         minhaapi-mongodb-6c98c75fcc-lnq5l                                 1/1     Running             0               93m
+kube-system     coredns-78fcd69978-5xcpp                                          1/1     Running             19 (102m ago)   27d
+kube-system     etcd-minikube                                                     1/1     Running             32 (102m ago)   27d
+kube-system     kube-apiserver-minikube                                           1/1     Running             31 (102m ago)   27d
+kube-system     kube-controller-manager-minikube                                  1/1     Running             32 (102m ago)   27d
+kube-system     kube-proxy-5pc9k                                                  1/1     Running             19 (102m ago)   27d
+kube-system     kube-scheduler-minikube                                           1/1     Running             28 (102m ago)   27d
+kube-system     my-custom-scheduler                                               0/1     ContainerCreating   0               5s
+kube-system     storage-provisioner                                               1/1     Running             37 (100m ago)   27d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f82hp89   1/1     Running             16 (102m ago)   21d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f8xpg5v   1/1     Running             16 (102m ago)   21d
+fernando@debian10x64:~$
+
+
+
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   1 (16s ago)     27s
+fernando@debian10x64:~$
+
+
+                        node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  44s                default-scheduler  Successfully assigned kube-system/my-custom-scheduler to minikube
+  Normal   Pulling    43s                kubelet            Pulling image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3"
+  Normal   Pulled     35s                kubelet            Successfully pulled image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" in 7.977852482s
+  Normal   Created    18s (x3 over 34s)  kubelet            Created container kube-scheduler
+  Normal   Started    18s (x3 over 34s)  kubelet            Started container kube-scheduler
+  Normal   Pulled     18s (x2 over 33s)  kubelet            Container image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" already present on machine
+  Warning  BackOff    6s (x4 over 32s)   kubelet            Back-off restarting failed container
+fernando@debian10x64:~$
+
+
+
+
+
+fernando@debian10x64:~$ kubectl logs my-custom-scheduler -n kube-system
+--address has no valid IP address
+fernando@debian10x64:~$
+
+
+
+
+
+- Ajustando o campo address:
+
+DE:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-custom-scheduler
+  namespace: kube-system
+spec:
+  containers:
+    - command:
+        - kube-scheduler
+        - --address=http://127.0.0.1
+        - --kubeconfig=/etc/kubernetes/scheduler.conf
+        - --leader-elect=true
+        - --scheduler-name=my-custom-scheduler
+        - --lock-object-name=my-custom-scheduler
+
+      image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+      name: kube-scheduler
+
+
+
+PARA:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-custom-scheduler
+  namespace: kube-system
+spec:
+  containers:
+    - command:
+        - kube-scheduler
+        - --address=127.0.0.1
+        - --kubeconfig=/etc/kubernetes/scheduler.conf
+        - --leader-elect=true
+        - --scheduler-name=my-custom-scheduler
+        - --lock-object-name=my-custom-scheduler
+
+      image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+      name: kube-scheduler
+
+
+
+
+- Aplicando
+
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+
+
+
+- ERRO:
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+The Pod "my-custom-scheduler" is invalid: spec: Forbidden: pod updates may not change fields other than `spec.containers[*].image`, `spec.initContainers[*].image`, `spec.activeDeadlineSeconds`, `spec.tolerations` (only additions to existing tolerations) or `spec.terminationGracePeriodSeconds` (allow it to be set to 1 if it was previously negative)
+  core.PodSpec{
+        Volumes:        {{Name: "kube-api-access-9zxnw", VolumeSource: {Projected: &{Sources: {{ServiceAccountToken: &{ExpirationSeconds: 3607, Path: "token"}}, {ConfigMap: &{LocalObjectReference: {Name: "kube-root-ca.crt"}, Items: {{Key: "ca.crt", Path: "ca.crt"}}}}, {DownwardAPI: &{Items: {{Path: "namespace", FieldRef: &{APIVersion: "v1", FieldPath: "metadata.namespace"}}}}}}, DefaultMode: &420}}}},
+        InitContainers: nil,
+        Containers: []core.Container{
+                {
+                        Name:  "kube-scheduler",
+                        Image: "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3",
+                        Command: []string{
+                                "kube-scheduler",
+-                               "--address=127.0.0.1",
++                               "--address=http://127.0.0.1",
+                                "--kubeconfig=/etc/kubernetes/scheduler.conf",
+                                "--leader-elect=true",
+                                ... // 2 identical elements
+                        },
+                        Args:       nil,
+                        WorkingDir: "",
+                        ... // 17 identical fields
+                },
+        },
+        EphemeralContainers: nil,
+        RestartPolicy:       "Always",
+        ... // 25 identical fields
+  }
+
+fernando@debian10x64:~$
+
+
+
+
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   5 (2m21s ago)   5m14s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl delete pod my-custom-scheduler -n kube-system
+pod "my-custom-scheduler" deleted
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+fernando@debian10x64:~$
+
+
+
+
+
+- Aplicando
+
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+
+
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+pod/my-custom-scheduler created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     Error     0               2s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   1 (4s ago)      6s
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   1 (6s ago)      8s
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   1 (9s ago)      11s
+fernando@debian10x64:~$
+
+
+
+
+
+- Erro:
+
+fernando@debian10x64:~$  kubectl logs my-custom-scheduler -n kube-system
+stat /etc/kubernetes/scheduler.conf: no such file or directory
+fernando@debian10x64:~$
+
+
+
+container não encontra o arquivo de conf
+
+
+
+
+
+
+
+
+
+DE:
+image: gcr.io/google_containers/kube-scheduler-amd64:v1.11.3
+
+PARA:
+image: k8s.gcr.io/kube-scheduler:v1.19.1
+
+
+- Aplicando
+kubectl delete pod my-custom-scheduler -n kube-system
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+
+
+segue com erro
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-pod-kube-scheduler_v3.yaml
+pod/my-custom-scheduler created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A | grep custom
+kube-system     my-custom-scheduler                                               0/1     CrashLoopBackOff   1 (2s ago)      4s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$  kubectl logs my-custom-scheduler -n kube-system
+stat /etc/kubernetes/scheduler.conf: no such file or directory
+fernando@debian10x64:~$
