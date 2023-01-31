@@ -1375,3 +1375,99 @@ View Schedulers
     To list the scheduler pods
 
     $ kubectl get pods -n kube-system
+
+
+
+
+Use the Custom Scheduler
+
+    Create a pod definition file and add new section called schedulerName and specify the name of the new scheduler
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+  schedulerName: my-custom-scheduler
+~~~~
+
+
+- Aplicando a versão que criei:
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+  schedulerName: my-scheduler
+~~~~
+
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-Pod-usando-scheduler-personalizado.yaml
+
+
+
+
+
+    To create a pod definition
+
+    $ kubectl create -f pod-definition.yaml
+
+    To list pods
+
+    $ kubectl get pods
+
+View Events
+
+    To view events
+
+    $ kubectl get events
+
+
+
+
+
+- Comando para poder visualizar qual Scheduler provisionou o Pod do NGINX:
+ kubectl get events -o wide
+
+fernando@debian10x64:~$ kubectl get events -o wide
+LAST SEEN   TYPE     REASON      OBJECT      SUBOBJECT                SOURCE                                                     MESSAGE                                            FIRST SEEN   COUNT   NAME
+76s         Normal   Scheduled   pod/nginx                            my-scheduler, my-scheduler-my-scheduler-6c595b886d-87dms   Successfully assigned default/nginx to minikube    76s          1       nginx.173f42c1833a3973
+75s         Normal   Pulling     pod/nginx   spec.containers{nginx}   kubelet, minikube                                          Pulling image "nginx"                              75s          1       nginx.173f42c1be7c74d4
+67s         Normal   Pulled      pod/nginx   spec.containers{nginx}   kubelet, minikube                                          Successfully pulled image "nginx" in 7.98447955s   67s          1       nginx.173f42c39a662e17
+67s         Normal   Created     pod/nginx   spec.containers{nginx}   kubelet, minikube                                          Created container nginx                            67s          1       nginx.173f42c3b166614f
+67s         Normal   Started     pod/nginx   spec.containers{nginx}   kubelet, minikube                                          Started container nginx                            67s          1       nginx.173f42c3bcd8ce1f
+fernando@debian10x64:~$
+
+
+
+
+- Verificando logs do scheduler:
+kubectl logs my-scheduler-6c595b886d-87dms -n kube-system
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl logs my-scheduler-6c595b886d-87dms -n kube-system
+I0131 01:52:58.692265       1 serving.go:347] Generated self-signed cert in-memory
+W0131 01:52:59.005691       1 client_config.go:615] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+W0131 01:52:59.020208       1 authorization.go:47] Authorization is disabled
+W0131 01:52:59.020269       1 authentication.go:47] Authentication is disabled
+I0131 01:52:59.020280       1 deprecated_insecure_serving.go:54] Serving healthz insecurely on [::]:10251
+I0131 01:52:59.026555       1 secure_serving.go:200] Serving securely on [::]:10259
+I0131 01:52:59.026732       1 requestheader_controller.go:169] Starting RequestHeaderAuthRequestController
+I0131 01:52:59.026788       1 shared_informer.go:240] Waiting for caches to sync for RequestHeaderAuthRequestController
+I0131 01:52:59.026814       1 tlsconfig.go:240] "Starting DynamicServingCertificateController"
+I0131 01:52:59.028068       1 configmap_cafile_content.go:201] "Starting controller" name="client-ca::kube-system::extension-apiserver-authentication::requestheader-client-ca-file"
+I0131 01:52:59.028585       1 shared_informer.go:240] Waiting for caches to sync for client-ca::kube-system::extension-apiserver-authentication::requestheader-client-ca-file
+I0131 01:52:59.028074       1 configmap_cafile_content.go:201] "Starting controller" name="client-ca::kube-system::extension-apiserver-authentication::client-ca-file"
+I0131 01:52:59.028937       1 shared_informer.go:240] Waiting for caches to sync for client-ca::kube-system::extension-apiserver-authentication::client-ca-file
+I0131 01:52:59.127105       1 shared_informer.go:247] Caches are synced for RequestHeaderAuthRequestController
+I0131 01:52:59.129018       1 shared_informer.go:247] Caches are synced for client-ca::kube-system::extension-apiserver-authentication::requestheader-client-ca-file
+I0131 01:52:59.129287       1 shared_informer.go:247] Caches are synced for client-ca::kube-system::extension-apiserver-authentication::client-ca-file
+fernando@debian10x64:~$
