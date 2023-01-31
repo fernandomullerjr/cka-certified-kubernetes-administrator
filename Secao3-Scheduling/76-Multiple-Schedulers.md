@@ -1103,3 +1103,275 @@ eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
 git status
+
+
+
+
+
+
+
+removendo
+kubectl delete -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v2.yaml
+
+
+- Aplicando nova versão, com imagem alterada:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v3.yaml
+
+
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v3.yaml
+serviceaccount/my-scheduler created
+clusterrolebinding.rbac.authorization.k8s.io/my-scheduler-as-kube-scheduler created
+clusterrolebinding.rbac.authorization.k8s.io/my-scheduler-as-volume-scheduler created
+rolebinding.rbac.authorization.k8s.io/my-scheduler-extension-apiserver-authentication-reader created
+configmap/my-scheduler-config created
+deployment.apps/my-scheduler created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -A
+NAMESPACE       NAME                                                              READY   STATUS    RESTARTS       AGE
+default         minhaapi-api-deployment-6586d4f7bc-6vcsx                          1/1     Running   1 (53m ago)    2d5h
+default         minhaapi-mongodb-6c98c75fcc-lnq5l                                 1/1     Running   1 (53m ago)    2d5h
+kube-system     coredns-78fcd69978-5xcpp                                          1/1     Running   20 (53m ago)   29d
+kube-system     etcd-minikube                                                     1/1     Running   33 (53m ago)   29d
+kube-system     kube-apiserver-minikube                                           1/1     Running   32 (53m ago)   29d
+kube-system     kube-controller-manager-minikube                                  1/1     Running   33 (53m ago)   29d
+kube-system     kube-proxy-5pc9k                                                  1/1     Running   20 (53m ago)   29d
+kube-system     kube-scheduler-minikube                                           1/1     Running   29 (53m ago)   29d
+kube-system     my-scheduler-6c595b886d-87dms                                     1/1     Running   0              5s
+kube-system     storage-provisioner                                               1/1     Running   39 (52m ago)   29d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f82hp89   1/1     Running   17 (53m ago)   23d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f8xpg5v   1/1     Running   17 (53m ago)   23d
+fernando@debian10x64:~$
+
+
+fernando@debian10x64:~$ kubectl get pods -n kube-system -l component=scheduler
+NAME                            READY   STATUS    RESTARTS   AGE
+my-scheduler-6c595b886d-87dms   1/1     Running   0          4m59s
+fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SCHEDULER - Erro no Pod do Scheduler adicional - no kind KubeSchedulerConfiguration is registered for version kubescheduler.config.k8s.io v1
+
+
+
+# ############################################################################################################################################################### ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ERRO
+
+- Erro no Pod do Scheduler adicional, deployado no Minikube:
+
+fernando@debian10x64:~$ kubectl logs -n kube-system -l component=scheduler
+no kind "KubeSchedulerConfiguration" is registered for version "kubescheduler.config.k8s.io/v1"
+fernando@debian10x64:~$
+
+
+
+
+# ############################################################################################################################################################### ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# ##############################################################################################################################################################
+# SOLUÇÃO
+
+https://www.youtube.com/watch?v=bezQz-mIO7U
+
+- Criar o Scheduler usando a mesma Docker image utilizada pelo Scheduler que já vem com o Minikube.
+
+
+- Verificando a imagem utilizada pelo Scheduler do Minikube:
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get pod kube-scheduler-minikube -n kube-system
+NAME                      READY   STATUS    RESTARTS       AGE
+kube-scheduler-minikube   1/1     Running   29 (33m ago)   29d
+
+
+fernando@debian10x64:~$ kubectl get pod kube-scheduler-minikube -n kube-system -o yaml | grep image
+    image: k8s.gcr.io/kube-scheduler:v1.22.2
+    imagePullPolicy: IfNotPresent
+    image: k8s.gcr.io/kube-scheduler:v1.22.2
+    imageID: docker-pullable://k8s.gcr.io/kube-scheduler@sha256:c76cb73debd5e37fe7ad42cea9a67e0bfdd51dd56be7b90bdc50dd1bc03c018b
+fernando@debian10x64:~$
+~~~~
+
+
+- Ajustando o campo image no Manifesto:
+
+~~~~YAML
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-scheduler
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: my-scheduler-as-kube-scheduler
+subjects:
+- kind: ServiceAccount
+  name: my-scheduler
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:kube-scheduler
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: my-scheduler-as-volume-scheduler
+subjects:
+- kind: ServiceAccount
+  name: my-scheduler
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:volume-scheduler
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: my-scheduler-extension-apiserver-authentication-reader
+  namespace: kube-system
+roleRef:
+  kind: Role
+  name: extension-apiserver-authentication-reader
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: my-scheduler
+  namespace: kube-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-scheduler-config
+  namespace: kube-system
+data:
+  my-scheduler-config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1beta2
+    kind: KubeSchedulerConfiguration
+    profiles:
+      - schedulerName: my-scheduler
+    leaderElection:
+      leaderElect: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: scheduler
+    tier: control-plane
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      component: scheduler
+      tier: control-plane
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: scheduler
+        tier: control-plane
+        version: second
+    spec:
+      serviceAccountName: my-scheduler
+      containers:
+      - command:
+        - /usr/local/bin/kube-scheduler
+        - --config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml
+        image: k8s.gcr.io/kube-scheduler:v1.22.2
+#        livenessProbe:
+#          httpGet:
+#            path: /healthz
+#            port: 10259
+#            scheme: HTTPS
+#          initialDelaySeconds: 15
+        name: kube-second-scheduler
+#        readinessProbe:
+#          httpGet:
+#            path: /healthz
+#            port: 10259
+#            scheme: HTTPS
+        resources:
+          requests:
+            cpu: '0.1'
+        securityContext:
+          privileged: false
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/kubernetes/my-scheduler
+      hostNetwork: false
+      hostPID: false
+      volumes:
+        - name: config-volume
+          configMap:
+            name: my-scheduler-config
+
+~~~~
+
+
+
+
+- Aplicando nova versão, com imagem alterada:
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v3.yaml
+
+
+
+- Validando:
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get pods -n kube-system -l component=scheduler
+NAME                            READY   STATUS    RESTARTS   AGE
+my-scheduler-6c595b886d-87dms   1/1     Running   0          4m59s
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# RETOMANDO O VIDEO
+[07:36min]
+View Schedulers
+
+    To list the scheduler pods
+
+    $ kubectl get pods -n kube-system
