@@ -967,13 +967,30 @@ fernando@debian10x64:~$
 
 
 
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  75s                 default-scheduler  Successfully assigned kube-system/my-scheduler-6bf9c88d55-2n98z to minikube
+  Normal   Pulled     29s (x4 over 74s)   kubelet            Container image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" already present on machine
+  Normal   Created    29s (x4 over 74s)   kubelet            Created container kube-second-scheduler
+  Normal   Started    29s (x4 over 74s)   kubelet            Started container kube-second-scheduler
+  Warning  BackOff    12s (x11 over 71s)  kubelet            Back-off restarting failed container
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl logs my-scheduler-6bf9c88d55-2n98z --namespace=kube-system
+no kind "KubeSchedulerConfiguration" is registered for version "kubescheduler.config.k8s.io/v1"
+fernando@debian10x64:~$
+
+
+
+
+
 
 # ANOTAÇÕES ANTERIORES
 
 # PENDENTE
 - Necessário efetuar o deploy de um Pod que tenha o Scheduler. O Pod tem um arquivo de config, que no video do Udemy não mostra como ele busca a config, o certo seria fazer um mapeamento de um Volume, ao estilo da DOC do Kubernetes.
 - Testar deploy do Pod usando um volume que aponte pro ConfigMap da config, seguir o DOC:
-<https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
+  <https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/>
 - Continuar o video em 7:33, validando que a solução ficou igual ao video.
 
 
