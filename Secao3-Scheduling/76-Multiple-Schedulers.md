@@ -1002,3 +1002,104 @@ fernando@debian10x64:~$
 - Buildar uma imagem própria do Kube-scheduler e adicionar ao meu Docker Registry:
 https://blog.searce.com/create-custom-scheduler-on-gke-for-pod-spreading-a23c1641a840
 <https://blog.searce.com/create-custom-scheduler-on-gke-for-pod-spreading-a23c1641a840>
+
+
+
+
+
+
+
+# dia 30/01/2023
+
+removendo
+
+kubectl delete -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v2.yaml
+
+
+- Aplicando denovo
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao3-Scheduling/76-deploy-my-scheduler_v2.yaml
+
+
+
+
+kubectl get pods -n kube-system -l component=scheduler
+
+
+fernando@debian10x64:~$ kubectl get pods -n kube-system -l component=scheduler
+NAME                            READY   STATUS             RESTARTS      AGE
+my-scheduler-5888957757-j8m9v   0/1     CrashLoopBackOff   2 (25s ago)   44s
+fernando@debian10x64:~$
+
+
+
+
+
+
+kubectl describe pod -n kube-system -l component=scheduler
+
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  63s                default-scheduler  Successfully assigned kube-system/my-scheduler-5888957757-j8m9v to minikube
+  Normal   Pulled     16s (x4 over 63s)  kubelet            Container image "gcr.io/google_containers/kube-scheduler-amd64:v1.11.3" already present on machine
+  Normal   Created    16s (x4 over 62s)  kubelet            Created container kube-second-scheduler
+  Normal   Started    16s (x4 over 62s)  kubelet            Started container kube-second-scheduler
+  Warning  BackOff    1s (x6 over 61s)   kubelet            Back-off restarting failed container
+fernando@debian10x64:~$
+
+
+
+
+kubectl logs -n kube-system -l component=scheduler
+
+
+fernando@debian10x64:~$ kubectl logs -n kube-system -l component=scheduler
+no kind "KubeSchedulerConfiguration" is registered for version "kubescheduler.config.k8s.io/v1"
+fernando@debian10x64:~$
+
+
+
+
+
+
+
+fernando@debian10x64:~$ kubectl get pods -A
+NAMESPACE       NAME                                                              READY   STATUS             RESTARTS        AGE
+default         minhaapi-api-deployment-6586d4f7bc-6vcsx                          1/1     Running            1 (29m ago)     2d5h
+default         minhaapi-mongodb-6c98c75fcc-lnq5l                                 1/1     Running            1 (29m ago)     2d5h
+kube-system     coredns-78fcd69978-5xcpp                                          1/1     Running            20 (29m ago)    29d
+kube-system     etcd-minikube                                                     1/1     Running            33 (29m ago)    29d
+kube-system     kube-apiserver-minikube                                           1/1     Running            32 (29m ago)    29d
+kube-system     kube-controller-manager-minikube                                  1/1     Running            33 (29m ago)    29d
+kube-system     kube-proxy-5pc9k                                                  1/1     Running            20 (29m ago)    29d
+kube-system     kube-scheduler-minikube                                           1/1     Running            29 (29m ago)    29d
+kube-system     my-scheduler-5888957757-j8m9v                                     0/1     CrashLoopBackOff   9 (4m19s ago)   25m
+kube-system     storage-provisioner                                               1/1     Running            39 (28m ago)    29d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f82hp89   1/1     Running            17 (29m ago)    23d
+nginx-ingress   meu-ingress-controller-ingress-nginx-controller-85685788f8xpg5v   1/1     Running            17 (29m ago)    23d
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pod kube-scheduler-minikube -n kube-system
+NAME                      READY   STATUS    RESTARTS       AGE
+kube-scheduler-minikube   1/1     Running   29 (33m ago)   29d
+fernando@debian10x64:~$ kubectl get pod kube-scheduler-minikube -n kube-system -o yaml | grep image
+    image: k8s.gcr.io/kube-scheduler:v1.22.2
+    imagePullPolicy: IfNotPresent
+    image: k8s.gcr.io/kube-scheduler:v1.22.2
+    imageID: docker-pullable://k8s.gcr.io/kube-scheduler@sha256:c76cb73debd5e37fe7ad42cea9a67e0bfdd51dd56be7b90bdc50dd1bc03c018b
+fernando@debian10x64:~$
+
+
+
+
+# push
+
+git status
+git add .
+git commit -m "Aula 76. Multiple Schedulers - TSHOOT erros com o Scheduler"
+eval $(ssh-agent -s)
+ssh-add /home/fernando/.ssh/chave-debian10-github
+git push
+git status
