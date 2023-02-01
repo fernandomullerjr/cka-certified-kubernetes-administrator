@@ -194,3 +194,298 @@ system:service-account-issuer-discovery                ClusterRole/system:servic
 system:volume-scheduler                                ClusterRole/system:volume-scheduler                                                9m32s
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Let's create a configmap that the new scheduler will employ using the concept of ConfigMap as a volume.
+We have already given a configMap definition file called my-scheduler-configmap.yaml at /root/ path that will create a configmap with name my-scheduler-config using the content of file /root/my-scheduler-config.yaml.
+
+    ConfigMap my-scheduler-config created ?
+
+
+controlplane ~ ➜  kubectl get configmap -A
+NAMESPACE         NAME                                 DATA   AGE
+default           kube-root-ca.crt                     1      10m
+kube-flannel      kube-flannel-cfg                     2      10m
+kube-flannel      kube-root-ca.crt                     1      10m
+kube-node-lease   kube-root-ca.crt                     1      10m
+kube-public       cluster-info                         2      10m
+kube-public       kube-root-ca.crt                     1      10m
+kube-system       coredns                              1      10m
+kube-system       extension-apiserver-authentication   6      10m
+kube-system       kube-proxy                           2      10m
+kube-system       kube-root-ca.crt                     1      10m
+kube-system       kubeadm-config                       1      10m
+kube-system       kubelet-config                       1      10m
+
+controlplane ~ ➜  ls
+my-scheduler-configmap.yaml  my-scheduler-config.yaml  my-scheduler.yaml  nginx-pod.yaml
+
+controlplane ~ ➜  pwd
+/root
+
+controlplane ~ ➜  kubectl apply -f my-scheduler-configmap.yaml
+configmap/my-scheduler-config created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get configmap -A
+NAMESPACE         NAME                                 DATA   AGE
+default           kube-root-ca.crt                     1      10m
+kube-flannel      kube-flannel-cfg                     2      10m
+kube-flannel      kube-root-ca.crt                     1      10m
+kube-node-lease   kube-root-ca.crt                     1      10m
+kube-public       cluster-info                         2      10m
+kube-public       kube-root-ca.crt                     1      10m
+kube-system       coredns                              1      10m
+kube-system       extension-apiserver-authentication   6      10m
+kube-system       kube-proxy                           2      10m
+kube-system       kube-root-ca.crt                     1      10m
+kube-system       kubeadm-config                       1      10m
+kube-system       kubelet-config                       1      10m
+kube-system       my-scheduler-config                  1      5s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+# Deploy an additional scheduler to the cluster following the given specification.
+
+Use the manifest file provided at /root/my-scheduler.yaml. Use the same image as used by the default kubernetes scheduler.
+
+    Name: my-scheduler
+
+    Status: Running
+
+    Correct image used?
+
+
+controlplane ~ ➜  ls
+my-scheduler-configmap.yaml  my-scheduler-config.yaml  my-scheduler.yaml  nginx-pod.yaml
+
+controlplane ~ ➜  cat my-scheduler.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: my-scheduler
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  serviceAccountName: my-scheduler
+  containers:
+  - command:
+    - /usr/local/bin/kube-scheduler
+    - --config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml
+    image: <use-correct-image>
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 10259
+        scheme: HTTPS
+      initialDelaySeconds: 15
+    name: kube-second-scheduler
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 10259
+        scheme: HTTPS
+    resources:
+      requests:
+        cpu: '0.1'
+    securityContext:
+      privileged: false
+    volumeMounts:
+      - name: config-volume
+        mountPath: /etc/kubernetes/my-scheduler
+  hostNetwork: false
+  hostPID: false
+  volumes:
+    - name: config-volume
+      configMap:
+        name: my-scheduler-config
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  vi my-scheduler.yaml
+
+controlplane ~ ➜  kubectl apply -f my-scheduler.yaml
+pod/my-scheduler created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+kube-flannel   kube-flannel-ds-bcg9n                  1/1     Running   0          12m
+kube-system    coredns-787d4945fb-cpngd               1/1     Running   0          12m
+kube-system    coredns-787d4945fb-gxqn8               1/1     Running   0          12m
+kube-system    etcd-controlplane                      1/1     Running   0          12m
+kube-system    kube-apiserver-controlplane            1/1     Running   0          12m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          12m
+kube-system    kube-proxy-6n28d                       1/1     Running   0          12m
+kube-system    kube-scheduler-controlplane            1/1     Running   0          12m
+kube-system    my-scheduler                           1/1     Running   0          5s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# A POD definition file is given. Use it to create a POD with the new custom scheduler.
+
+File is located at /root/nginx-pod.yaml
+
+    Uses custom scheduler
+
+    Status: Running
+
+
+
+- Exemplo do meu rascunho:
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+  schedulerName: my-scheduler
+~~~~
+
+
+
+controlplane ~ ➜  ls
+my-scheduler-configmap.yaml  my-scheduler-config.yaml  my-scheduler.yaml  nginx-pod.yaml
+
+controlplane ~ ➜  cat nginx-pod.yaml
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: nginx 
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+
+controlplane ~ ➜  vi nginx-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f^Cginx-pod.yaml
+
+controlplane ~ ✖ cat nginx-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+  schedulerName: my-scheduler
+
+
+controlplane ~ ➜  kubectl apply -f nginx-pod.yaml
+pod/nginx created
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS              RESTARTS   AGE
+default        nginx                                  0/1     ContainerCreating   0          8s
+kube-flannel   kube-flannel-ds-bcg9n                  1/1     Running             0          14m
+kube-system    coredns-787d4945fb-cpngd               1/1     Running             0          14m
+kube-system    coredns-787d4945fb-gxqn8               1/1     Running             0          14m
+kube-system    etcd-controlplane                      1/1     Running             0          14m
+kube-system    kube-apiserver-controlplane            1/1     Running             0          14m
+kube-system    kube-controller-manager-controlplane   1/1     Running             0          14m
+kube-system    kube-proxy-6n28d                       1/1     Running             0          14m
+kube-system    kube-scheduler-controlplane            1/1     Running             0          14m
+kube-system    my-scheduler                           1/1     Running             0          118s
+
+controlplane ~ ➜  kubectl get pods -A | grep nginx
+default        nginx                                  1/1     Running   0          17s
+
+controlplane ~ ➜  kubectl get pods -A -o wide | grep nginx
+default        nginx                                  1/1     Running   0          22s     10.244.0.5    controlplane   <none>           <none>
+
+controlplane ~ ➜  kubectl get events
+LAST SEEN   TYPE      REASON                    OBJECT              MESSAGE
+15m         Normal    NodeHasSufficientMemory   node/controlplane   Node controlplane status is now: NodeHasSufficientMemory
+15m         Normal    NodeHasNoDiskPressure     node/controlplane   Node controlplane status is now: NodeHasNoDiskPressure
+15m         Normal    NodeHasSufficientPID      node/controlplane   Node controlplane status is now: NodeHasSufficientPID
+15m         Normal    NodeAllocatableEnforced   node/controlplane   Updated Node Allocatable limit across pods
+14m         Normal    Starting                  node/controlplane   Starting kubelet.
+14m         Warning   InvalidDiskCapacity       node/controlplane   invalid capacity 0 on image filesystem
+14m         Normal    NodeHasSufficientMemory   node/controlplane   Node controlplane status is now: NodeHasSufficientMemory
+14m         Normal    NodeHasNoDiskPressure     node/controlplane   Node controlplane status is now: NodeHasNoDiskPressure
+14m         Normal    NodeHasSufficientPID      node/controlplane   Node controlplane status is now: NodeHasSufficientPID
+14m         Normal    NodeAllocatableEnforced   node/controlplane   Updated Node Allocatable limit across pods
+14m         Normal    RegisteredNode            node/controlplane   Node controlplane event: Registered Node controlplane in Controller
+14m         Normal    Starting                  node/controlplane   
+14m         Normal    NodeReady                 node/controlplane   Node controlplane status is now: NodeReady
+31s         Normal    Scheduled                 pod/nginx           Successfully assigned default/nginx to controlplane
+29s         Normal    Pulling                   pod/nginx           Pulling image "nginx"
+23s         Normal    Pulled                    pod/nginx           Successfully pulled image "nginx" in 5.685410981s (5.685428703s including waiting)
+23s         Normal    Created                   pod/nginx           Created container nginx
+22s         Normal    Started                   pod/nginx           Started container nginx
+
+controlplane ~ ➜  kubectl get events -o wide
+LAST SEEN   TYPE      REASON                    OBJECT              SUBOBJECT                SOURCE                                    MESSAGE                                                                              FIRST SEEN   COUNT   NAME
+15m         Normal    NodeHasSufficientMemory   node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasSufficientMemory                             15m          8       controlplane.173f93c8a5c398dd
+15m         Normal    NodeHasNoDiskPressure     node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasNoDiskPressure                               15m          7       controlplane.173f93c8a5c3bee2
+15m         Normal    NodeHasSufficientPID      node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasSufficientPID                                15m          7       controlplane.173f93c8a5c3e86d
+15m         Normal    NodeAllocatableEnforced   node/controlplane                            kubelet, controlplane                     Updated Node Allocatable limit across pods                                           15m          1       controlplane.173f93c8b68c89da
+15m         Normal    Starting                  node/controlplane                            kubelet, controlplane                     Starting kubelet.                                                                    15m          1       controlplane.173f93cca2b16635
+15m         Warning   InvalidDiskCapacity       node/controlplane                            kubelet, controlplane                     invalid capacity 0 on image filesystem                                               15m          1       controlplane.173f93cca646b79b
+15m         Normal    NodeHasSufficientMemory   node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasSufficientMemory                             15m          1       controlplane.173f93ccac5e0e5f
+15m         Normal    NodeHasNoDiskPressure     node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasNoDiskPressure                               15m          1       controlplane.173f93ccac5e31f8
+15m         Normal    NodeHasSufficientPID      node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeHasSufficientPID                                15m          1       controlplane.173f93ccac5e47ff
+15m         Normal    NodeAllocatableEnforced   node/controlplane                            kubelet, controlplane                     Updated Node Allocatable limit across pods                                           15m          1       controlplane.173f93cce2646c32
+15m         Normal    RegisteredNode            node/controlplane                            node-controller                           Node controlplane event: Registered Node controlplane in Controller                  15m          1       controlplane.173f93cea0e78df3
+15m         Normal    Starting                  node/controlplane                            kube-proxy, kube-proxy-controlplane                                                                                            15m          1       controlplane.173f93cf6d557ba2
+14m         Normal    NodeReady                 node/controlplane                            kubelet, controlplane                     Node controlplane status is now: NodeReady                                           14m          1       controlplane.173f93d097f71587
+46s         Normal    Scheduled                 pod/nginx                                    my-scheduler, my-scheduler-my-scheduler   Successfully assigned default/nginx to controlplane                                  46s          1       nginx.173f94964f24e4be
+44s         Normal    Pulling                   pod/nginx           spec.containers{nginx}   kubelet, controlplane                     Pulling image "nginx"                                                                44s          1       nginx.173f94970dfd69e5
+38s         Normal    Pulled                    pod/nginx           spec.containers{nginx}   kubelet, controlplane                     Successfully pulled image "nginx" in 5.685410981s (5.685428703s including waiting)   38s          1       nginx.173f949860dec78b
+38s         Normal    Created                   pod/nginx           spec.containers{nginx}   kubelet, controlplane                     Created container nginx                                                              38s          1       nginx.173f9498679d42d4
+37s         Normal    Started                   pod/nginx           spec.containers{nginx}   kubelet, controlplane                     Started container nginx                                                              37s          1       nginx.173f94987c47db2c
+
+controlplane ~ ➜  
