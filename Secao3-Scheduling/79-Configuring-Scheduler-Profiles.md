@@ -79,3 +79,10 @@ spec:
 # PENDENTE
 - Video continua em 02:44
 - Video continua em 02:44
+
+
+
+
+# Dia 01/02/2023
+
+
