@@ -31,7 +31,7 @@ You can configure a single instance of kube-scheduler to run multiple profiles.
 
 
 
-# Processo
+# Processo - Scheduler
 
 - Pods vão para uma "Scheduling Queue".
 - O Pod é provisionado conforme a sua prioridade, que é definida pela PriorityClass.
@@ -86,3 +86,56 @@ spec:
 # Dia 01/02/2023
 
 
+
+
+
+# Processo - Scheduler - RESUMIDO
+
+- Scheduling Queue
+- Filtering
+- Scoring
+- Binding
+
+
+
+
+
+- Em cada fase, são usados Plugins para as atividades.
+
+- Na fase de "Scheduling Queue", são usados os Plugins "PrioritySort":
+PrioritySort: Provides the default priority based sorting. Extension points: queueSort.
+
+- Na fase de "Filtering" são usados os Plugins de "NodeResourcesFit", "NodeName":
+NodeResourcesFit: Checks if the node has all the resources that the Pod is requesting. The score can use one of three strategies: LeastAllocated (default), MostAllocated and RequestedToCapacityRatio. Extension points: preFilter, filter, score.
+NodeName: Checks if a Pod spec node name matches the current node. Extension points: filter.
+
+
+
+
+
+
+
+
+
+
+# EXEMPLO - FILTERING
+
+- Filtrando pelo "nodeName".
+
+- Crie um pod que é agendado em um nó específico
+
+Você pode também agendar um pod para um nó específico usando nodeName.
+pods/pod-nginx-specific-node.yaml [Copy pods/pod-nginx-specific-node.yaml to clipboard]
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: foo-node # schedule pod to specific node
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+~~~~
