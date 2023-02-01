@@ -14,6 +14,7 @@ git status
 
 
 
+
 # ##############################################################################################################################################################
 #  76. Multiple Schedulers
 
@@ -1471,3 +1472,6 @@ I0131 01:52:59.127105       1 shared_informer.go:247] Caches are synced for Requ
 I0131 01:52:59.129018       1 shared_informer.go:247] Caches are synced for client-ca::kube-system::extension-apiserver-authentication::requestheader-client-ca-file
 I0131 01:52:59.129287       1 shared_informer.go:247] Caches are synced for client-ca::kube-system::extension-apiserver-authentication::client-ca-file
 fernando@debian10x64:~$
+
+
+

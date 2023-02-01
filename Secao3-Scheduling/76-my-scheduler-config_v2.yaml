@@ -6,3 +6,4 @@ leaderElection:
   leaderElect: true
   resourceNamespace: kube-system
   resourceName: lock-object-my-scheduler
+
