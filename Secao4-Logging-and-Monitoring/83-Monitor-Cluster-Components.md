@@ -117,3 +117,135 @@ $ kubectl top pod
 
 - Para validar que o Metrics Server está OK e funcionando, usar o comando top:
 kubectl top node
+
+
+
+
+
+
+
+
+
+
+# ##############################################################################################################################################################
+# Minikube - Testes
+
+- Verificando os addons do Minikube:
+
+~~~~bash
+fernando@debian10x64:~$ minikube addons list
+|-----------------------------|----------|--------------|-----------------------|
+|         ADDON NAME          | PROFILE  |    STATUS    |      MAINTAINER       |
+|-----------------------------|----------|--------------|-----------------------|
+| ambassador                  | minikube | disabled     | unknown (third-party) |
+| auto-pause                  | minikube | disabled     | google                |
+| csi-hostpath-driver         | minikube | disabled     | kubernetes            |
+| dashboard                   | minikube | disabled     | kubernetes            |
+| default-storageclass        | minikube | enabled ✅   | kubernetes            |
+| efk                         | minikube | disabled     | unknown (third-party) |
+| freshpod                    | minikube | disabled     | google                |
+| gcp-auth                    | minikube | disabled     | google                |
+| gvisor                      | minikube | disabled     | google                |
+| helm-tiller                 | minikube | disabled     | unknown (third-party) |
+| ingress                     | minikube | disabled     | unknown (third-party) |
+| ingress-dns                 | minikube | disabled     | unknown (third-party) |
+| istio                       | minikube | disabled     | unknown (third-party) |
+| istio-provisioner           | minikube | disabled     | unknown (third-party) |
+| kubevirt                    | minikube | disabled     | unknown (third-party) |
+| logviewer                   | minikube | disabled     | google                |
+| metallb                     | minikube | disabled     | unknown (third-party) |
+| metrics-server              | minikube | disabled     | kubernetes            |
+| nvidia-driver-installer     | minikube | disabled     | google                |
+| nvidia-gpu-device-plugin    | minikube | disabled     | unknown (third-party) |
+| olm                         | minikube | disabled     | unknown (third-party) |
+| pod-security-policy         | minikube | disabled     | unknown (third-party) |
+| portainer                   | minikube | disabled     | portainer.io          |
+| registry                    | minikube | disabled     | google                |
+| registry-aliases            | minikube | disabled     | unknown (third-party) |
+| registry-creds              | minikube | disabled     | unknown (third-party) |
+| storage-provisioner         | minikube | enabled ✅   | kubernetes            |
+| storage-provisioner-gluster | minikube | disabled     | unknown (third-party) |
+| volumesnapshots             | minikube | disabled     | kubernetes            |
+|-----------------------------|----------|--------------|-----------------------|
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+
+
+- MATERIAL EXTRA
+
+<http://www.mtitek.com/tutorials/kubernetes/kubernetes_metrics.php>
+
+~~~~bash
+ Verify that 'metrics-server' addon is enabled
+Verify that 'metrics-server' addon is enabled:
+
+1
+
+$ minikube addons list | grep metrics-server
+
+1
+
+| metrics-server              | minikube | disabled     |
+
+
+Enable metrics-server addon (if disabled):
+
+1
+
+$ minikube addons enable metrics-server
+
+1
+
+🌟  The 'metrics-server' addon is enabled
+
+
+Verify that 'metrics-server' pod is running:
+
+1
+
+$ kubectl get pods --namespace kube-system | grep metrics-server
+
+1
+
+metrics-server-7bc6d75975-qwgxt    1/1     Running   0          17s
+
+Use Kubernetes Dashboard to visualize metrics
+Please see this page for details on how to configure Minikube dashboard: MiniKube dashboard
+
+    Visualize Nodes metrics
+
+~~~~
+
+
+
+
+
+
+- Para ativar o metrics-server no Minikube:
+
+minikube addons enable metrics-server
+minikube addons list | grep metrics-server
+kubectl get pods --namespace kube-system | grep metrics-server
+
+~~~~bash
+fernando@debian10x64:~$ minikube addons enable metrics-server
+  - Using image k8s.gcr.io/metrics-server/metrics-server:v0.4.2
+* The 'metrics-server' addon is enabled
+fernando@debian10x64:~$
+
+
+fernando@debian10x64:~$ minikube addons list | grep metrics-server
+| metrics-server              | minikube | enabled ✅   | kubernetes            |
+fernando@debian10x64:~$
+
+fernando@debian10x64:~$ kubectl get pods --namespace kube-system | grep metrics-server
+metrics-server-77c99ccb96-pnnwl    1/1     Running   0                78s
+fernando@debian10x64:~$
+
+~~~~
+
+
