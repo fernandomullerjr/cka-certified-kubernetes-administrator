@@ -75,8 +75,45 @@ In this section, we will take a look at monitoring kubernetes cluster
 # ##############################################################################################################################################################
 #  83. Monitor Cluster Components
 
+- Heapster vs Metrics Server
+    Heapster is now deprecated and a slimmed down version was formed known as the metrics server.
 
 
+## Metrics Server
 
+How are the metrics generated for the PODs on these nodes?
+
+
+### Metrics Server - Getting Started
+
+- Para ativar o metrics-server no Minikube:
 
 minikube addons enable metrics-server
+
+
+### OUTROS 
+
+- Fazendo o Deploy do Metrics Server manualmente num cluster Kubernetes:
+é necessário fazer o apply de manifestos que vão criar os recursos necessários para o Metrics Server trabalhar.
+após aplicado, é necessário deixar o Metrics Server trabalhar algum tempo, coletando dados e métricas.
+
+- Clone the metric server from github repo
+
+$ git clone https://github.com/kubernetes-incubator/metrics-server.git
+
+- Deploy the metric server
+
+$ kubectl create -f metric-server/deploy/1.8+/
+
+View the cluster performance
+
+$ kubectl top node
+
+View performance metrics of pod
+
+$ kubectl top pod
+
+
+
+- Para validar que o Metrics Server está OK e funcionando, usar o comando top:
+kubectl top node
