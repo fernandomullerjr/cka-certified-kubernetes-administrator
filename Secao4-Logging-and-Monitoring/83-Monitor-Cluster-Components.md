@@ -65,3 +65,18 @@ In this section, we will take a look at monitoring kubernetes cluster
   ![view](../../images/view.PNG)
   
   
+
+
+
+
+
+
+
+# ##############################################################################################################################################################
+#  83. Monitor Cluster Components
+
+
+
+
+
+minikube addons enable metrics-server
