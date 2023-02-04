@@ -326,3 +326,17 @@ profiles:
 ~~~~
 
 
+
+- Na configuração do YAML, podemos definir os plugins que serão habilitados(enabled) ou desabilitados(disabled).
+
+
+
+- No exemplo abaixo, ao usar o asterisco *, indicamos que vamos desativar/ativar os plugins que tenham o padrão "preScore" ou "score", no caso abaixo:
+
+    plugins:
+      preScore:
+        disabled:
+        - name: '*'
+      score:
+        disabled:
+        - name: '*'
