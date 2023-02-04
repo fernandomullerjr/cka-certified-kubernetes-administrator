@@ -105,10 +105,16 @@ spec:
 - Na fase de "Scheduling Queue", são usados os Plugins "PrioritySort":
 PrioritySort: Provides the default priority based sorting. Extension points: queueSort.
 
-- Na fase de "Filtering" são usados os Plugins de "NodeResourcesFit", "NodeName":
-NodeResourcesFit: Checks if the node has all the resources that the Pod is requesting. The score can use one of three strategies: LeastAllocated (default), MostAllocated and RequestedToCapacityRatio. Extension points: preFilter, filter, score.
-NodeName: Checks if a Pod spec node name matches the current node. Extension points: filter.
+- Na fase de "Filtering" são usados os Plugins de "NodeResourcesFit", "NodeName", "NodeUnschedulable", por exemplo:
+  NodeResourcesFit: Checks if the node has all the resources that the Pod is requesting. The score can use one of three strategies: LeastAllocated (default), MostAllocated and RequestedToCapacityRatio. Extension points: preFilter, filter, score.
+  NodeName: Checks if a Pod spec node name matches the current node. Extension points: filter.
+  NodeUnschedulable: Filters out nodes that have .spec.unschedulable set to true. Extension points: filter.
 
+
+- Scoring:
+  na fase de "Scoring", temos o plugin "NodeResourcesFit", que também é usado na fase de Filtering.
+  um plugin pode ser usado em múltiplos stages.
+    NodeResourcesFit: Checks if the node has all the resources that the Pod is requesting. The score can use one of three strategies: LeastAllocated (default), MostAllocated and RequestedToCapacityRatio. Extension points: preFilter, filter, score.
 
 
 
@@ -139,3 +145,24 @@ spec:
     image: nginx
     imagePullPolicy: IfNotPresent
 ~~~~
+
+
+
+
+
+- Verificando status da flash "Unschedulable" no Node:
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get nodes
+NAME       STATUS   ROLES                  AGE   VERSION
+minikube   Ready    control-plane,master   34d   v1.22.2
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl describe node minikube | grep "Unschedulable"
+Unschedulable:      false
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+~~~~
+
+
+caso a flag "NodeUnschedulable" esteja setada como true, os Pods não podem usar este Node.
