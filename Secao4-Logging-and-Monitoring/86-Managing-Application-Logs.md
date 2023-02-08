@@ -211,5 +211,71 @@ Quando um Pod tem múltiplos Containers, é necessário especifica o Pod e o Con
 
 
 
+~~~~bash
+fernando@debian10x64:~$ vi event-simulator.yaml
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl apply -f event-simulator.yaml
+pod/event-simulator-pod created
+fernando@debian10x64:~$
 
+kubectl logs -f event-simulator-pod event-simulator
 
+fernando@debian10x64:~$ kubectl logs -f event-simulator-pod event-simulator
+[2023-02-08 03:02:54,375] INFO in event-simulator: USER2 is viewing page2
+[2023-02-08 03:02:55,376] INFO in event-simulator: USER4 is viewing page3
+[2023-02-08 03:02:56,378] INFO in event-simulator: USER3 is viewing page2
+[2023-02-08 03:02:57,380] INFO in event-simulator: USER2 is viewing page1
+[2023-02-08 03:02:58,381] INFO in event-simulator: USER1 is viewing page2
+[2023-02-08 03:02:59,383] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:02:59,385] INFO in event-simulator: USER1 is viewing page1
+[2023-02-08 03:03:00,387] INFO in event-simulator: USER1 logged out
+[2023-02-08 03:03:01,389] INFO in event-simulator: USER1 logged out
+[2023-02-08 03:03:02,391] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+[2023-02-08 03:03:02,391] INFO in event-simulator: USER4 is viewing page1
+[2023-02-08 03:03:03,393] INFO in event-simulator: USER1 logged in
+[2023-02-08 03:03:04,397] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:04,397] INFO in event-simulator: USER3 is viewing page2
+[2023-02-08 03:03:05,399] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:06,402] INFO in event-simulator: USER2 is viewing page3
+[2023-02-08 03:03:07,403] INFO in event-simulator: USER3 is viewing page2
+[2023-02-08 03:03:08,406] INFO in event-simulator: USER3 is viewing page2
+[2023-02-08 03:03:09,408] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:09,409] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:10,411] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+[2023-02-08 03:03:10,412] INFO in event-simulator: USER4 is viewing page2
+[2023-02-08 03:03:11,414] INFO in event-simulator: USER3 logged in
+[2023-02-08 03:03:12,416] INFO in event-simulator: USER2 is viewing page2
+[2023-02-08 03:03:13,418] INFO in event-simulator: USER2 logged in
+[2023-02-08 03:03:14,419] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:14,420] INFO in event-simulator: USER2 is viewing page2
+[2023-02-08 03:03:15,421] INFO in event-simulator: USER2 logged out
+[2023-02-08 03:03:16,423] INFO in event-simulator: USER4 logged out
+[2023-02-08 03:03:17,426] INFO in event-simulator: USER3 is viewing page1
+[2023-02-08 03:03:18,426] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+[2023-02-08 03:03:18,427] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:19,429] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:19,429] INFO in event-simulator: USER3 logged out
+[2023-02-08 03:03:20,431] INFO in event-simulator: USER2 logged in
+[2023-02-08 03:03:21,433] INFO in event-simulator: USER1 logged out
+[2023-02-08 03:03:22,435] INFO in event-simulator: USER1 logged out
+[2023-02-08 03:03:23,436] INFO in event-simulator: USER2 is viewing page2
+[2023-02-08 03:03:24,437] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:24,437] INFO in event-simulator: USER2 logged out
+[2023-02-08 03:03:25,439] INFO in event-simulator: USER3 logged in
+[2023-02-08 03:03:26,440] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+[2023-02-08 03:03:26,440] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:27,442] INFO in event-simulator: USER4 is viewing page1
+[2023-02-08 03:03:28,444] INFO in event-simulator: USER1 logged out
+[2023-02-08 03:03:29,444] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:29,445] INFO in event-simulator: USER2 logged out
+[2023-02-08 03:03:30,447] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:31,449] INFO in event-simulator: USER4 is viewing page1
+[2023-02-08 03:03:32,452] INFO in event-simulator: USER1 is viewing page3
+[2023-02-08 03:03:33,454] INFO in event-simulator: USER3 logged in
+[2023-02-08 03:03:34,456] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.
+[2023-02-08 03:03:34,456] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+[2023-02-08 03:03:34,457] INFO in event-simulator: USER3 is viewing page1
+[2023-02-08 03:03:35,458] INFO in event-simulator: USER2 logged in
+^C
+fernando@debian10x64:~$
+~~~~
