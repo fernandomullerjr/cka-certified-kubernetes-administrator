@@ -230,6 +230,8 @@ Please see this page for details on how to configure Minikube dashboard: MiniKub
 minikube addons enable metrics-server
 minikube addons list | grep metrics-server
 kubectl get pods --namespace kube-system | grep metrics-server
+kubectl get --raw /apis/metrics.k8s.io/
+kubectl get --raw /apis/metrics.k8s.io/v1beta1
 
 ~~~~bash
 fernando@debian10x64:~$ minikube addons enable metrics-server
@@ -245,6 +247,14 @@ fernando@debian10x64:~$
 fernando@debian10x64:~$ kubectl get pods --namespace kube-system | grep metrics-server
 metrics-server-77c99ccb96-pnnwl    1/1     Running   0                78s
 fernando@debian10x64:~$
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ kubectl get --raw /apis/metrics.k8s.io/
+{"kind":"APIGroup","apiVersion":"v1","name":"metrics.k8s.io","versions":[{"groupVersion":"metrics.k8s.io/v1beta1","version":"v1beta1"}],"preferredVersion":{"groupVersion":"metrics.k8s.io/v1beta1","version":"v1beta1"}}
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ kubectl get --raw /apis/metrics.k8s.io/v1beta1
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"metrics.k8s.io/v1beta1","resources":[{"name":"nodes","singularName":"","namespaced":false,"kind":"NodeMetrics","verbs":["get","list"]},{"name":"pods","singularName":"","namespaced":true,"kind":"PodMetrics","verbs":["get","list"]}]}
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 ~~~~
 
