@@ -287,3 +287,40 @@ kube-system    metrics-server-c4cdc7cc9-rb9sf         2m           21Mi
 
 controlplane ~ ➜  
 ~~~~
+
+
+
+
+
+## 8
+
+Identify the POD that consumes the least CPU.
+
+~~~~bash
+
+controlplane ~ ➜  kubectl top pod -A
+NAMESPACE      NAME                                   CPU(cores)   MEMORY(bytes)   
+default        elephant                               21m          32Mi            
+default        lion                                   1m           18Mi            
+default        rabbit                                 172m         252Mi           
+kube-flannel   kube-flannel-ds-dl4ph                  3m           37Mi            
+kube-flannel   kube-flannel-ds-wqgst                  0m           37Mi            
+kube-system    coredns-787d4945fb-hn6hq               1m           21Mi            
+kube-system    coredns-787d4945fb-jdvl6               2m           21Mi            
+kube-system    etcd-controlplane                      18m          46Mi            
+kube-system    kube-apiserver-controlplane            37m          274Mi           
+kube-system    kube-controller-manager-controlplane   17m          57Mi            
+kube-system    kube-proxy-644rj                       1m           39Mi            
+kube-system    kube-proxy-8mf4m                       5m           39Mi            
+kube-system    kube-scheduler-controlplane            4m           25Mi            
+kube-system    metrics-server-c4cdc7cc9-rb9sf         3m           21Mi            
+
+controlplane ~ ➜  
+~~~~
+
+
+
+Coloquei a resposta como Lion, mas acusou como errada.
+Rabbit e Elephant também acusou como errada.
+Colocando uma outra opção que nem existi, também acusou erro.
+Reportado no final do Lab
