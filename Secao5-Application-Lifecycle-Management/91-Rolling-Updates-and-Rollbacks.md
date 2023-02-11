@@ -295,3 +295,246 @@ myapp-deployment-5c7c75f4d8-dfv6q   1/1     Running   0          61s
 myapp-deployment-5c7c75f4d8-f4bwq   1/1     Running   0          61s
 myapp-deployment-5c7c75f4d8-jxklg   1/1     Running   0          61s
 fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+
+
+
+## Version / Revision
+
+- Mudando o Deployment, trocando a image para:
+nginx:1.9.1
+
+~~~~YAML
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: nginx
+spec:
+  template:
+    metadata:
+      name: myap-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:1.9.1
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end
+~~~~
+
+
+- Aplicando:
+
+kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/91-DEPLOYMENT-exemplo.yaml
+
+
+
+    You can see the status of the rollout by the below command
+
+    $ kubectl rollout status deployment/myapp-deployment
+
+    To see the history and revisions
+
+    $ kubectl rollout history deployment/myapp-deployment
+
+
+fernando@debian10x64:~$ kubectl apply -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/91-DEPLOYMENT-exemplo.yaml
+deployment.apps/myapp-deployment configured
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -l app=myapp
+NAME                                READY   STATUS              RESTARTS   AGE
+myapp-deployment-5c7c75f4d8-dfv6q   1/1     Running             0          3m27s
+myapp-deployment-5c7c75f4d8-f4bwq   1/1     Running             0          3m27s
+myapp-deployment-5c7c75f4d8-jxklg   1/1     Running             0          3m27s
+myapp-deployment-dbd96b5f8-w2dn7    0/1     ContainerCreating   0          4s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get pods -l app=myapp
+NAME                                READY   STATUS              RESTARTS   AGE
+myapp-deployment-5c7c75f4d8-dfv6q   1/1     Running             0          3m33s
+myapp-deployment-5c7c75f4d8-f4bwq   1/1     Running             0          3m33s
+myapp-deployment-5c7c75f4d8-jxklg   1/1     Running             0          3m33s
+myapp-deployment-dbd96b5f8-w2dn7    0/1     ContainerCreating   0          10s
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ ^C
+fernando@debian10x64:~$ kubectl get pods -l app=myapp
+NAME                               READY   STATUS    RESTARTS   AGE
+myapp-deployment-dbd96b5f8-mhv68   1/1     Running   0          33s
+myapp-deployment-dbd96b5f8-q2w46   1/1     Running   0          31s
+myapp-deployment-dbd96b5f8-w2dn7   1/1     Running   0          45s
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl rollout status deployment/myapp-deployment
+deployment "myapp-deployment" successfully rolled out
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl rollout history deployment/myapp-deployment
+deployment.apps/myapp-deployment
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+fernando@debian10x64:~$
+
+
+
+
+
+
+kubectl describe deployment/myapp-deployment
+
+
+fernando@debian10x64:~$ kubectl describe deployment/myapp-deployment
+Name:                   myapp-deployment
+Namespace:              default
+CreationTimestamp:      Sat, 11 Feb 2023 00:54:03 -0300
+Labels:                 app=nginx
+Annotations:            deployment.kubernetes.io/revision: 2
+Selector:               type=front-end
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=myapp
+           type=front-end
+  Containers:
+   nginx-container:
+    Image:        nginx:1.9.1
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   myapp-deployment-dbd96b5f8 (3/3 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  5m56s  deployment-controller  Scaled up replica set myapp-deployment-5c7c75f4d8 to 3
+  Normal  ScalingReplicaSet  2m33s  deployment-controller  Scaled up replica set myapp-deployment-dbd96b5f8 to 1
+  Normal  ScalingReplicaSet  2m21s  deployment-controller  Scaled down replica set myapp-deployment-5c7c75f4d8 to 2
+  Normal  ScalingReplicaSet  2m21s  deployment-controller  Scaled up replica set myapp-deployment-dbd96b5f8 to 2
+  Normal  ScalingReplicaSet  2m19s  deployment-controller  Scaled down replica set myapp-deployment-5c7c75f4d8 to 1
+  Normal  ScalingReplicaSet  2m19s  deployment-controller  Scaled up replica set myapp-deployment-dbd96b5f8 to 3
+  Normal  ScalingReplicaSet  2m9s   deployment-controller  Scaled down replica set myapp-deployment-5c7c75f4d8 to 0
+fernando@debian10x64:~$
+
+
+
+
+
+- Verificando apenas detalhes da estratégia:
+
+fernando@debian10x64:~$ kubectl describe deployment/myapp-deployment | grep Strategy
+StrategyType:           RollingUpdate
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+fernando@debian10x64:~$
+
+
+
+- Por debaixo dos panos o Kubernetes cria um replicaset adicional.
+
+
+
+
+
+
+
+
+# To undo a change
+
+$ kubectl rollout undo deployment/myapp-deployment
+
+
+
+- ANTES:
+
+fernando@debian10x64:~$ kubectl describe deployment/myapp-deployment | grep -i image
+    Image:        nginx:1.9.1
+fernando@debian10x64:~$
+
+fernando@debian10x64:~$ kubectl get replicasets | grep myapp
+myapp-deployment-5c7c75f4d8          0         0         0       8m41s
+myapp-deployment-dbd96b5f8           3         3         3       5m18s
+fernando@debian10x64:~$
+
+
+
+
+
+
+- Efetuando Rollback:
+kubectl rollout undo deployment/myapp-deployment
+
+
+- DEPOIS:
+
+fernando@debian10x64:~$ kubectl rollout undo deployment/myapp-deployment
+deployment.apps/myapp-deployment rolled back
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl describe deployment/myapp-deployment | grep -i image
+    Image:        nginx:1.7.1
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get replicasets | grep myapp
+myapp-deployment-5c7c75f4d8          3         3         3       9m58s
+myapp-deployment-dbd96b5f8           0         0         0       6m35s
+fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+
+
+
+# kubectl create
+
+    To create a deployment
+
+    $ kubectl create deployment nginx --image=nginx
+
+# Summarize kubectl commands
+
+$ kubectl create -f deployment-definition.yaml
+$ kubectl get deployments
+$ kubectl apply -f deployment-definition.yaml
+$ kubectl set image deployment/myapp-deployment nginx=nginx:1.9.1
+$ kubectl rollout status deployment/myapp-deployment
+$ kubectl rollout history deployment/myapp-deployment
+$ kubectl rollout undo deployment/myapp-deployment
