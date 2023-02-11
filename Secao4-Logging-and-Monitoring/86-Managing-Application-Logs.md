@@ -16,8 +16,6 @@ git status
 
 
 
-
-
 # ##############################################################################################################################################################
 #  86. Managing Application Logs
 
@@ -279,3 +277,8 @@ fernando@debian10x64:~$ kubectl logs -f event-simulator-pod event-simulator
 ^C
 fernando@debian10x64:~$
 ~~~~
+
+
+
+
+
