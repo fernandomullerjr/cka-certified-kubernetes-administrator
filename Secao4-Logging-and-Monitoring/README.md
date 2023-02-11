@@ -8,3 +8,4 @@ In this section, we will take a look at the below
     Monitor Applications
     Monitor Cluster Components Logs
     Application Logs
+
