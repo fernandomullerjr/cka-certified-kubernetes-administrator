@@ -1,3 +1,3 @@
 # cka-certified-kubernetes-administrator
 
-Curso do CKA
+Curso do CKA - Udemy
