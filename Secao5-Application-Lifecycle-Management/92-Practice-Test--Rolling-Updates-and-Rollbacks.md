@@ -712,3 +712,263 @@ controlplane ~ ➜
 
 
 kubectl create deployment frontend --image=kodekloud/webapp-color:v2 --replicas=4 --dry-run=client -o yaml
+
+
+controlplane ~ ➜  kubectl create deployment frontend --image=kodekloud/webapp-color:v2 --replicas=4 --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: frontend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: kodekloud/webapp-color:v2
+        name: webapp-color
+        resources: {}
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+
+
+- Editando:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: frontend
+  strategy: {Recreate}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: kodekloud/webapp-color:v2
+        name: webapp-color
+        resources: {}
+status: {}
+
+
+
+
+controlplane ~ ✖ kubectl delete deploy frontend
+deployment.apps "frontend" deleted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f front2.yaml
+Error from server (BadRequest): error when creating "front2.yaml": Deployment in version "v1" cannot be handled as a Deployment: strict decoding error: unknown field "spec.strategy.Recreate"
+
+controlplane ~ ✖ 
+
+
+
+
+- Editando denovo:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: kodekloud/webapp-color:v2
+        name: webapp-color
+        resources: {}
+status: {}
+
+
+controlplane ~ ➜  vi front3.yaml 
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f front3.yaml 
+deployment.apps/frontend created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deploy
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+frontend   4/4     4            4           6s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe deploy frontend
+Name:               frontend
+Namespace:          default
+CreationTimestamp:  Wed, 22 Feb 2023 02:45:10 +0000
+Labels:             app=frontend
+Annotations:        deployment.kubernetes.io/revision: 1
+Selector:           app=frontend
+Replicas:           4 desired | 4 updated | 4 total | 4 available | 0 unavailable
+StrategyType:       Recreate
+MinReadySeconds:    0
+Pod Template:
+  Labels:  app=frontend
+  Containers:
+   webapp-color:
+    Image:        kodekloud/webapp-color:v2
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   frontend-745dcffc94 (4/4 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  24s   deployment-controller  Scaled up replica set frontend-745dcffc94 to 4
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Upgrade the application by setting the image on the deployment to kodekloud/webapp-color:v3
+
+Do not delete and re-create the deployment. Only set the new image name for the existing deployment.
+
+    Deployment Name: frontend
+
+    Deployment Image: kodekloud/webapp-color:v3
+
+
+
+kubectl set image deployment/frontend simple-webapp=kodekloud/webapp-color:v3
+
+
+controlplane ~ ➜  kubectl set image deployment/frontend simple-webapp=kodekloud/webapp-color:v3
+error: unable to find container named "simple-webapp"
+
+controlplane ~ ✖ 
+
+
+
+
+kubectl set image deployment/frontend webapp-color=kodekloud/webapp-color:v3
+
+
+controlplane ~ ✖ kubectl set image deployment/frontend webapp-color=kodekloud/webapp-color:v3
+
+deployment.apps/frontend image updated
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe deploy frontend 
+Name:               frontend
+Namespace:          default
+CreationTimestamp:  Wed, 22 Feb 2023 02:45:10 +0000
+Labels:             app=frontend
+Annotations:        deployment.kubernetes.io/revision: 1
+Selector:           app=frontend
+Replicas:           4 desired | 0 updated | 0 total | 0 available | 0 unavailable
+StrategyType:       Recreate
+MinReadySeconds:    0
+Pod Template:
+  Labels:  app=frontend
+  Containers:
+   webapp-color:
+    Image:        kodekloud/webapp-color:v3
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type          Status  Reason
+  ----          ------  ------
+  Progressing   True    NewReplicaSetAvailable
+  Available     False   MinimumReplicasUnavailable
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  2m28s  deployment-controller  Scaled up replica set frontend-745dcffc94 to 4
+  Normal  ScalingReplicaSet  13s    deployment-controller  Scaled down replica set frontend-745dcffc94 to 0 from 4
+
+controlplane ~ ➜  
+
+
+
+
+Run the script curl-test.sh again. Notice the failures. Wait for the new application to be ready. Notice that the requests now do not hit both the versions
+
+Execute the script at /root/curl-test.sh.
