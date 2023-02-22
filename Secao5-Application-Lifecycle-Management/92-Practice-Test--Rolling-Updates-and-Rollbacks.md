@@ -969,6 +969,158 @@ controlplane ~ ➜
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 Run the script curl-test.sh again. Notice the failures. Wait for the new application to be ready. Notice that the requests now do not hit both the versions
 
 Execute the script at /root/curl-test.sh.
+
+
+
+
+controlplane ~ ➜  tail saida-curl-3.txt
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+
+controlplane ~ ➜  tail saida-curl-3.txt
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   local-path-provisioner-5d56847996-2csdm   1/1     Running     0          55m
+kube-system   coredns-5c6b6c5476-sgvn6                  1/1     Running     0          55m
+kube-system   helm-install-traefik-crd-lnkrj            0/1     Completed   0          55m
+kube-system   helm-install-traefik-9vgl8                0/1     Completed   1          55m
+kube-system   svclb-traefik-039eb2be-kfs48              2/2     Running     0          54m
+kube-system   metrics-server-7b67f64457-mmttp           1/1     Running     0          55m
+kube-system   traefik-56b8c5fb5c-b689v                  1/1     Running     0          54m
+kube-public   curl                                      1/1     Running     0          37m
+default       frontend-7b5fbdc5fc-gr2z8                 1/1     Running     0          2m39s
+default       frontend-7b5fbdc5fc-d8vbc                 1/1     Running     0          2m38s
+default       frontend-7b5fbdc5fc-4k4jl                 1/1     Running     0          2m39s
+default       frontend-7b5fbdc5fc-4bp69                 1/1     Running     0          2m39s
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  tail saida-curl-4.txt
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+
+controlplane ~ ➜  tail saida-curl-4.txt
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+
+controlplane ~ ➜  cat saida-curl-4.txt
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+Failed
+
+
+controlplane ~ ➜  ls
+curl-pod.yaml     front.yaml        front3.yaml       saida-curl-3.txt  saida-curl.txt
+curl-test.sh      front2.yaml       saida-curl-2.txt  saida-curl-4.txt
+
+controlplane ~ ➜  cat curl-test.sh 
+for i in {1..35}; do
+   kubectl exec --namespace=kube-public curl -- sh -c 'test=`wget -qO- -T 2  http://webapp-service.default.svc.cluster.local:8080/info 2>&1` && echo "$test OK" || echo "Failed"';
+   echo ""
+done
+
+controlplane ~ ➜  kubectl get svc
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes       ClusterIP   10.43.0.1       <none>        443/TCP          56m
+webapp-service   NodePort    10.43.137.228   <none>        8080:30080/TCP   39m
+
+controlplane ~ ➜  /curl-test
+-bash: /curl-test: No such file or directory
+
+controlplane ~ ✖ /curl-test.sh
+-bash: /curl-test.sh: No such file or directory
+
+controlplane ~ ✖ sh curl-test.sh 
+
+Failed
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+
+
+
+- Provavel que seja devido os Labels dos Pods
+daí o Service não encaminhar corretamente
