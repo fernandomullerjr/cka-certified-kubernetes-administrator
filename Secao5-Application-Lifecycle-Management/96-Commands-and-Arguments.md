@@ -82,3 +82,7 @@ spec:
       command: ["sleep2.0"]
       args: ["10"]
 ~~~~
+
+
+- O campo "command" no manifesto, substitui o campo ENTRYPOINT do Dockerfile.
+- O campo "args" no manifesto, substitui o campo CMD do Dockerfile.
