@@ -164,4 +164,99 @@ ao utilizar um dicionário, o primeiro parametro precisa ser um executável!
     CMD ["param1","param2"] (as default parameters to ENTRYPOINT)
     CMD command param1 param2 (shell form)
 
-docker run ubuntu sleep 5
+
+
+- Exemplo de uso correto do dicionário para os valores do CMD:
+
+~~~~Dockerfile
+FROM Ubuntu
+
+CMD ["sleep", "5"]
+~~~~
+
+
+- Para buildar a  docker image:
+    docker build -t ubuntu-sleeper .
+
+- Ao executar, o Container vai morrer após 5 segundos:
+    docker run ubuntu-sleeper
+
+
+
+- Para alterar a quantidade de segundos que queremos que o Container fique rodando, podemos passar um comando diferente no ato da execução:
+    docker run ubuntu-sleeper [COMMAND]
+    docker run ubuntu-sleeper sleep 10
+
+
+
+
+
+
+
+- Caso a gente queira passar apenas o parametro para o comando de execução, nesse formato:
+    docker run ubuntu-sleeper 10
+
+- Precisamos usar um ENTRYPOINT, exemplo de uso do ENTRYPOINT onde ele espera um valor a ser passado no comando:
+
+~~~~Dockerfile
+FROM Ubuntu
+
+ENTRYPOINT ["sleep"]
+~~~~
+
+
+- Buildando a imagem acima, podemos passar apenas o valor 10 para o comando, que o Container vai durar 10 segundos:
+    docker run ubuntu-sleeper 10
+
+
+
+
+
+
+
+
+- Ao usar o ENTRYPOINT, sem passar um parametro nele e ao executar um comando sem passar um parametro também, tomamos um erro:
+
+~~~~Dockerfile
+FROM Ubuntu
+
+ENTRYPOINT ["sleep"]
+~~~~
+
+docker run ubuntu-sleeper
+sleep: missing operand
+Try 'sleep --help' for more information.
+
+
+
+
+
+- Ao usar o ENTRYPOINT e passar o parametro via CMD, este será o padrão adotado na execução, fazendo que o Container dure 5 segundos:
+
+~~~~Dockerfile
+FROM Ubuntu
+
+ENTRYPOINT ["sleep"]
+
+CMD ["5"]
+~~~~
+
+
+- Ao passar um parametro ao comando, como por exemplo, 10 segundos, ele vai sobrepor ao que está no Dockerfile:
+    docker run ubuntu-sleeper 10
+
+
+
+
+
+
+
+
+
+# Sobrepondo o ENTRYPOINT
+
+- Ao executar o comando desta maneira:
+    docker run --entrypoint sleep2.0 ubuntu-sleeper 10
+
+- Vai executar o comando abaixo na inicialização:
+    sleep2.0 10
