@@ -34,7 +34,6 @@ How many PODs exist on the system?
 
 In the current(default) namespace
 
-
 controlplane ~ ➜  kubectl get pods
 NAME             READY   STATUS    RESTARTS   AGE
 ubuntu-sleeper   1/1     Running   0          4m38s
@@ -354,3 +353,412 @@ Note: Only make the necessary changes. Do not modify the name.
     Command: sleep 1200
 
 
+controlplane ~ ➜  ls
+sample.yaml            ubuntu-sleeper-2.yaml  ubuntu-sleeper-3.yaml  webapp-color           webapp-color-2         webapp-color-3
+
+controlplane ~ ➜  cat ubuntu-sleeper-3.yaml
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-3 
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+      - "sleep"
+      - 1200
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  vi ubuntu-sleeper-3.yaml
+
+controlplane ~ ➜  kubectl apply -f ubuntu-sleeper-3.yaml
+pod/ubuntu-sleeper-3 created
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-5c6b6c5476-qz5mw                  1/1     Running     0          45m
+kube-system   local-path-provisioner-5d56847996-xqqkz   1/1     Running     0          45m
+kube-system   helm-install-traefik-crd-xgnzn            0/1     Completed   0          45m
+kube-system   helm-install-traefik-xtzht                0/1     Completed   1          45m
+kube-system   svclb-traefik-5d205092-hxrx6              2/2     Running     0          45m
+kube-system   metrics-server-7b67f64457-lkqb4           1/1     Running     0          45m
+kube-system   traefik-56b8c5fb5c-lxl7c                  1/1     Running     0          45m
+default       ubuntu-sleeper                            1/1     Running     0          25m
+default       ubuntu-sleeper-2                          1/1     Running     0          6m10s
+default       ubuntu-sleeper-3                          1/1     Running     0          5s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+Update pod ubuntu-sleeper-3 to sleep for 2000 seconds.
+
+Note: Only make the necessary changes. Do not modify the name of the pod. Delete and recreate the pod if necessary.
+
+    Pod Name: ubuntu-sleeper-3
+
+    Command: sleep 2000
+
+
+
+controlplane ~ ➜  ls
+sample.yaml            ubuntu-sleeper-2.yaml  ubuntu-sleeper-3.yaml  webapp-color           webapp-color-2         webapp-color-3
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-5c6b6c5476-qz5mw                  1/1     Running     0          46m
+kube-system   local-path-provisioner-5d56847996-xqqkz   1/1     Running     0          46m
+kube-system   helm-install-traefik-crd-xgnzn            0/1     Completed   0          46m
+kube-system   helm-install-traefik-xtzht                0/1     Completed   1          46m
+kube-system   svclb-traefik-5d205092-hxrx6              2/2     Running     0          45m
+kube-system   metrics-server-7b67f64457-lkqb4           1/1     Running     0          46m
+kube-system   traefik-56b8c5fb5c-lxl7c                  1/1     Running     0          45m
+default       ubuntu-sleeper                            1/1     Running     0          25m
+default       ubuntu-sleeper-2                          1/1     Running     0          6m43s
+default       ubuntu-sleeper-3                          1/1     Running     0          38s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  vi ubuntu-sleeper-3.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f ubuntu-sleeper-3.yaml
+The Pod "ubuntu-sleeper-3" is invalid: spec: Forbidden: pod updates may not change fields other than `spec.containers[*].image`, `spec.initContainers[*].image`, `spec.activeDeadlineSeconds`, `spec.tolerations` (only additions to existing tolerations) or `spec.terminationGracePeriodSeconds` (allow it to be set to 1 if it was previously negative)
+  core.PodSpec{
+        Volumes:        {{Name: "kube-api-access-j4dgc", VolumeSource: {Projected: &{Sources: {{ServiceAccountToken: &{ExpirationSeconds: 3607, Path: "token"}}, {ConfigMap: &{LocalObjectReference: {Name: "kube-root-ca.crt"}, Items: {{Key: "ca.crt", Path: "ca.crt"}}}}, {DownwardAPI: &{Items: {{Path: "namespace", FieldRef: &{APIVersion: "v1", FieldPath: "metadata.namespace"}}}}}}, DefaultMode: &420}}}},
+        InitContainers: nil,
+        Containers: []core.Container{
+                {
+                        Name:  "ubuntu",
+                        Image: "ubuntu",
+                        Command: []string{
+                                "sleep",
+-                               "1200",
++                               "2000",
+                        },
+                        Args:       nil,
+                        WorkingDir: "",
+                        ... // 17 identical fields
+                },
+        },
+        EphemeralContainers: nil,
+        RestartPolicy:       "Always",
+        ... // 28 identical fields
+  }
+
+
+controlplane ~ ✖ 
+
+
+controlplane ~ ✖ kubectl delete pod ubuntu-sleeper-3
+pod "ubuntu-sleeper-3" deleted
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f ubuntu-sleeper-3.yaml
+pod/ubuntu-sleeper-3 created
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-5c6b6c5476-qz5mw                  1/1     Running     0          48m
+kube-system   local-path-provisioner-5d56847996-xqqkz   1/1     Running     0          48m
+kube-system   helm-install-traefik-crd-xgnzn            0/1     Completed   0          48m
+kube-system   helm-install-traefik-xtzht                0/1     Completed   1          48m
+kube-system   svclb-traefik-5d205092-hxrx6              2/2     Running     0          47m
+kube-system   metrics-server-7b67f64457-lkqb4           1/1     Running     0          48m
+kube-system   traefik-56b8c5fb5c-lxl7c                  1/1     Running     0          47m
+default       ubuntu-sleeper                            1/1     Running     0          28m
+default       ubuntu-sleeper-2                          1/1     Running     0          9m2s
+default       ubuntu-sleeper-3                          1/1     Running     0          15s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Inspect the file Dockerfile given at /root/webapp-color directory. What command is run at container startup?
+
+
+controlplane ~ ➜  ls /root
+sample.yaml            ubuntu-sleeper-2.yaml  ubuntu-sleeper-3.yaml  webapp-color           webapp-color-2         webapp-color-3
+
+controlplane ~ ➜  cat /root/webapp-color
+webapp-color/   webapp-color-2/ webapp-color-3/ 
+
+controlplane ~ ➜  cat /root/webapp-color/Dockerfile
+FROM python:3.6-alpine
+
+RUN pip install flask
+
+COPY . /opt/
+
+EXPOSE 8080
+
+WORKDIR /opt
+
+ENTRYPOINT ["python", "app.py"]
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+Inspect the file Dockerfile2 given at /root/webapp-color directory. What command is run at container startup?
+
+controlplane ~ ➜  cat /root/webapp-color/Dockerfile
+Dockerfile   Dockerfile2  
+
+controlplane ~ ➜  cat /root/webapp-color/Dockerfile
+Dockerfile   Dockerfile2  
+
+controlplane ~ ➜  cat /root/webapp-color/Dockerfile2
+FROM python:3.6-alpine
+
+RUN pip install flask
+
+COPY . /opt/
+
+EXPOSE 8080
+
+WORKDIR /opt
+
+ENTRYPOINT ["python", "app.py"]
+
+CMD ["--color", "red"]
+
+controlplane ~ ➜  
+
+
+
+- RESPOSTA:
+python app.py --color red
+
+
+
+
+
+
+
+
+
+Inspect the two files under directory webapp-color-2. What command is run at container startup?
+
+Assume the image was created from the Dockerfile in this directory.
+
+controlplane ~ ➜  cat /root/webapp-color-2/
+Dockerfile2            webapp-color-pod.yaml  
+
+controlplane ~ ➜  cat /root/webapp-color-2/webapp-color-pod.yaml 
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    command: ["--color","green"]
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  cat /root/webapp-color-2/Dockerfile2 
+FROM python:3.6-alpine
+
+RUN pip install flask
+
+COPY . /opt/
+
+EXPOSE 8080
+
+WORKDIR /opt
+
+ENTRYPOINT ["python", "app.py"]
+
+CMD ["--color", "red"]
+
+controlplane ~ ➜  
+
+
+
+- RESPOSTA:
+--color red
+
+
+
+
+
+
+
+
+
+
+Inspect the two files under directory webapp-color-3. What command is run at container startup?
+
+Assume the image was created from the Dockerfile in this directory.
+
+
+controlplane ~ ➜  cat /root/webapp-color
+webapp-color/   webapp-color-2/ webapp-color-3/ 
+
+controlplane ~ ➜  cat /root/webapp-color-3/
+Dockerfile2              webapp-color-pod-2.yaml  
+
+controlplane ~ ➜  cat /root/webapp-color-3/webapp-color-pod-2.yaml 
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+  labels:
+      name: webapp-green 
+spec:
+  containers:
+  - name: simple-webapp
+    image: kodekloud/webapp-color
+    command: ["python", "app.py"]
+    args: ["--color", "pink"]
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  cat /root/webapp-color-3/Dockerfile2 
+FROM python:3.6-alpine
+
+RUN pip install flask
+
+COPY . /opt/
+
+EXPOSE 8080
+
+WORKDIR /opt
+
+ENTRYPOINT ["python", "app.py"]
+
+CMD ["--color", "red"]
+
+controlplane ~ ➜  
+
+
+- RESPOSTA:
+python app.py --color pink
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Create a pod with the given specifications. By default it displays a blue background. Set the given command line arguments to change it to green.
+
+    Pod Name: webapp-green
+
+    Image: kodekloud/webapp-color
+
+    Command line arguments: --color=green
+
+
+- Exemplo:
+
+~~~~YAML
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-2 
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep"]
+    args: ["5000"]
+~~~~
+
+
+- Editado:
+
+~~~~YAML
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: webapp-green
+spec:
+  containers:
+  - name: webapp-green
+    image: kodekloud/webapp-color
+    args: ["--color=green"]
+~~~~
+
+
+controlplane ~ ➜  vi pod-green.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f pod-green.yaml
+pod/webapp-green created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-5c6b6c5476-qz5mw                  1/1     Running     0          57m
+kube-system   local-path-provisioner-5d56847996-xqqkz   1/1     Running     0          57m
+kube-system   helm-install-traefik-crd-xgnzn            0/1     Completed   0          57m
+kube-system   helm-install-traefik-xtzht                0/1     Completed   1          57m
+kube-system   svclb-traefik-5d205092-hxrx6              2/2     Running     0          57m
+kube-system   metrics-server-7b67f64457-lkqb4           1/1     Running     0          57m
+kube-system   traefik-56b8c5fb5c-lxl7c                  1/1     Running     0          57m
+default       ubuntu-sleeper                            1/1     Running     0          37m
+default       ubuntu-sleeper-2                          1/1     Running     0          18m
+default       ubuntu-sleeper-3                          1/1     Running     0          9m19s
+default       webapp-green                              1/1     Running     0          6s
+
+controlplane ~ ➜  
