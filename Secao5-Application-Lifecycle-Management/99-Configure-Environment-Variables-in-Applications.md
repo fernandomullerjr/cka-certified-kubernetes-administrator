@@ -203,10 +203,52 @@ apiVersion: v1
 
 
 
+
+### Configure all key-value pairs in a Secret as container environment variables
+
+Note: This functionality is available in Kubernetes v1.6 and later.
+
+- Create a Secret containing multiple key-value pairs
+    kubectl create secret generic test-secret --from-literal=username='my-app' --from-literal=password='39528$vdg7Jb'
+
+- Use envFrom to define all of the Secret's data as container environment variables. The key from the Secret becomes the environment variable name in the Pod.
+
+~~~~YAML
+apiVersion: v1
+  kind: Pod
+  metadata:
+    name: envfrom-secret
+  spec:
+    containers:
+    - name: envars-test-container
+      image: nginx
+      envFrom:
+      - secretRef:
+          name: test-secret
+  
+~~~~
+
+
+- Create the Pod:
+  kubectl create -f https://k8s.io/examples/pods/inject/pod-secret-envFrom.yaml
+
+- In your shell, display username and password container environment variables
+  kubectl exec -i -t envfrom-secret -- /bin/sh -c 'echo "username: $username\npassword: $password\n"'
+
+- The output is
+  username: my-app
+  password: 39528$vdg7Jb
+
+
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-#### Variáveis no Kubernetes usando Secrets
+#### Variáveis no Kubernetes usando ConfigMaps
+
+# PENDENTE
+- Criar material sobre uso de variáveis utilizando ConfigMaps
+
 
 
