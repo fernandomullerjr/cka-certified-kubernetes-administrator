@@ -326,13 +326,159 @@ For this example, defining a volume and mounting it inside the demo container as
 
 
 
+### Using ConfigMaps as files from a Pod
+
+To consume a ConfigMap in a volume in a Pod:
+
+    Create a ConfigMap or use an existing one. Multiple Pods can reference the same ConfigMap.
+    Modify your Pod definition to add a volume under .spec.volumes[]. Name the volume anything, and have a .spec.volumes[].configMap.name field set to reference your ConfigMap object.
+    Add a .spec.containers[].volumeMounts[] to each container that needs the ConfigMap. Specify .spec.containers[].volumeMounts[].readOnly = true and .spec.containers[].volumeMounts[].mountPath to an unused directory name where you would like the ConfigMap to appear.
+    Modify your image or command line so that the program looks for files in that directory. Each key in the ConfigMap data map becomes the filename under mountPath.
+
+This is an example of a Pod that mounts a ConfigMap in a volume:
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mypod
+    image: redis
+    volumeMounts:
+    - name: foo
+      mountPath: "/etc/foo"
+      readOnly: true
+  volumes:
+  - name: foo
+    configMap:
+      name: myconfigmap
+~~~~
 
 
+
+
+
+
+### Define container environment variables with data from multiple ConfigMaps
+
+As with the previous example, create the ConfigMaps first. Here is the manifest you will use:
+
+criando 2 configmaps:
+
+~~~~YAML
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: special-config
+  namespace: default
+data:
+  special.how: very
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+  namespace: default
+data:
+  log_level: INFO
+~~~~
+
+- Create the ConfigMap:
+  kubectl create -f https://kubernetes.io/examples/configmap/configmaps.yaml
+
+- Define the environment variables in the Pod specification:
+
+~~~~yaml
+apiVersion: v1
+  kind: Pod
+  metadata:
+    name: dapi-test-pod
+  spec:
+    containers:
+      - name: test-container
+        image: registry.k8s.io/busybox
+        command: [ "/bin/sh", "-c", "env" ]
+        env:
+          - name: SPECIAL_LEVEL_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: special-config
+                key: special.how
+          - name: LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                name: env-config
+                key: log_level
+    restartPolicy: Never
+~~~~
+
+
+- Create the Pod:
+  kubectl create -f https://kubernetes.io/examples/pods/pod-multiple-configmap-env-variable.yaml
+
+- Now, the Pod's output includes environment variables SPECIAL_LEVEL_KEY=very and LOG_LEVEL=INFO.
+
+- Once you're happy to move on, delete that Pod:
+  kubectl delete pod dapi-test-pod --now
+
+
+
+
+### Configure all key-value pairs in a ConfigMap as container environment variables
+
+- Create a ConfigMap containing multiple key-value pairs.
+    configmap/configmap-multikeys.yaml [Copy configmap/configmap-multikeys.yaml to clipboard]
+
+~~~~YAML
+apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: special-config
+    namespace: default
+  data:
+    SPECIAL_LEVEL: very
+    SPECIAL_TYPE: charm
+~~~~
+
+- Create the ConfigMap:
+    kubectl create -f https://kubernetes.io/examples/configmap/configmap-multikeys.yaml
+
+    Use envFrom to define all of the ConfigMap's data as container environment variables. The key from the ConfigMap becomes the environment variable name in the Pod.
+    pods/pod-configmap-envFrom.yaml [Copy pods/pod-configmap-envFrom.yaml to clipboard]
+
+~~~~YAML
+apiVersion: v1
+  kind: Pod
+  metadata:
+    name: dapi-test-pod
+  spec:
+    containers:
+      - name: test-container
+        image: registry.k8s.io/busybox
+        command: [ "/bin/sh", "-c", "env" ]
+        envFrom:
+        - configMapRef:
+            name: special-config
+    restartPolicy: Never
+~~~~
+
+- Create the Pod:
+    kubectl create -f https://kubernetes.io/examples/pods/pod-configmap-envFrom.yaml
+
+- Now, the Pod's output includes environment variables SPECIAL_LEVEL=very and SPECIAL_TYPE=charm.
+
+- Once you're happy to move on, delete that Pod:
+    kubectl delete pod dapi-test-pod --now
 
 
 
 # PENDENTE
 - Criar material sobre uso de variáveis utilizando ConfigMaps
 - aula 99, diferenças
-
-
+- Ver mais sobre ConfigMaps:
+https://kubernetes.io/docs/concepts/configuration/configmap/
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+- Ver sonbre "Use ConfigMap-defined environment variables in Pod commands":
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#use-configmap-defined-environment-variables-in-pod-commands
