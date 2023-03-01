@@ -482,3 +482,18 @@ https://kubernetes.io/docs/concepts/configuration/configmap/
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
 - Ver sonbre "Use ConfigMap-defined environment variables in Pod commands":
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#use-configmap-defined-environment-variables-in-pod-commands
+- Criar alias para commit
+
+
+
+
+
+
+
+
+git status | git add .
+
+
+
+
+git status | git add . | git commit -m "Aula 99. Configure Environment Variables in Applications" | eval $(ssh-agent -s) | ssh-add /home/fernando/.ssh/chave-debian10-github | git push | git status
