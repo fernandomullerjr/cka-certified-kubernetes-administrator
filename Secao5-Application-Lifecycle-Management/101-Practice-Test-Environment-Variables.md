@@ -709,9 +709,20 @@ controlplane ~ ➜
 
 
 
+- Outra opção seria criar via comando imperativo:
+
+# Create ConfigMaps from literal values
+
+~~~~bash
+kubectl create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm
+~~~~
 
 
+- Editado:
 
+~~~~bash
+kubectl create configmap webapp-config-map --from-literal=APP_COLOR=darkblue
+~~~~
 
 
 
