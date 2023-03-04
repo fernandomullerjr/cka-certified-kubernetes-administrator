@@ -178,3 +178,57 @@ In this section, we will take a look at secrets in kubernetes
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # 103. Configure Secrets in Applications
 
+Secrets
+
+    Take me to Video Tutorials
+
+In this section, we will take a look at secrets in kubernetes
+Web-Mysql Application
+
+web
+
+    One way is to move the app properties/envs into a configmap. But the configmap stores data into a plain text format. It is definitely not a right place to store a password.
+
+~~~~YAML
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: app-config
+data:
+  DB_Host: mysql
+  DB_User: root
+  DB_Password: paswrd
+~~~~
+
+
+
+
+    Secrets are used to store sensitive information. They are similar to configmaps but they are stored in an encrypted format or a hashed format.
+
+There are 2 steps involved with secrets
+
+    First, Create a secret
+
+    Second, Inject the secret into a pod.
+
+
+
+There are 2 ways of creating a secret
+
+    The Imperative way
+
+~~~~bash
+    $ kubectl create secret generic app-secret --from-literal=DB_Host=mysql --from-literal=DB_User=root --from-literal=DB_Password=paswrd
+    $ kubectl create secret generic app-secret --from-file=app_secret.properties
+~~~~
+
+
+The Declarative way
+
+Generate a hash value of the password and pass it to secret-data.yaml definition value as a value to DB_Password variable.
+
+~~~~bash
+$ echo -n "mysql" | base64
+$ echo -n "root" | base64
+$ echo -n "paswrd"| base64
+~~~~
