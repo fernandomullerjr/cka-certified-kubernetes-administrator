@@ -235,6 +235,8 @@ controlplane ~ ➜
 
 - Erro, editando direto
 
+kubectl edit pod webapp-color
+
 ~~~~bash
 # Please edit the object below. Lines beginning with a '#' will be ignored,
 # and an empty file will abort the edit. If an error occurs while saving this file will be
