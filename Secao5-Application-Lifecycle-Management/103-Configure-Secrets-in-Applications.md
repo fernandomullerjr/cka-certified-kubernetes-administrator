@@ -428,3 +428,40 @@ echo "$( cat /etc/secret-volume/password )"
 The output is your username and password:
     my-app
     39528$vdg7Jb
+
+
+
+
+
+
+# Encrypting your data
+
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+Create a new encryption config file:
+
+~~~~YAML
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+      - configmaps
+      - pandas.awesome.bears.example
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <BASE 64 ENCODED SECRET>
+      - identity: {}
+~~~~
+
+
+# Notes
+- Secrets are not encrypted. Only encoded.
+- Do not check-in Secret objects to SCM along with code.
+- Secrets are not encrypted in ETCD.
+- Can enable encryption at rest.
+- Anyone able to create pods/deployments in the same namespace can access the secrets.
+- Configure least privilege.
+- Consider third-party secrets store providers(AWS, Azure, Vault, etc)
