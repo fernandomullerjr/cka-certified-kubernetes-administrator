@@ -251,7 +251,7 @@ data:
 
 kubectl create -f secret-data.yaml
 
-
+kubectl apply -f /home/fernando/cursos/Kubernetes/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/103-secret.yaml
 
 
 # Encode Secrets
@@ -266,3 +266,165 @@ kubectl describe secret
 
 To view the values of the secret
 kubectl get secret app-secret -o yaml
+
+
+
+
+
+~~~~bash
+
+fernando@debian10x64:~$ kubectl get secret app-secret -o yaml
+apiVersion: v1
+data:
+  DB_Host: bX1zcWw=
+  DB_Password: cGFzd3Jk
+  DB_User: cm9vdA==
+kind: Secret
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"DB_Host":"bX1zcWw=","DB_Password":"cGFzd3Jk","DB_User":"cm9vdA=="},"kind":"Secret","metadata":{"annotations":{},"name":"app-secret","namespace":"default"}}
+  creationTimestamp: "2023-03-07T02:01:27Z"
+  name: app-secret
+  namespace: default
+  resourceVersion: "128589"
+  uid: d43dfc62-d890-4b10-aaea-037565c4ea38
+type: Opaque
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+## Decode Secrets
+
+    To decode secrets
+
+~~~~bash
+    $ echo -n "bX1zcWw=" | base64 --decode
+    $ echo -n "cm9vdA==" | base64 --decode
+    $ echo -n "cGFzd3Jk" | base64 --decode
+~~~~
+
+
+~~~~bash
+fernando@debian10x64:~$ cat | echo -n "bX1zcWw=" | base64 --decode
+m}sql
+fernando@debian10x64:~$
+
+fernando@debian10x64:~$ cat | echo -n "cm9vdA==" | base64 --decode
+root
+fernando@debian10x64:~$
+
+fernando@debian10x64:~$ cat | echo -n "cGFzd3Jk" | base64 --decode
+paswrd
+fernando@debian10x64:~$
+
+~~~~
+
+
+
+
+
+
+
+
+## Configuring secret with a pod
+
+    To inject a secret to a pod add a new property envFrom followed by secretRef name and then create the pod-definition
+
+~~~~YAML
+apiVersion: v1
+kind: Secret
+metadata:
+ name: app-secret
+data:
+  DB_Host: bX1zcWw=
+  DB_User: cm9vdA==
+  DB_Password: cGFzd3Jk
+ apiVersion: v1
+~~~~
+
+~~~~YAML
+kind: Pod
+ metadata:
+   name: simple-webapp-color
+ spec:
+  containers:
+  - name: simple-webapp-color
+    image: simple-webapp-color
+    ports:
+    - containerPort: 8080
+    envFrom:
+    - secretRef:
+        name: app-secret
+~~~~
+
+kubectl create -f pod-definition.yaml
+
+
+
+
+
+# There are other ways to inject secrets into pods.
+
+    You can inject as Single ENV variable
+
+    You can inject as whole secret as files in a Volume
+
+
+
+## ENV
+
+    envFrom:
+    - secretRef:
+        name: app-secret
+
+
+
+
+# Secrets in pods as volume
+
+    Each attribute in the secret is created as a file with the value of the secret as its content.
+
+  volumes:
+  - name: foo
+    secret:
+      secretName: app-secret
+
+- Outro exemplo usando Volume:
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: nginx
+      volumeMounts:
+        # name must match the volume name below
+        - name: secret-volume
+          mountPath: /etc/secret-volume
+          readOnly: true
+  # The secret data is exposed to Containers in the Pod through a Volume.
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: test-secret
+~~~~
+
+- Dentro do container:
+    ls /etc/secret-volume
+The output shows two files, one for each piece of secret data:
+    password username
+In your shell, display the contents of the username and password files:
+~~~~bash
+# Run this in the shell inside the container
+echo "$( cat /etc/secret-volume/username )"
+echo "$( cat /etc/secret-volume/password )"
+~~~~
+The output is your username and password:
+    my-app
+    39528$vdg7Jb
