@@ -201,9 +201,10 @@ data:
 ~~~~
 
 
-
-
     Secrets are used to store sensitive information. They are similar to configmaps but they are stored in an encrypted format or a hashed format.
+
+
+
 
 There are 2 steps involved with secrets
 
@@ -215,7 +216,7 @@ There are 2 steps involved with secrets
 
 There are 2 ways of creating a secret
 
-    The Imperative way
+##    The Imperative way
 
 ~~~~bash
     $ kubectl create secret generic app-secret --from-literal=DB_Host=mysql --from-literal=DB_User=root --from-literal=DB_Password=paswrd
@@ -223,7 +224,7 @@ There are 2 ways of creating a secret
 ~~~~
 
 
-The Declarative way
+## The Declarative way
 
 Generate a hash value of the password and pass it to secret-data.yaml definition value as a value to DB_Password variable.
 
@@ -232,3 +233,36 @@ $ echo -n "mysql" | base64
 $ echo -n "root" | base64
 $ echo -n "paswrd"| base64
 ~~~~
+
+
+
+- Create a secret definition file and run kubectl create to deploy it
+
+~~~~YAML
+apiVersion: v1
+kind: Secret
+metadata:
+ name: app-secret
+data:
+  DB_Host: bX1zcWw=
+  DB_User: cm9vdA==
+  DB_Password: cGFzd3Jk
+~~~~
+
+kubectl create -f secret-data.yaml
+
+
+
+
+# Encode Secrets
+
+## View Secrets
+
+To view secrets
+kubectl get secrets
+
+To describe secret
+kubectl describe secret
+
+To view the values of the secret
+kubectl get secret app-secret -o yaml
