@@ -46,3 +46,22 @@ Read about the protections and risks of using secrets here
 
 
 Having said that, there are other better ways of handling sensitive data like passwords in Kubernetes, such as using tools like Helm Secrets, HashiCorp Vault. I hope to make a lecture on these in the future.
+
+
+
+
+
+
+
+
+
+
+
+# RESUMO
+As Secrets do Kubernetes podem ser decodificadas por qualquer pessoa que tenha acesso ao manifesto utilizado para criar a Secret, certo?
+
+Sim, se alguém tiver acesso ao manifesto utilizado para criar uma Secret do Kubernetes, ele poderá decodificar a Secret e acessar os dados confidenciais contidos nela.
+
+As Secrets do Kubernetes são armazenadas em uma forma codificada base64, e não criptografada, no objeto Secret do Kubernetes. Isso significa que é relativamente fácil para alguém com acesso ao manifesto de decodificar a Secret e visualizar o seu conteúdo.
+
+Para proteger as Secrets do Kubernetes contra acesso não autorizado, é importante garantir que apenas usuários com as permissões apropriadas possam acessar os manifestos que criam e atualizam as Secrets. Além disso, é uma boa prática usar ferramentas de gerenciamento de Secrets, como o HashiCorp Vault ou o Google Cloud KMS, que podem criptografar e armazenar Secrets de forma mais segura.
