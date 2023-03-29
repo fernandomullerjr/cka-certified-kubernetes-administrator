@@ -153,3 +153,547 @@ controlplane ~ ➜
 
 
 
+
+
+
+
+
+
+
+
+The reason the application is failed is because we have not created the secrets yet. Create a new secret named db-secret with the data given below.
+
+You may follow any one of the methods discussed in lecture to create the secret.
+
+    Secret Name: db-secret
+
+    Secret 1: DB_Host=sql01
+
+    Secret 2: DB_User=root
+
+    Secret 3: DB_Password=password123
+
+~~~~YAML
+apiVersion: v1
+kind: Secret
+metadata:
+ name: db-secret
+data:
+  DB_Host: sql01
+  DB_User: root
+  DB_Password: password123
+~~~~
+
+
+vi secret-manifest.yaml
+
+
+controlplane ~ ➜  kubectl apply -f secret-manifest.yaml
+Error from server (BadRequest): error when creating "secret-manifest.yaml": Secret in version "v1" cannot be handled as a Secret: illegal base64 data at input byte 4
+
+controlplane ~ ✖ 
+
+
+
+- Encriptando os valores:
+
+~~~~bash
+$ echo -n "sql01" | base64
+$ echo -n "root" | base64
+$ echo -n "password123"| base64
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ echo -n "sql01" | base64
+c3FsMDE=
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ echo -n "root" | base64
+cm9vdA==
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ echo -n "password123"| base64
+cGFzc3dvcmQxMjM=
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+
+~~~~
+
+
+vi secret-manifest.yaml
+
+~~~~YAML
+apiVersion: v1
+kind: Secret
+metadata:
+ name: db-secret
+data:
+  DB_Host: c3FsMDE=
+  DB_User: cm9vdA==
+  DB_Password: cGFzc3dvcmQxMjM=
+~~~~
+
+
+controlplane ~ ➜  kubectl apply -f secret-manifest.yaml
+secret/db-secret created
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get all
+NAME             READY   STATUS    RESTARTS   AGE
+pod/webapp-pod   1/1     Running   0          6m8s
+pod/mysql        1/1     Running   0          6m8s
+
+NAME                     TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes       ClusterIP   10.43.0.1      <none>        443/TCP          27m
+service/webapp-service   NodePort    10.43.177.41   <none>        8080:30080/TCP   6m8s
+service/sql01            ClusterIP   10.43.200.71   <none>        3306/TCP         6m8s
+
+controlplane ~ ➜  
+
+
+
+
+https://30080-port-cfe76abc866c42e7.labs.kodekloud.com/
+
+Failed connecting to the MySQL database.
+Environment Variables: DB_Host=Not Set; DB_Database=Not Set; DB_User=Not Set; DB_Password=Not Set; 2003: Can't connect to MySQL server on 'localhost:3306' (111 Connection refused)
+
+From webapp-pod!
+
+
+
+
+
+
+
+
+
+
+
+Configure webapp-pod to load environment variables from the newly created secret.
+
+Delete and recreate the pod if required.
+
+    Pod name: webapp-pod
+
+    Image name: kodekloud/simple-webapp-mysql
+
+    Env From: Secret=db-secret
+
+
+
+kubectl get pod webapp-pod -n default -o=json | jq 'del(.metadata.resourceVersion,.metadata.uid,.metadata.selfLink,.metadata.creationTimestamp,.metadata.annotations,.metadata.generation,.metadata.ownerReferences)' | yq eval - -P > my-object.cleaned.yaml
+
+controlplane ~ ➜  cat my-object.cleaned.yaml 
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: webapp-pod
+  name: webapp-pod
+  namespace: default
+spec:
+  containers:
+    - image: kodekloud/simple-webapp-mysql
+      imagePullPolicy: Always
+      name: webapp
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-p8ngj
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: controlplane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+  volumes:
+    - name: kube-api-access-p8ngj
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+status:
+  conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: PodScheduled
+  containerStatuses:
+    - containerID: containerd://6fb0ad1a381485dcfb2085ba0171fc9584de8e8b6d7eabbcbcb9a9fc0c627e2d
+      image: docker.io/kodekloud/simple-webapp-mysql:latest
+      imageID: docker.io/kodekloud/simple-webapp-mysql@sha256:92943d2b3ea4a1db7c8a9529cd5786ae3b9999e0246ab665c29922e9800d1b41
+      lastState: {}
+      name: webapp
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2023-03-29T01:34:44Z"
+  hostIP: 172.25.0.55
+  phase: Running
+  podIP: 10.42.0.9
+  podIPs:
+    - ip: 10.42.0.9
+  qosClass: BestEffort
+  startTime: "2023-03-29T01:34:34Z"
+~~~~
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+    envFrom:
+    - secretRef:
+        name: app-secret
+
+
+
+
+- Editado
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: webapp-pod
+  name: webapp-pod
+  namespace: default
+spec:
+  containers:
+    - image: kodekloud/simple-webapp-mysql
+      imagePullPolicy: Always
+      name: webapp
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-p8ngj
+          readOnly: true
+  envFrom:
+    - secretRef:
+        name: app-secret
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: controlplane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+  volumes:
+    - name: kube-api-access-p8ngj
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+status:
+  conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: PodScheduled
+  containerStatuses:
+    - containerID: containerd://6fb0ad1a381485dcfb2085ba0171fc9584de8e8b6d7eabbcbcb9a9fc0c627e2d
+      image: docker.io/kodekloud/simple-webapp-mysql:latest
+      imageID: docker.io/kodekloud/simple-webapp-mysql@sha256:92943d2b3ea4a1db7c8a9529cd5786ae3b9999e0246ab665c29922e9800d1b41
+      lastState: {}
+      name: webapp
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2023-03-29T01:34:44Z"
+  hostIP: 172.25.0.55
+  phase: Running
+  podIP: 10.42.0.9
+  podIPs:
+    - ip: 10.42.0.9
+  qosClass: BestEffort
+  startTime: "2023-03-29T01:34:34Z"
+~~~~
+
+
+
+
+
+
+
+
+
+controlplane ~ ➜  vi meu-pod-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f meu-pod-editado.yaml
+Warning: resource pods/webapp-pod is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+The request is invalid: patch: Invalid value: "map[metadata:map[annotations:map[kubectl.kubernetes.io/last-applied-configuration:{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"labels\":{\"name\":\"webapp-pod\"},\"name\":\"webapp-pod\",\"namespace\":\"default\"},\"spec\":{\"containers\":[{\"image\":\"kodekloud/simple-webapp-mysql\",\"imagePullPolicy\":\"Always\",\"name\":\"webapp\",\"resources\":{},\"terminationMessagePath\":\"/dev/termination-log\",\"terminationMessagePolicy\":\"File\",\"volumeMounts\":[{\"mountPath\":\"/var/run/secrets/kubernetes.io/serviceaccount\",\"name\":\"kube-api-access-p8ngj\",\"readOnly\":true}]}],\"dnsPolicy\":\"ClusterFirst\",\"enableServiceLinks\":true,\"envFrom\":[{\"secretRef\":{\"name\":\"app-secret\"}}],\"nodeName\":\"controlplane\",\"preemptionPolicy\":\"PreemptLowerPriority\",\"priority\":0,\"restartPolicy\":\"Always\",\"schedulerName\":\"default-scheduler\",\"securityContext\":{},\"serviceAccount\":\"default\",\"serviceAccountName\":\"default\",\"terminationGracePeriodSeconds\":30,\"tolerations\":[{\"effect\":\"NoExecute\",\"key\":\"node.kubernetes.io/not-ready\",\"operator\":\"Exists\",\"tolerationSeconds\":300},{\"effect\":\"NoExecute\",\"key\":\"node.kubernetes.io/unreachable\",\"operator\":\"Exists\",\"tolerationSeconds\":300}],\"volumes\":[{\"name\":\"kube-api-access-p8ngj\",\"projected\":{\"defaultMode\":420,\"sources\":[{\"serviceAccountToken\":{\"expirationSeconds\":3607,\"path\":\"token\"}},{\"configMap\":{\"items\":[{\"key\":\"ca.crt\",\"path\":\"ca.crt\"}],\"name\":\"kube-root-ca.crt\"}},{\"downwardAPI\":{\"items\":[{\"fieldRef\":{\"apiVersion\":\"v1\",\"fieldPath\":\"metadata.namespace\"},\"path\":\"namespace\"}]}}]}}]},\"status\":{\"conditions\":[{\"lastProbeTime\":null,\"lastTransitionTime\":\"2023-03-29T01:34:34Z\",\"status\":\"True\",\"type\":\"Initialized\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2023-03-29T01:34:44Z\",\"status\":\"True\",\"type\":\"Ready\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2023-03-29T01:34:44Z\",\"status\":\"True\",\"type\":\"ContainersReady\"},{\"lastProbeTime\":null,\"lastTransitionTime\":\"2023-03-29T01:34:34Z\",\"status\":\"True\",\"type\":\"PodScheduled\"}],\"containerStatuses\":[{\"containerID\":\"containerd://6fb0ad1a381485dcfb2085ba0171fc9584de8e8b6d7eabbcbcb9a9fc0c627e2d\",\"image\":\"docker.io/kodekloud/simple-webapp-mysql:latest\",\"imageID\":\"docker.io/kodekloud/simple-webapp-mysql@sha256:92943d2b3ea4a1db7c8a9529cd5786ae3b9999e0246ab665c29922e9800d1b41\",\"lastState\":{},\"name\":\"webapp\",\"ready\":true,\"restartCount\":0,\"started\":true,\"state\":{\"running\":{\"startedAt\":\"2023-03-29T01:34:44Z\"}}}],\"hostIP\":\"172.25.0.55\",\"phase\":\"Running\",\"podIP\":\"10.42.0.9\",\"podIPs\":[{\"ip\":\"10.42.0.9\"}],\"qosClass\":\"BestEffort\",\"startTime\":\"2023-03-29T01:34:34Z\"}}\n]] spec:map[envFrom:[map[secretRef:map[name:app-secret]]]]]": strict decoding error: unknown field "spec.envFrom"
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+
+controlplane ~ ✖ kubectl delete pod webapp-pod
+pod "webapp-pod" deleted
+^[[A^[[A
+controlplane ~ ➜  kubectl apply -f meu-pod-editado.yaml
+Error from server (BadRequest): error when creating "meu-pod-editado.yaml": Pod in version "v1" cannot be handled as a Pod: strict decoding error: unknown field "spec.envFrom"
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+controlplane ~ ➜  cat my-object.cleaned.yaml 
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: webapp-pod
+  name: webapp-pod
+  namespace: default
+spec:
+  containers:
+    - image: kodekloud/simple-webapp-mysql
+      imagePullPolicy: Always
+      name: webapp
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      envFrom:
+        - secretRef:
+            name: db-secret
+      volumeMounts:
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-p8ngj
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: controlplane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+  volumes:
+    - name: kube-api-access-p8ngj
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+status:
+  conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:44Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2023-03-29T01:34:34Z"
+      status: "True"
+      type: PodScheduled
+  containerStatuses:
+    - containerID: containerd://6fb0ad1a381485dcfb2085ba0171fc9584de8e8b6d7eabbcbcb9a9fc0c627e2d
+      image: docker.io/kodekloud/simple-webapp-mysql:latest
+      imageID: docker.io/kodekloud/simple-webapp-mysql@sha256:92943d2b3ea4a1db7c8a9529cd5786ae3b9999e0246ab665c29922e9800d1b41
+      lastState: {}
+      name: webapp
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2023-03-29T01:34:44Z"
+  hostIP: 172.25.0.55
+  phase: Running
+  podIP: 10.42.0.9
+  podIPs:
+    - ip: 10.42.0.9
+  qosClass: BestEffort
+  startTime: "2023-03-29T01:34:34Z"
+~~~~
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ✖ vi meu-pod-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f meu-pod-editado.yaml
+pod/webapp-pod created
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get pods 
+NAME         READY   STATUS                       RESTARTS   AGE
+mysql        1/1     Running                      0          15m
+webapp-pod   0/1     CreateContainerConfigError   0          13s
+
+controlplane ~ ➜  
+
+
+
+
+- Ajustado o nome da Secret no EnvFrom do Pod:
+
+controlplane ~ ➜  vi meu-pod-editado.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f meu-pod-editado.yaml
+pod/webapp-pod created
+
+controlplane ~ ➜  kubectl get pods 
+NAME         READY   STATUS    RESTARTS   AGE
+mysql        1/1     Running   0          17m
+webapp-pod   1/1     Running   0          2s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+info
+
+View the web application to verify it can successfully connect to the database
+
+
+https://30080-port-cfe76abc866c42e7.labs.kodekloud.com/
+<https://30080-port-cfe76abc866c42e7.labs.kodekloud.com/>
+
+Successfully connected to the MySQL database.
+Environment Variables: DB_Host=sql01; DB_Database=Not Set; DB_User=root; DB_Password=password123;
+
+From webapp-pod!
