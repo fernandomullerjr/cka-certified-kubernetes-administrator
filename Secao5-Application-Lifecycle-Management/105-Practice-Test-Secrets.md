@@ -23,7 +23,6 @@ git status
 # 105. Practice Test - Secrets
 
 
-
 How many Secrets exist on the system?
 
 In the current(default) namespace.
