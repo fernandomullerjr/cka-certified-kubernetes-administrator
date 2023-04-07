@@ -321,7 +321,7 @@ fernando@debian10x64:~$
 
 
 
-- Validando existência do etc
+- Validando existência do etcdctl dentro do Pod:
 
 ~~~~bash
 sh-5.0#
@@ -362,3 +362,423 @@ OPTIONS:
 
 sh-5.0#
 ~~~~
+
+
+
+
+
+
+
+
+
+
+my-secret
+
+
+ETCDCTL_API=3 etcdctl \
+   --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+   --cert=/etc/kubernetes/pki/etcd/server.crt \
+   --key=/etc/kubernetes/pki/etcd/server.key  \
+   get /registry/secrets/default/my-secret | hexdump -C
+
+
+
+
+
+sh-5.0# ETCDCTL_API=3 etcdctl \
+>    --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+>    --cert=/etc/kubernetes/pki/etcd/server.crt \
+>    --key=/etc/kubernetes/pki/etcd/server.key  \
+>    get /registry/secrets/default/my-secret
+Error: open /etc/kubernetes/pki/etcd/server.crt: no such file or directory
+sh-5.0#
+
+
+
+
+~~~~bash
+sh-5.0# cd /var/lib/minikube/certs/etcd/
+ca.crt                  healthcheck-client.crt  peer.crt                server.crt
+ca.key                  healthcheck-client.key  peer.key                server.key
+sh-5.0# cd /var/lib/minikube/certs/etcd/
+~~~~
+
+
+my-secret
+
+~~~~bash
+ETCDCTL_API=3 etcdctl \
+   --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+   --cert=/var/lib/minikube/certs/etcd/server.crt \
+   --key=/var/lib/minikube/certs/etcd/server.key  \
+   get /registry/secrets/default/my-secret | hexdump -C
+~~~~
+
+
+- Rodando sem o hexdump:
+
+~~~~bash
+sh-5.0# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret
+/registry/secrets/default/my-secret
+k8s
+
+v1Secret▒
+▒
+        my-secretdefault"*$e02e2b0b-4be6-4f1b-9f42-2e6e216927872▒▒▒z▒a
+kubectl-createUpdatev▒▒▒FieldsV1:-
++{"f:data":{".":{},"f:key1":{}},"f:type":{}}B
+key1
+    supersecretOpaque"
+sh-5.0#
+~~~~
+
+
+
+
+- A palavra "supersecretOpaque" indica que ela está oculta.
+
+
+
+- Rodando com o hexdump:
+
+~~~~bash
+sh-5.0# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret | hexdump -C
+sh: hexdump: command not found
+sh-5.0# apk add busybox-extras
+sh: apk: command not found
+sh-5.0# apt install hex
+sh: apt: command not found
+sh-5.0#
+~~~~
+
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+- Não tem o hexdump no etcd do minikube
+
+
+
+
+
+
+
+
+HEXDUMP(1)                    User Commands                   HEXDUMP(1)
+
+NAME         top
+
+       hexdump - display file contents in hexadecimal, decimal, octal,
+       or ascii
+
+       hexdump options file ...
+
+       hd options file ...
+
+DESCRIPTION         top
+
+       The hexdump utility is a filter which displays the specified
+       files, or standard input if no files are specified, in a
+       user-specified format.
+
+
+
+
+
+
+- Como o etcd do minikube não tem o hexdump, segue um exemplo de como seria o uso:
+
+The output is similar to this (abbreviated):
+~~~~bash
+00000000  2f 72 65 67 69 73 74 72  79 2f 73 65 63 72 65 74  |/registry/secret|
+00000010  73 2f 64 65 66 61 75 6c  74 2f 73 65 63 72 65 74  |s/default/secret|
+00000020  31 0a 6b 38 73 3a 65 6e  63 3a 61 65 73 63 62 63  |1.k8s:enc:aescbc|
+00000030  3a 76 31 3a 6b 65 79 31  3a c7 6c e7 d3 09 bc 06  |:v1:supersecret:.l.....|
+00000040  25 51 91 e4 e0 6c e5 b1  4d 7a 8b 3d b9 c2 7c 6e  |%Q...l..Mz.=..|n|
+00000050  b4 79 df 05 28 ae 0d 8e  5f 35 13 2c c0 18 99 3e  |.y..(..._5.,...>|
+[...]
+00000110  23 3a 0d fc 28 ca 48 2d  6b 2d 46 cc 72 0b 70 4c  |#:..(.H-k-F.r.pL|
+00000120  a5 fc 35 43 12 4e 60 ef  bf 6f fe cf df 0b ad 1f  |..5C.N`..o......|
+00000130  82 c4 88 53 02 da 3e 66  ff 0a                    |...S..>f..|
+0000013a
+~~~~
+
+
+
+- É possível verifiar a chave decodificada:
+supersecret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Conectando via minikube ssh
+
+Como utilizar o hexdump no etcd do Minikube, já que o hexdump não vem instalado?
+
+O hexdump é uma ferramenta útil para visualizar o conteúdo de arquivos binários em formato hexadecimal. No entanto, não está incluído por padrão no Minikube ou no etcd.
+
+Para instalar o hexdump no Minikube, você pode seguir estas etapas:
+
+    Acesse o shell do seu cluster Minikube executando o comando:
+
+minikube ssh
+
+    Atualize os repositórios do apt-get:
+
+sql
+
+sudo apt-get update
+
+    Instale o pacote bsdmainutils, que inclui o hexdump:
+
+arduino
+
+sudo apt-get install bsdmainutils
+
+    Verifique se o hexdump está instalado executando o comando:
+
+css
+
+hexdump --version
+
+Com o hexdump instalado, você pode usá-lo para visualizar o conteúdo de arquivos binários no etcd. Por exemplo, para visualizar o conteúdo do diretório padrão do etcd (/var/lib/etcd), você pode executar o seguinte comando:
+
+bash
+
+sudo hexdump -C /var/lib/etcd/*
+
+Isso exibirá o conteúdo de cada arquivo no diretório /var/lib/etcd em formato hexadecimal.
+fernandomj90@gmail.com
+na versão 1.23 do minikube onde fica o diretório do etcd?
+
+Na versão 1.23 do Minikube, o diretório padrão do etcd é /data/etcd.
+
+Para acessar o diretório do etcd, você pode seguir estas etapas:
+
+    Acesse o shell do seu cluster Minikube executando o comando:
+
+minikube ssh
+
+    Acesse o diretório do etcd executando o comando:
+
+bash
+
+cd /data/etcd
+
+    Você pode verificar o conteúdo do diretório executando o comando:
+
+bash
+
+ls -la
+
+Isso listará todos os arquivos e diretórios no diretório do etcd.
+
+A partir daqui, você pode usar ferramentas como o hexdump para visualizar o conteúdo dos arquivos binários no diretório do etcd. Por exemplo, para visualizar o conteúdo do arquivo member/snap/db em formato hexadecimal, você pode executar o seguinte comando:
+
+bash
+
+sudo hexdump -C member/snap/db
+
+Isso exibirá o conteúdo do arquivo db em formato hexadecimal. Lembre-se de que você precisará ter o hexdump instalado no seu cluster Minikube para usar essa ferramenta.
+
+
+
+
+
+
+
+
+
+
+
+sudo hexdump -C member/snap/db
+
+~~~~bash
+root@minikube:/var/lib/minikube/etcd/member# ls -lhasp
+total 16K
+4.0K drwx------ 4 root root 4.0K Apr  7 17:54 ./
+4.0K drwx------ 3 root root 4.0K Apr  7 17:53 ../
+4.0K drwx------ 2 root root 4.0K Apr  7 19:44 snap/
+4.0K drwx------ 2 root root 4.0K Apr  7 17:54 wal/
+root@minikube:/var/lib/minikube/etcd/member# pwd
+/var/lib/minikube/etcd/member
+root@minikube:/var/lib/minikube/etcd/member#
+~~~~
+
+
+sudo hexdump -C /var/lib/minikube/etcd/member/snap/db
+
+
+
+
+
+~~~~bash
+ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret | hexdump -C
+~~~~
+
+
+
+
+
+
+
+
+
+
+como instalar o etcdctl no minikube?
+
+O etcdctl é a ferramenta de linha de comando para interagir com o etcd. Para instalar o etcdctl no Minikube, você pode seguir estas etapas:
+
+    Acesse o shell do seu cluster Minikube executando o comando:
+
+minikube ssh
+
+    Baixe a versão mais recente do etcdctl usando o comando curl:
+
+arduino
+
+curl -L https://github.com/etcd-io/etcd/releases/latest/download/etcd-v3.6.0-linux-amd64.tar.gz -o etcd-v3.6.0-linux-amd64.tar.gz
+
+Certifique-se de atualizar o URL com a versão mais recente do etcdctl disponível. Verifique o site oficial do etcd para obter a versão mais recente.
+
+    Extraia o arquivo etcdctl do arquivo .tar.gz:
+
+tar xzvf etcd-v3.6.0-linux-amd64.tar.gz
+
+    Mova o arquivo etcdctl para o diretório /usr/local/bin/:
+
+bash
+
+sudo mv etcd-v3.6.0-linux-amd64/etcdctl /usr/local/bin/
+
+    Verifique se o etcdctl foi instalado corretamente, executando o comando:
+
+etcdctl version
+
+Isso exibirá a versão do etcdctl instalada no Minikube.
+
+Com o etcdctl instalado, você pode usá-lo para interagir com o etcd no seu cluster Minikube. Por exemplo, para listar as chaves armazenadas no etcd, você pode executar o seguinte comando:
+
+css
+
+etcdctl get / --prefix --keys-only
+
+Isso listará todas as chaves no etcd. Lembre-se de que você precisará ter permissão adequada para executar esses comandos no etcd.
+
+
+
+
+
+
+
+
+
+- Instalar o etcd client:
+apt-get install etcd-client
+
+
+~~~~bash
+root@minikube:~# ls -lhasp /var/lib/minikube/certs/etcd/
+total 40K
+4.0K drwxr-xr-x 2 root root 4.0K Nov  1 01:45 ./
+4.0K drwxr-xr-x 3 root root 4.0K Nov  1 01:45 ../
+4.0K -rw-r--r-- 1 root root 1.1K Nov  1 01:45 ca.crt
+4.0K -rw------- 1 root root 1.7K Nov  1 01:45 ca.key
+4.0K -rw-r--r-- 1 root root 1.2K Nov  1 01:45 healthcheck-client.crt
+4.0K -rw------- 1 root root 1.7K Nov  1 01:45 healthcheck-client.key
+4.0K -rw-r--r-- 1 root root 1.2K Nov  1 01:45 peer.crt
+4.0K -rw------- 1 root root 1.7K Nov  1 01:45 peer.key
+4.0K -rw-r--r-- 1 root root 1.2K Nov  1 01:45 server.crt
+4.0K -rw------- 1 root root 1.7K Nov  1 01:45 server.key
+root@minikube:~#
+~~~~bash
+
+
+
+
+
+ETCDCTL_API=3 etcdctl \
+   --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+   --cert=/var/lib/minikube/certs/etcd/server.crt \
+   --key=/var/lib/minikube/certs/etcd/server.key  \
+   get /registry/secrets/default/my-secret | hexdump -C
+
+
+~~~~bash
+root@minikube:~# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret | hexdump -C
+00000000  2f 72 65 67 69 73 74 72  79 2f 73 65 63 72 65 74  |/registry/secret|
+00000010  73 2f 64 65 66 61 75 6c  74 2f 6d 79 2d 73 65 63  |s/default/my-sec|
+00000020  72 65 74 0a 6b 38 73 00  0a 0c 0a 02 76 31 12 06  |ret.k8s.....v1..|
+00000030  53 65 63 72 65 74 12 d2  01 0a b2 01 0a 09 6d 79  |Secret........my|
+00000040  2d 73 65 63 72 65 74 12  00 1a 07 64 65 66 61 75  |-secret....defau|
+00000050  6c 74 22 00 2a 24 65 30  32 65 32 62 30 62 2d 34  |lt".*$e02e2b0b-4|
+00000060  62 65 36 2d 34 66 31 62  2d 39 66 34 32 2d 32 65  |be6-4f1b-9f42-2e|
+00000070  36 65 32 31 36 39 32 37  38 37 32 00 38 00 42 08  |6e216927872.8.B.|
+00000080  08 95 b3 c1 a1 06 10 00  7a 00 8a 01 61 0a 0e 6b  |........z...a..k|
+00000090  75 62 65 63 74 6c 2d 63  72 65 61 74 65 12 06 55  |ubectl-create..U|
+000000a0  70 64 61 74 65 1a 02 76  31 22 08 08 95 b3 c1 a1  |pdate..v1"......|
+000000b0  06 10 00 32 08 46 69 65  6c 64 73 56 31 3a 2d 0a  |...2.FieldsV1:-.|
+000000c0  2b 7b 22 66 3a 64 61 74  61 22 3a 7b 22 2e 22 3a  |+{"f:data":{".":|
+000000d0  7b 7d 2c 22 66 3a 6b 65  79 31 22 3a 7b 7d 7d 2c  |{},"f:key1":{}},|
+000000e0  22 66 3a 74 79 70 65 22  3a 7b 7d 7d 42 00 12 13  |"f:type":{}}B...|
+000000f0  0a 04 6b 65 79 31 12 0b  73 75 70 65 72 73 65 63  |..key1..supersec|
+00000100  72 65 74 1a 06 4f 70 61  71 75 65 1a 00 22 00 0a  |ret..Opaque.."..|
+00000110
+root@minikube:~#
+~~~~
+
+
+
+- Foi possível trazer a "supersecret", de dentro do Cluster Minikube, via comando "minikube ssh" e o processo acima, que foi documentado no markdown abaixo:
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-Usando-Hexdump-no-ETCD-do-Minikube.md
+
+
+
+
+
+
+
+
+
+# RESUMO
+
+- Foi possível obter o valor da Secret via etcdctl no Minikube, seguindo o tutorial abaixo:
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-Usando-Hexdump-no-ETCD-do-Minikube.md
