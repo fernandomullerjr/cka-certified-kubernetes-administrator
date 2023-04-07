@@ -775,7 +775,46 @@ root@minikube:~#
 
 
 
+- Understanding the encryption at rest configuration
 
+~~~~YAML
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+      - configmaps
+      - pandas.awesome.bears.example
+    providers:
+      - identity: {}
+      - aesgcm:
+          keys:
+            - name: key1
+              secret: c2VjcmV0IGlzIHNlY3VyZQ==
+            - name: key2
+              secret: dGhpcyBpcyBwYXNzd29yZA==
+      - aescbc:
+          keys:
+            - name: key1
+              secret: c2VjcmV0IGlzIHNlY3VyZQ==
+            - name: key2
+              secret: dGhpcyBpcyBwYXNzd29yZA==
+      - secretbox:
+          keys:
+            - name: key1
+              secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=
+~~~~
+
+
+
+
+# PENDENTE
+
+- Continua em:
+06:44
+
+- Necessário fazer procedimento sobre "--encryption-provider-config" do kube-apiserver:
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
 
 
 # RESUMO
