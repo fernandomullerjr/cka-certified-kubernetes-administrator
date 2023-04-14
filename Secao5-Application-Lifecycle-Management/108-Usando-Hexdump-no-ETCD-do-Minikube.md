@@ -54,7 +54,10 @@ root@minikube:~#
 
 
 
+
 - Adaptar o comando:
+
+Verificar os paths usados no Node, seja Minikube ou não.
 
 https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
 <https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/>

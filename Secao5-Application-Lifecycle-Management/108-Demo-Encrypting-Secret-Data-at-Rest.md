@@ -829,3 +829,57 @@ https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
 
 - Foi possível obter o valor da Secret via etcdctl no Minikube, seguindo o tutorial abaixo:
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-Usando-Hexdump-no-ETCD-do-Minikube.md
+
+
+
+
+
+
+
+
+
+
+# Dia 14/04/2023
+
+[07:00]
+
+<https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/>
+
+Configuration and determining whether encryption at rest is already enabled
+The kube-apiserver process accepts an argument --encryption-provider-config that controls how API data is encrypted in etcd. The configuration is provided as an API named EncryptionConfiguration. --encryption-provider-config-automatic-reload boolean argument determines if the file set by --encryption-provider-config should be automatically reloaded if the disk contents change. This enables key rotation without API server restarts. An example configuration is provided below.
+
+
+- Verificando se o kube-apiserver já utiliza o argumento "--encryption-provider-config":
+
+minikube ssh
+sudo su
+ps -aux | grep kube-api
+ps -aux | grep kube-api | grep "encryption-provider-config"
+
+~~~~bash
+
+root@minikube:/home/docker#
+root@minikube:/home/docker# ps -aux | grep kube-api
+root        1724 12.3  3.3 1172676 336696 ?      Ssl  23:39   0:40 kube-apiserver --advertise-address=192.168.49.2 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/var/lib/minikube/certs/ca.crt --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota --enable-bootstrap-token-auth=true --etcd-cafile=/var/lib/minikube/certs/etcd/ca.crt --etcd-certfile=/var/lib/minikube/certs/apiserver-etcd-client.crt --etcd-keyfile=/var/lib/minikube/certs/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/var/lib/minikube/certs/apiserver-kubelet-client.crt --kubelet-client-key=/var/lib/minikube/certs/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/var/lib/minikube/certs/front-proxy-client.crt --proxy-client-key-file=/var/lib/minikube/certs/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/var/lib/minikube/certs/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=8443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/var/lib/minikube/certs/sa.pub --service-account-signing-key-file=/var/lib/minikube/certs/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/var/lib/minikube/certs/apiserver.crt --tls-private-key-file=/var/lib/minikube/certs/apiserver.key
+root        8026  0.0  0.0   3440   660 pts/1    S+   23:44   0:00 grep --color=auto kube-api
+root@minikube:/home/docker#
+
+
+root@minikube:/home/docker# ps -aux | grep kube-api | grep "encryption-provider-config"
+root@minikube:/home/docker#
+
+
+~~~~
+
+
+- Como foi possível verificar, o argumento "--encryption-provider-config" não está configurado no Kube-API-Server
+
+
+
+
+
+root@minikube:/home/docker# ls /etc/kubernetes/manifests/
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+root@minikube:/home/docker# date
+Fri Apr 14 23:53:31 UTC 2023
+root@minikube:/home/docker#
