@@ -1089,3 +1089,122 @@ resources:
 
 
 
+
+
+
+To create a new Secret, perform the following steps:
+
+    Generate a 32-byte random key and base64 encode it. If you're on Linux or macOS, run the following command:
+
+    head -c 32 /dev/urandom | base64
+
+    Place that value in the secret field of the EncryptionConfiguration struct.
+
+    Set the --encryption-provider-config flag on the kube-apiserver to point to the location of the config file.
+
+    You will need to mount the new encryption config file to the kube-apiserver static pod. Here is an example on how to do that:
+        Save the new encryption config file to /etc/kubernetes/enc/enc.yaml on the control-plane node.
+        Edit the manifest for the kube-apiserver static pod: /etc/kubernetes/manifests/kube-apiserver.yaml similarly to this:
+
+~~~~yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+        kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 10.10.30.4:6443
+      creationTimestamp: null
+      labels:
+        component: kube-apiserver
+        tier: control-plane
+      name: kube-apiserver
+      namespace: kube-system
+    spec:
+      containers:
+      - command:
+        - kube-apiserver
+        ...
+        - --encryption-provider-config=/etc/kubernetes/enc/enc.yaml  # <-- add this line
+        volumeMounts:
+        ...
+        - name: enc                           # <-- add this line
+          mountPath: /etc/kubernetes/enc      # <-- add this line
+          readonly: true                      # <-- add this line
+        ...
+      volumes:
+      ...
+      - name: enc                             # <-- add this line
+        hostPath:                             # <-- add this line
+          path: /etc/kubernetes/enc           # <-- add this line
+          type: DirectoryOrCreate             # <-- add this line
+      ...
+~~~~
+
+    Restart your API server.
+
+
+
+
+
+- Entrar no Node do Minikube:
+minikube ssh
+
+- Gerar o valor randomico e encodificar ele com base64:
+head -c 32 /dev/urandom | base64
+
+root@minikube:/home/docker# head -c 32 /dev/urandom | base64
+K4NniAyqOMm6To9hEuxDEKl8O9+IMk1IqPbcFaee9Ag=
+root@minikube:/home/docker#
+
+
+- Colocar o valor no manifesto do EncryptionConfiguration
+Secao5-Application-Lifecycle-Management/108-EncryptionConfiguration-with-encryption_editado.yaml
+ficando assim
+
+~~~~YAML
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: K4NniAyqOMm6To9hEuxDEKl8O9+IMk1IqPbcFaee9Ag=
+      - identity: {}
+~~~~
+
+
+
+- Criar o diretório onde vai ficar o manifesto do EncryptionConfiguration:
+mkdir /etc/kubernetes/enc/
+
+- Criar o manifesto:
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-EncryptionConfiguration-with-encryption_editado.yaml
+vi /etc/kubernetes/enc/enc.yaml
+
+
+
+- Criar manifesto para o kube-apiserver:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-kube-apiserver.yaml
+
+vi /etc/kubernetes/manifests/kube-apiserver.yaml
+
+
+- --encryption-provider-config=/etc/kubernetes/enc/enc.yaml
+
+    volumeMounts:
+    - mountPath: /etc/kubernetes/enc      # <-- add this line
+      name: enc                           # <-- add this line
+      readonly: true                      # <-- add this line
+
+
+  volumes:
+  - hostPath:                             # <-- add this line
+      path: /etc/kubernetes/enc           # <-- add this line
+      type: DirectoryOrCreate             # <-- add this line
+    name: enc                             # <-- add this line
+
+
+-
