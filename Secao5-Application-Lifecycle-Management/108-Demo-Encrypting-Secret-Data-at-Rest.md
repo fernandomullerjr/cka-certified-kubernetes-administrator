@@ -1208,3 +1208,316 @@ vi /etc/kubernetes/manifests/kube-apiserver.yaml
 
 
 -
+
+
+
+
+- Após editado o manifesto o Pod do kube-apiserver é ajustado sozinho:
+
+usando o crictl, é possível ver o container dentro do minikube
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get pods -A | grep apiserver
+kube-system     kube-apiserver-minikube                                           1/1     Running   0              82s
+fernando@debian10x64:~$ date
+Sat 15 Apr 2023 12:39:55 AM -03
+fernando@debian10x64:~$
+
+
+root@minikube:/home/docker#
+root@minikube:/home/docker# crictl ps | head
+CONTAINER           IMAGE                                                                                                       CREATED             STATE               NAME                      ATTEMPT             POD ID
+a515a43162ae8       6e38f40d628db                                                                                               2 minutes ago       Running             storage-provisioner       71                  160934d6279f1
+8749f0cec693f       e64579b7d8862                                                                                               2 minutes ago       Running             kube-apiserver            0                   f1a821ffd559a
+a89e8717673b3       kodekloud/event-simulator@sha256:1e3e9c72136bbc76c96dd98f29c04f298c3ae241c7d44e2bf70bcc209b030bf9           18 minutes ago      Running             event-simulator           12                  e62e52b174a10
+3f3d27b97a33b       nginx@sha256:63b44e8ddb83d5dd8020327c1f40436e37a6fffd3ef2498a6204df23be6e7e94                               18 minutes ago      Running             nginx                     15                  fcf8e1fac3ade
+b5429d7732260       fabricioveronez/pedelogo-catalogo@sha256:82c6460c89b2e3b98f013a34dc720391a8c840c5ed4a0c8dbeaf14c648afc331   18 minutes ago      Running             api                       16                  34f78f4fd6e0d
+249df364c7bfd       e3e043d3ed2f7                                                                                               18 minutes ago      Running             nginx-container           11                  cf5b69555007c
+b374308e6998a       e3e043d3ed2f7                                                                                               18 minutes ago      Running             nginx-container           11                  09114b727bad2
+b96353090af7d       8d147537fb7d1                                                                                               18 minutes ago      Running             coredns                   35                  e594caa3bcd25
+396d180f39931       17c225a562d97                                                                                               18 minutes ago      Running             metrics-server            16                  9727912cada2a
+root@minikube:/home/docker#
+
+~~~~
+
+
+
+
+
+
+- Validando a configuração:
+
+~~~~bash
+
+root@minikube:/home/docker# ps -aux | grep apiserver | grep "encrypt"
+root       14824 10.2  3.9 1172932 399000 ?      Ssl  03:38   0:23 kube-apiserver --advertise-address=192.168.49.2 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/var/lib/minikube/certs/ca.crt --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota --enable-bootstrap-token-auth=true --etcd-cafile=/var/lib/minikube/certs/etcd/ca.crt --etcd-certfile=/var/lib/minikube/certs/apiserver-etcd-client.crt --etcd-keyfile=/var/lib/minikube/certs/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/var/lib/minikube/certs/apiserver-kubelet-client.crt --kubelet-client-key=/var/lib/minikube/certs/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/var/lib/minikube/certs/front-proxy-client.crt --proxy-client-key-file=/var/lib/minikube/certs/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/var/lib/minikube/certs/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=8443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/var/lib/minikube/certs/sa.pub --service-account-signing-key-file=/var/lib/minikube/certs/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/var/lib/minikube/certs/apiserver.crt --tls-private-key-file=/var/lib/minikube/certs/apiserver.key --encryption-provider-config=/etc/kubernetes/enc/enc.yaml
+root@minikube:/home/docker#
+
+~~~~
+
+
+
+
+
+
+
+
+
+- Criando uma nova Secret:
+
+kubectl create secret generic my-secret-2 --from-literal=key2=topsecret
+
+~~~~bash
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl create secret generic my-secret-2 --from-literal=key2=topsecret
+secret/my-secret-2 created
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl get secret
+NAME                                             TYPE                                  DATA   AGE
+app-secret                                       Opaque                                3      39d
+default-token-cb22x                              kubernetes.io/service-account-token   3      103d
+meu-ingress-controller-ingress-nginx-admission   Opaque                                3      103d
+minhaapi-api-secret                              Opaque                                2      78d
+minhaapi-mongodb                                 Opaque                                2      78d
+minhaapi-mongodb-token-bk9zr                     kubernetes.io/service-account-token   3      78d
+my-secret                                        Opaque                                1      7d9h
+my-secret-2                                      Opaque                                1      8s
+sh.helm.release.v1.minhaapi.v1                   helm.sh/release.v1                    1      91d
+sh.helm.release.v1.minhaapi.v10                  helm.sh/release.v1                    1      76d
+sh.helm.release.v1.minhaapi.v2                   helm.sh/release.v1                    1      83d
+sh.helm.release.v1.minhaapi.v3                   helm.sh/release.v1                    1      83d
+sh.helm.release.v1.minhaapi.v4                   helm.sh/release.v1                    1      81d
+sh.helm.release.v1.minhaapi.v5                   helm.sh/release.v1                    1      81d
+sh.helm.release.v1.minhaapi.v6                   helm.sh/release.v1                    1      78d
+sh.helm.release.v1.minhaapi.v7                   helm.sh/release.v1                    1      76d
+sh.helm.release.v1.minhaapi.v8                   helm.sh/release.v1                    1      76d
+sh.helm.release.v1.minhaapi.v9                   helm.sh/release.v1                    1      76d
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+
+
+- Verificando a antiga Secret, ela segue aparecendo sem encriptação:
+
+~~~~bash
+ETCDCTL_API=3 etcdctl \
+   --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+   --cert=/var/lib/minikube/certs/etcd/server.crt \
+   --key=/var/lib/minikube/certs/etcd/server.key  \
+   get /registry/secrets/default/my-secret | hexdump -C
+~~~~
+
+
+~~~~bash
+
+root@minikube:/home/docker# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret | hexdump -C
+00000000  2f 72 65 67 69 73 74 72  79 2f 73 65 63 72 65 74  |/registry/secret|
+00000010  73 2f 64 65 66 61 75 6c  74 2f 6d 79 2d 73 65 63  |s/default/my-sec|
+00000020  72 65 74 0a 6b 38 73 00  0a 0c 0a 02 76 31 12 06  |ret.k8s.....v1..|
+00000030  53 65 63 72 65 74 12 d2  01 0a b2 01 0a 09 6d 79  |Secret........my|
+00000040  2d 73 65 63 72 65 74 12  00 1a 07 64 65 66 61 75  |-secret....defau|
+00000050  6c 74 22 00 2a 24 65 30  32 65 32 62 30 62 2d 34  |lt".*$e02e2b0b-4|
+00000060  62 65 36 2d 34 66 31 62  2d 39 66 34 32 2d 32 65  |be6-4f1b-9f42-2e|
+00000070  36 65 32 31 36 39 32 37  38 37 32 00 38 00 42 08  |6e216927872.8.B.|
+00000080  08 95 b3 c1 a1 06 10 00  7a 00 8a 01 61 0a 0e 6b  |........z...a..k|
+00000090  75 62 65 63 74 6c 2d 63  72 65 61 74 65 12 06 55  |ubectl-create..U|
+000000a0  70 64 61 74 65 1a 02 76  31 22 08 08 95 b3 c1 a1  |pdate..v1"......|
+000000b0  06 10 00 32 08 46 69 65  6c 64 73 56 31 3a 2d 0a  |...2.FieldsV1:-.|
+000000c0  2b 7b 22 66 3a 64 61 74  61 22 3a 7b 22 2e 22 3a  |+{"f:data":{".":|
+000000d0  7b 7d 2c 22 66 3a 6b 65  79 31 22 3a 7b 7d 7d 2c  |{},"f:key1":{}},|
+000000e0  22 66 3a 74 79 70 65 22  3a 7b 7d 7d 42 00 12 13  |"f:type":{}}B...|
+000000f0  0a 04 6b 65 79 31 12 0b  73 75 70 65 72 73 65 63  |..key1..supersec|
+00000100  72 65 74 1a 06 4f 70 61  71 75 65 1a 00 22 00 0a  |ret..Opaque.."..|
+00000110
+root@minikube:/home/docker#
+
+~~~~
+
+
+
+
+
+- Já a nova Secret, está encriptada, conforme o esperado:
+
+~~~~bash
+ETCDCTL_API=3 etcdctl \
+   --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+   --cert=/var/lib/minikube/certs/etcd/server.crt \
+   --key=/var/lib/minikube/certs/etcd/server.key  \
+   get /registry/secrets/default/my-secret-2 | hexdump -C
+~~~~
+
+~~~~bash
+
+root@minikube:/home/docker# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret-2 | hexdump -C
+00000000  2f 72 65 67 69 73 74 72  79 2f 73 65 63 72 65 74  |/registry/secret|
+00000010  73 2f 64 65 66 61 75 6c  74 2f 6d 79 2d 73 65 63  |s/default/my-sec|
+00000020  72 65 74 2d 32 0a 6b 38  73 3a 65 6e 63 3a 61 65  |ret-2.k8s:enc:ae|
+00000030  73 63 62 63 3a 76 31 3a  6b 65 79 31 3a f5 2c 0e  |scbc:v1:key1:.,.|
+00000040  80 c7 b9 9e 1c cd ae 96  42 83 db 82 5c 49 36 6f  |........B...\I6o|
+00000050  00 96 5f cc cc b8 f6 88  4c e1 61 74 57 c6 73 d4  |.._.....L.atW.s.|
+00000060  66 73 67 a0 90 5b f7 ed  d4 aa 5f df c5 da 3e 66  |fsg..[...._...>f|
+00000070  b8 94 50 c6 15 db dd b9  a3 da 05 ac d4 21 7a 9a  |..P..........!z.|
+00000080  0f 92 28 43 ea 7e bd 6b  5b 61 0f ff 20 8e db 61  |..(C.~.k[a.. ..a|
+00000090  8e 7f e3 95 63 1b 4b 96  ec 93 a9 c5 2c 96 97 9a  |....c.K.....,...|
+000000a0  cd e3 9a fb e9 78 fa 0a  e4 f9 a7 0f f0 99 8f 61  |.....x.........a|
+000000b0  97 a4 97 b7 9e 32 00 5a  47 09 c1 bb c2 48 65 3b  |.....2.ZG....He;|
+000000c0  2d 9a b4 fd c7 48 5c 59  90 00 25 c2 1c fb 09 99  |-....H\Y..%.....|
+000000d0  d2 64 c2 2e e9 ff 1d da  50 8f 2c 20 8d 75 db 2f  |.d......P., .u./|
+000000e0  6b 52 51 69 43 d7 ec 78  e1 24 e5 00 97 ee ba d0  |kRQiC..x.$......|
+000000f0  33 53 be 95 3f 2a 53 37  3d a6 92 0b e4 2a 46 6a  |3S..?*S7=....*Fj|
+00000100  1d 9d cb d6 d6 af 0b 87  24 66 d9 c8 87 3e 41 85  |........$f...>A.|
+00000110  a4 e3 99 0a 49 d7 a1 d8  f7 b7 26 54 8a f1 24 b9  |....I.....&T..$.|
+00000120  da cf 86 c3 8a 72 54 fe  96 de 20 6d a9 e7 51 c0  |.....rT... m..Q.|
+00000130  81 df f9 69 e5 7e ea 48  2a 92 7c 98 f6 0a        |...i.~.H*.|...|
+0000013e
+root@minikube:/home/docker#
+
+~~~~
+
+
+
+
+- O procedimento de "Encrypting Secret Data at Rest" só tem efeito para novos recursos.
+
+
+
+
+
+
+
+## Ensure all Secrets are encrypted
+
+Since Secrets are encrypted on write, performing an update on a Secret will encrypt that content.
+
+kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+
+
+- Comando Efetua uma nova escrita em todas secrets, para elas terem o seu conteúdo encriptado, caso tenha sido ativado o  "Encrypting Secret Data at Rest".
+
+
+
+
+
+- Efetuando teste
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+secret/app-secret replaced
+secret/default-token-cb22x replaced
+secret/meu-ingress-controller-ingress-nginx-admission replaced
+secret/minhaapi-api-secret replaced
+secret/minhaapi-mongodb replaced
+secret/minhaapi-mongodb-token-bk9zr replaced
+secret/my-secret replaced
+secret/my-secret-2 replaced
+secret/sh.helm.release.v1.minhaapi.v1 replaced
+secret/sh.helm.release.v1.minhaapi.v10 replaced
+secret/sh.helm.release.v1.minhaapi.v2 replaced
+secret/sh.helm.release.v1.minhaapi.v3 replaced
+secret/sh.helm.release.v1.minhaapi.v4 replaced
+secret/sh.helm.release.v1.minhaapi.v5 replaced
+secret/sh.helm.release.v1.minhaapi.v6 replaced
+secret/sh.helm.release.v1.minhaapi.v7 replaced
+secret/sh.helm.release.v1.minhaapi.v8 replaced
+secret/sh.helm.release.v1.minhaapi.v9 replaced
+secret/default-token-6sf65 replaced
+secret/default-token-gggs7 replaced
+secret/attachdetach-controller-token-8ch4s replaced
+secret/bootstrap-signer-token-5xcvb replaced
+secret/certificate-controller-token-rl9cr replaced
+secret/clusterrole-aggregation-controller-token-xpdct replaced
+secret/coredns-token-tj7nv replaced
+secret/cronjob-controller-token-z9dgj replaced
+secret/daemon-set-controller-token-mbs8c replaced
+secret/default-token-rqmtv replaced
+secret/deployment-controller-token-smjbs replaced
+secret/disruption-controller-token-7lnfd replaced
+secret/endpoint-controller-token-qw2cx replaced
+secret/endpointslice-controller-token-5lvpd replaced
+secret/endpointslicemirroring-controller-token-j8xhb replaced
+secret/ephemeral-volume-controller-token-t7fgl replaced
+secret/expand-controller-token-dm9m2 replaced
+secret/generic-garbage-collector-token-2z7v2 replaced
+secret/horizontal-pod-autoscaler-token-zrl7w replaced
+secret/job-controller-token-2pqn4 replaced
+secret/kube-proxy-token-cfwqb replaced
+secret/metrics-server-token-hpq6k replaced
+secret/my-scheduler-token-mfph4 replaced
+secret/namespace-controller-token-ddn8z replaced
+secret/node-controller-token-z6g5d replaced
+secret/persistent-volume-binder-token-w5s2n replaced
+secret/pod-garbage-collector-token-phlbr replaced
+secret/pv-protection-controller-token-r6k56 replaced
+secret/pvc-protection-controller-token-mw8qq replaced
+secret/replicaset-controller-token-z45pz replaced
+secret/replication-controller-token-jhr5q replaced
+secret/resourcequota-controller-token-vjb42 replaced
+secret/root-ca-cert-publisher-token-92d59 replaced
+secret/service-account-controller-token-ncghb replaced
+secret/service-controller-token-92qfn replaced
+secret/statefulset-controller-token-2s2t5 replaced
+secret/storage-provisioner-token-jsl7g replaced
+secret/token-cleaner-token-72fpm replaced
+secret/ttl-after-finished-controller-token-9x4l7 replaced
+secret/ttl-controller-token-zqq6q replaced
+secret/default-token-9jkwp replaced
+secret/meu-ingress-controller-ingress-nginx-admission replaced
+secret/meu-ingress-controller-ingress-nginx-token-9mn82 replaced
+secret/sh.helm.release.v1.meu-ingress-controller.v1 replaced
+secret/sh.helm.release.v1.meu-ingress-controller.v2 replaced
+secret/sh.helm.release.v1.meu-ingress-controller.v3 replaced
+secret/sh.helm.release.v1.meu-ingress-controller.v4 replaced
+secret/sh.helm.release.v1.meu-ingress-controller.v5 replaced
+fernando@debian10x64:~$
+~~~~
+
+
+
+
+
+- Agora encriptou até a antiga Secret:
+
+~~~~bash
+
+root@minikube:/home/docker# ETCDCTL_API=3 etcdctl \
+>    --cacert=/var/lib/minikube/certs/etcd/ca.crt   \
+>    --cert=/var/lib/minikube/certs/etcd/server.crt \
+>    --key=/var/lib/minikube/certs/etcd/server.key  \
+>    get /registry/secrets/default/my-secret | hexdump -C
+00000000  2f 72 65 67 69 73 74 72  79 2f 73 65 63 72 65 74  |/registry/secret|
+00000010  73 2f 64 65 66 61 75 6c  74 2f 6d 79 2d 73 65 63  |s/default/my-sec|
+00000020  72 65 74 0a 6b 38 73 3a  65 6e 63 3a 61 65 73 63  |ret.k8s:enc:aesc|
+00000030  62 63 3a 76 31 3a 6b 65  79 31 3a 7c 94 70 93 74  |bc:v1:key1:|.p.t|
+00000040  00 40 74 98 07 f0 f4 bb  62 52 c8 f1 7f 9a 5e 13  |.@t.....bR....^.|
+00000050  14 a3 0e 10 cb 3a 52 47  d1 e3 f4 3b b2 b1 8a 8c  |.....:RG...;....|
+00000060  de 63 8a 81 61 80 ab 10  47 80 8a c4 7e 58 00 54  |.c..a...G...~X.T|
+00000070  9b d2 00 10 8e bb 06 e1  04 3b d3 86 ce b8 32 dd  |.........;....2.|
+00000080  b3 dd 69 af 02 45 c3 0f  ba c9 72 00 e4 4e 00 e3  |..i..E....r..N..|
+00000090  11 7c b8 f8 99 b5 b6 6e  2d 7d 0e f2 66 30 f8 f2  |.|.....n-}..f0..|
+000000a0  92 db 74 dd d9 c9 e7 bb  af 5f 45 f9 9a 0e 2a d9  |..t......_E...*.|
+000000b0  c3 65 02 f0 de 0e 53 c3  e4 d4 dd f5 55 07 9b 46  |.e....S.....U..F|
+000000c0  e6 6e fc 4b d5 c6 d6 b5  ee 55 09 e4 92 8a 96 9e  |.n.K.....U......|
+000000d0  1f 8d c2 fa 70 35 41 ae  6c a2 7b 4f 51 90 4a 1b  |....p5A.l.{OQ.J.|
+000000e0  de 8c ba b3 f4 40 95 03  33 00 e5 c2 00 c6 ca 6f  |.....@..3......o|
+000000f0  fc 27 ed 8e 9d 69 c5 76  ba e0 3f f2 a4 9d 3e f8  |.'...i.v..?...>.|
+00000100  49 a7 b4 75 4a 23 6e cd  d2 75 34 ad c0 0a 43 d6  |I..uJ#n..u4...C.|
+00000110  65 35 e9 7b 57 f9 a1 e2  a6 3d 61 31 0a c3 d0 cc  |e5.{W....=a1....|
+00000120  70 8d 32 be aa 7f 78 08  91 00 1c 7a 74 4c b8 56  |p.2...x....ztL.V|
+00000130  7b aa 3e e8 2e e9 c5 06  b4 f1 bd 0a              |{.>.........|
+0000013c
+root@minikube:/home/docker#
+
+~~~~
