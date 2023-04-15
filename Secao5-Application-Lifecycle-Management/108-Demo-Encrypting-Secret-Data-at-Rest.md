@@ -18,6 +18,10 @@ git status
 
 # RESUMO
 
+- Aula em torno do material:
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+<https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/>
+
 - Foi possível obter o valor da Secret via etcdctl no Minikube, seguindo o tutorial abaixo:
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao5-Application-Lifecycle-Management/108-Usando-Hexdump-no-ETCD-do-Minikube.md
 
@@ -1047,6 +1051,7 @@ resources:
 
 
 
+- A ordem é importante.
 - Quando o identity está no inicio, não ocorre encriptação!
   - identity: {}
 
@@ -1054,3 +1059,33 @@ resources:
 
 - CONTINUA EM
 10:52
+
+
+
+## Encrypting your data
+
+Create a new encryption config file:
+
+~~~~YAML
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+      - configmaps
+      - pandas.awesome.bears.example
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <BASE 64 ENCODED SECRET>
+      - identity: {}
+~~~~
+
+
+- Para que ocorra a encriptação, no caso do manifesto do EncryptionConfiguration, o "aescbc" precisa ser passado para o começo da listagem de providers, pois o "identity: {}" não efetua encriptação.
+
+
+
+
+
