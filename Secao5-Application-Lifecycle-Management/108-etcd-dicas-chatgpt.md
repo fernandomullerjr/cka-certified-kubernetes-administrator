@@ -1,3 +1,6 @@
+
+
+
 Como utilizar o hexdump no etcd do Minikube, já que o hexdump não vem instalado?
 
 O hexdump é uma ferramenta útil para visualizar o conteúdo de arquivos binários em formato hexadecimal. No entanto, não está incluído por padrão no Minikube ou no etcd.

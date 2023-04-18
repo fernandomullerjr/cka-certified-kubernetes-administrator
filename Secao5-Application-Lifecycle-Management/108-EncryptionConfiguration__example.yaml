@@ -1,3 +1,5 @@
+# No exemplo abaixo, como o identity está listado como primeiro provider, a encriptação não acontece. 
+# Precisaria usar o aesgcm ou outro, ao inicio da listagem de providers
 apiVersion: apiserver.config.k8s.io/v1
 kind: EncryptionConfiguration
 resources:
