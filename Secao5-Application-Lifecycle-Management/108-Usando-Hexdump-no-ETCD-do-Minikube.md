@@ -1,6 +1,6 @@
 
 
-
+Verificando se os dados estão sendo armazenados de forma encriptada no etcd.
 
 - Acesse o shell do seu cluster Minikube executando o comando:
 
