@@ -70,3 +70,8 @@ In this section, we will take a look at multi-container pods
 - Pods comportam mais de 1 container.
 
 - É útil utilizar um container com o agent de Logs, por exemplo.
+
+
+- Maiores detalhes:
+https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/
+<https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/>
