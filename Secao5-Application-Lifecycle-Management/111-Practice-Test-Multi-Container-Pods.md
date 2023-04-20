@@ -854,3 +854,221 @@ spec:
     command: ["/bin/sh"]
     args: ["-c", "echo Hello from the debian container > /pod-data/index.html"]
 ~~~~
+
+
+
+
+
+
+
+- EDITADO
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: app
+  name: app
+  namespace: elastic-stack
+spec:
+  containers:
+  - image: kodekloud/event-simulator
+    imagePullPolicy: Always
+    name: app
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-w59ff
+      readOnly: true
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/event-simulator/
+#    command: ["/bin/sh"]
+#    args: ["-c", "echo Hello from the debian container > /pod-data/index.html"]
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: controlplane
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - hostPath:
+      path: /var/log/webapp
+      type: DirectoryOrCreate
+    name: log-volume
+  - name: kube-api-access-w59ff
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+
+~~~~
+
+
+controlplane ~ ➜  vi app-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f app-editado.yaml
+Warning: resource pods/app is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+The Pod "app" is invalid: spec.containers: Forbidden: pod updates may not add or remove containers
+
+controlplane ~ ✖ kubectl delete -f app-editado.yaml
+pod "app" deleted
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f app-editado.yaml
+pod/app created
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Inspect the Kibana UI. You should now see logs appearing in the Discover section.
+
+You might have to wait for a couple of minutes for the logs to populate. You might have to create an index pattern to list the logs. If not sure check this video: https://bit.ly/2EXYdHf
+
+
+
+
+- No Kibana em "Discover", trouxe os logs:
+
+April 19th 2023, 21:08:13.826
+
+@timestamp:
+    April 19th 2023, 21:08:13.826
+host.name:
+    alpha-n2-worker3
+source:
+    /var/log/event-simulator/app.log
+offset:
+    282,598
+message:
+    [2023-04-19 23:43:51,640] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.
+prospector.type:
+    log
+input.type:
+    log
+beat.name:
+    alpha-n2-worker3
+beat.hostname:
+    alpha-n2-worker3
+beat.version:
+    6.4.2
+_id:
+    IH_9m4cBzsTfkN5jkqod
+_type:
+    doc
+_index:
+    filebeat-6.4.2-2023.04.20
+_score:
+    2
+
+April 19th 2023, 21:08:13.826
+
+@timestamp:
+    April 19th 2023, 21:08:13.826
+source:
+    /var/log/event-simulator/app.log
+offset:
+    283,979
+message:
+    [2023-04-19 23:43:58,647] INFO in event-simulator: USER1 logged in
+prospector.type:
+    log
+input.type:
+    log
+beat.name:
+    alpha-n2-worker3
+beat.hostname:
+    alpha-n2-worker3
+beat.version:
+    6.4.2
+host.name:
+    alpha-n2-worker3
+_id:
+    MX_9m4cBzsTfkN5jkqod
+_type:
+    doc
+_index:
+    filebeat-6.4.2-2023.04.20
+_score:
+    2
+
+April 19th 2023, 21:08:13.826
+
+@timestamp:
+    April 19th 2023, 21:08:13.826
+source:
+    /var/log/event-simulator/app.log
+offset:
+    284,046
+message:
+    [2023-04-19 23:43:58,650] INFO in event-simulator: USER2 is viewing page1
+input.type:
+    log
+prospector.type:
+    log
+beat.version:
+    6.4.2
+beat.name:
+    alpha-n2-worker3
+beat.hostname:
+    alpha-n2-worker3
+host.name:
+    alpha-n2-worker3
+_id:
+    Mn_9m4cBzsTfkN5jkqod
+_type:
+    doc
+_index:
+    filebeat-6.4.2-2023.04.20
+_score:
+    2 
