@@ -22,7 +22,6 @@ git status
 # 111. Practice Test - Multi Container Pods
 
 
-
 ## Identify the number of containers created in the red pod.
 
 
@@ -1072,3 +1071,6 @@ _index:
     filebeat-6.4.2-2023.04.20
 _score:
     2 
+
+
+
