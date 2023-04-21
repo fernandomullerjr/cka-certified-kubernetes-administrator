@@ -7,7 +7,7 @@
 
 git status
 git add .
-git commit -m "112. Solution - Multi-Container Pods (Optional)"
+git commit -m "113 Multi-container Pods Design Patterns"
 eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
@@ -19,55 +19,7 @@ git status
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-# 112. Solution - Multi-Container Pods (Optional)
+#  Multi-container Pods Design Patterns
+There are 3 common patterns, when it comes to designing multi-container PODs. The first and what we just saw with the logging service example is known as a side car pattern. The others are the adapter and the ambassador pattern.
 
-
-
-
-
-- Para a questão "Create a multi-container pod with 2 containers", além do jeito que foi feito originalmente, poderia ter sido usado o dry-run passando  o parametro da imagem, neste formato:
-
-kubectl run yellow --image=busybox --dry-run=client -o yaml > pod-multiplo.yaml
-
-- Então iria gerar o manifesto abaixo:
-
-~~~~yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  creationTimestamp: null
-  labels:
-    run: yellow
-  name: yellow
-spec:
-  containers:
-  - image: busybox
-    name: yellow
-    resources: {}
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
-~~~~
-
-
-- Aproveitando o manifesto, pode ser editado para ter 2 containers, conforme pedia:
-~~~~yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  creationTimestamp: null
-  labels:
-    run: yellow
-  name: yellow
-spec:
-  containers:
-  - image: busybox
-    name: lemon
-    resources: {}
-    command: [ "sleep", "1000" ]
-  - image: redis
-    name: gold
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
-status: {}
-~~~~
+But these fall under the CKAD curriculum and are not required for the CKA exam. So we will be discuss these in more detail in the CKAD course.
