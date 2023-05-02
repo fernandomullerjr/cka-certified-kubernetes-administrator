@@ -31,7 +31,7 @@ But at times you may want to run a process that runs to completion in a containe
 An initContainer is configured in a pod like all other containers, except that it is specified inside a initContainers section,  like this:
 
 
-
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -47,6 +47,7 @@ spec:
   - name: init-myservice
     image: busybox
     command: ['sh', '-c', 'git clone <some-repository-that-will-be-used-by-application> ; done;']
+~~~~
 
 
 When a POD is first created the initContainer is run, and the process in the initContainer must run to a completion before the real container hosting the application starts. 
@@ -55,6 +56,7 @@ You can configure multiple such initContainers as well, like how we did for mult
 
 If any of the initContainers fail to complete, Kubernetes restarts the Pod repeatedly until the Init Container succeeds.
 
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -73,6 +75,7 @@ spec:
   - name: init-mydb
     image: busybox:1.28
     command: ['sh', '-c', 'until nslookup mydb; do echo waiting for mydb; sleep 2; done;']
+~~~~
 
 
 Read more about initContainers here. And try out the upcoming practice test.
