@@ -20,3 +20,30 @@ git status
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # 116. Solution - Init Containers
+
+
+
+
+
+How long after the creation of the POD will the application come up and be available to users?
+
+resposta errada:
+20minutos
+
+600 segundos também está errado
+
+- RESPOSTA CORRETA:
+30minutos
+
+
+# solução
+
+- Como existem 2 initContainers, é calculado o sleep dos 2.
+No caso é:
+600
++
+1200
+=
+1800
+
+1800/60 = 30minutos

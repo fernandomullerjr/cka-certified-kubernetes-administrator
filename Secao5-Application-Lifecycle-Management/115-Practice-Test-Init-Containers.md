@@ -334,7 +334,8 @@ Events:
 
 controlplane ~ ➜  
 
-
+- RESPOSTA:
+State:          Terminated
 
 
 
