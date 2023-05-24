@@ -47,3 +47,31 @@ No caso é:
 1800/60 = 30minutos
 
 
+
+
+
+
+
+
+
+
+
+- Sobre a questão do Pod orange crashando.
+- Foi verificado o YAML do Pod e verificado comando sleep incoerente.
+- Mas o mais adequado teria sido avaliando os logs do Pod, pegando o erro do comando inexistente.
+
+~~~~YAML
+Init Containers:
+  init-myservice:
+    Container ID:  containerd://2cfe3b099d97ffab21f92016ad69c13bc28bb7f4176075c44221ea6f871c9d41
+    Image:         busybox
+    Image ID:      docker.io/library/busybox@sha256:b5d6fe0712636ceb7430189de28819e195e8966372edfc2d9409d79402a0dc16
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+      sleeeep 2;
+    State:          Terminated
+      Reason:       Error
+~~~~
