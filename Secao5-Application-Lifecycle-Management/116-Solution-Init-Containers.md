@@ -23,9 +23,7 @@ git status
 
 
 
-
-
-How long after the creation of the POD will the application come up and be available to users?
+# How long after the creation of the POD will the application come up and be available to users?
 
 resposta errada:
 20minutos
@@ -47,3 +45,5 @@ No caso é:
 1800
 
 1800/60 = 30minutos
+
+
