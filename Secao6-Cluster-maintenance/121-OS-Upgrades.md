@@ -89,5 +89,7 @@ kubectl uncordon node-1
 kubectl cordon NODE
 ~~~~
 
+
+
 # RESUMO
 - Por padrão o node leva 5min para "evitar" os Pods.
