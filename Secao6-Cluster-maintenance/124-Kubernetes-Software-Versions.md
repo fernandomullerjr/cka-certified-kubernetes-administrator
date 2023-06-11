@@ -20,3 +20,14 @@ git status
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # 124. Kubernetes Software Versions
+
+- Verificando a versão do Kubernetes:
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get node
+NAME       STATUS   ROLES                  AGE    VERSION
+minikube   Ready    control-plane,master   160d   v1.22.2
+fernando@debian10x64:~$
+
+
+~~~~
