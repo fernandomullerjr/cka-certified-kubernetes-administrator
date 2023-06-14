@@ -1,5 +1,4 @@
-
-controlplane ~ ✖ kubectl get ds kube-flannel-ds -n kube-flannel -o yaml
+# EXEMPLO do kodekloud:   controlplane ~ ✖ kubectl get ds kube-flannel-ds -n kube-flannel -o yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -161,5 +160,3 @@ status:
   numberReady: 2
   observedGeneration: 1
   updatedNumberScheduled: 2
-
-controlplane ~ ➜  
