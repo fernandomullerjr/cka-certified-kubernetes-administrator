@@ -23,3 +23,11 @@ git status
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # 126. Cluster Upgrade Process
+
+
+- Os componentes do Kubernetes podem estar em releases diferentes.
+
+- O kube-apiserver é o principal componente do Cluster Kubernetes.
+os demais componentes não podem estar numa versão superior ao  kube-apiserver.
+
+- Apenas o kubectl pode estar numa versão superior ao kube-apiserver.
