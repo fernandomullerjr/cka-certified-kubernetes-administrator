@@ -20,3 +20,14 @@ git status
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # 127. Demo - Cluster upgrade
+
+- Acessar o Kubernetes Playground
+iniciar um lab do Kubernetes 1.24
+
+
+- Material
+<https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/>
+
+
+1. Determine which version to upgrade to
+2. Upgrading control plane nodes
