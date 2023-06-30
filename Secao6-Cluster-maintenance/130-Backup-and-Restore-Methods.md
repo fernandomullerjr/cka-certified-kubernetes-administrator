@@ -147,3 +147,101 @@ spec:
   - name: nginx-container
     image: nginx
 ~~~~
+
+
+
+
+
+## Backup - Resource Configs
+
+~~~~BASH
+$ kubectl get all --all-namespaces -o yaml > all-deploy-services.yaml       # (only for few resource groups)
+~~~~
+
+
+
+## Backup - ETCD
+
+    So, instead of backing up resources as before, you may choose to backup the ETCD cluster itself.
+
+You can take a snapshot of the etcd database by using etcdctl utility snapshot save command.
+
+~~~~BASH
+$ ETCDCTL_API=3 etcdctl snapshot save snapshot.db
+
+$  ETCDCTL_API=3 etcdctl snapshot status snapshot.db
+~~~~
+
+
+- Material de apoio
+https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster
+<https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster>
+
+
+
+
+## Restore - ETCD
+
+    To restore etcd from the backup at later in time. First stop kube-apiserver service
+~~~~BASH
+    $ service kube-apiserver stop
+~~~~
+
+
+Run the etcdctl snapshot restore command
+
+~~~~BASH
+ETCDCTL_API=3 etcdctl \
+  snapshot restore snapshot.db \
+  --data-dir /var/lib/etcd-from-backup
+~~~~
+
+Update the etcd service
+    usar conf de exemplo
+
+Reload system configs
+
+~~~~BASH
+$ systemctl daemon-reload
+~~~~
+
+Restart etcd
+
+~~~~BASH
+$ service etcd restart
+~~~~
+
+
+Start the kube-apiserver
+
+~~~~BASH
+$ service kube-apiserver start
+~~~~
+
+
+With all etcdctl commands specify the cert,key,cacert and endpoint for authentication.
+
+~~~~BASH
+$ ETCDCTL_API=3 etcdctl \
+  snapshot save /tmp/snapshot.db \
+  --endpoints=https://[127.0.0.1]:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/etcd-server.crt \
+  --key=/etc/kubernetes/pki/etcd/etcd-server.key
+~~~~
+
+- Material de apoio:
+https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#restoring-an-etcd-cluster
+<https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#restoring-an-etcd-cluster>
+
+
+
+
+
+
+## RESUMO
+- Existem 2 maneiras de backup de Cluster Kubernetes
+1. Backup - Resource Configs, salvando os YAML dos recursos.
+2. Backup do ETCD através da API dele.
+
+- Cluster Kubernetes gerenciados não fornecem acesso ao ETCD Cluster, então só é possível o backup via Query ao API-Server(salvando os YAML.).
