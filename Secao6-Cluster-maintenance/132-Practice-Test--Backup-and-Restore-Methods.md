@@ -230,3 +230,44 @@ ETCDCTL_API=3 etcdctl snapshot save /opt/snapshot-pre-boot.db
 
 ETCDCTL_API=3 etcdctl snapshot status /opt/snapshot-pre-boot.db
 ~~~~
+
+
+ ~ ➜  ^C
+
+controlplane ~ ✖ ETCDCTL_API=3 etcdctl snapshot save /opt/snapshot-pre-boot.db
+Error: rpc error: code = Unavailable desc = transport is closing
+
+controlplane ~ ✖ 
+
+controlplane ~ ➜  kubectl exec -ti etcd-controlplane -n kube-system sh
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+sh-5.1#                                                                                                                                        sh-5.1# 
+sh-5.1# 
+sh-5.1# 
+sh-5.1# 
+sh-5.1# 
+sh-5.1# 
+sh-5.1# 
+sh-5.1# ps -ef
+sh: ps: command not found
+sh-5.1# ps
+sh: ps: command not found
+sh-5.1# ls
+sh: ls: command not found
+sh-5.1# ETCDCTL_API=3 etcdctl snapshot save /opt/snapshot-pre-boot.db
+Error: could not open /opt/snapshot-pre-boot.db.part (open /opt/snapshot-pre-boot.db.part: no such file or directory)
+sh-5.1# 
+
+
+- ERROS,
+- Tentar copiar sem passar o path /opt:
+
+ETCDCTL_API=3 etcdctl snapshot save snapshot-pre-boot.db
+
+sh-5.1# 
+sh-5.1# lsb_release -a
+sh: lsb_release: command not found
+sh-5.1# uname -r
+sh: uname: command not found
+sh-5.1# ETCDCTL_API=3 etcdctl snapshot save snapshot-pre-boot.db
+{"level":"info","ts":"2023-07-12T22:56:19.544Z","caller":"snapshot/v3_snapshot.go:65","msg":"created temporary db file","path":"snapshot-pre-boot.db.part"}
