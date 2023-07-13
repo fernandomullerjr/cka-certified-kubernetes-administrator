@@ -52,3 +52,14 @@ controlplane ~ ➜
 - Nele tem uma parte sobre volumes, nesta parte é usado "hostPath", indicando que não é algo externo, é algo local mesmo.
 - Dizendo que ele monta este diretório no container, usando este volume.
 
+
+
+06:13
+
+08:18
+export
+ ETCDCTL_API=3 etcdctl snapshot save /opt/snapshot-pre-boot.db
+
+
+formando o comando
+10:40 , terminou
