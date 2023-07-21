@@ -229,3 +229,266 @@ Note this path down as you will need to use it later.
 The master node in our cluster is planned for a regular maintenance reboot tonight. While we do not anticipate anything to go wrong, we are required to take the necessary backups. Take a snapshot of the ETCD database using the built-in snapshot functionality.
 
 Store the backup file at location /opt/snapshot-pre-boot.db
+
+
+- Testando:
+ETCDCTL_API=3 etcdctl snapshot save /opt/snapshot-pre-boot.db
+NÃO FUNCIONOU
+
+- Dica do github
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/06-Cluster-Maintenance/09-Practice-Test-Backup-and-Restore-Methods.md
+<https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/06-Cluster-Maintenance/09-Practice-Test-Backup-and-Restore-Methods.md>
+Take a snapshot of the ETCD database using the built-in snapshot functionality.
+Store the backup file at location /opt/snapshot-pre-boot.db
+
+~~~~bash
+ETCDCTL_API=3 etcdctl snapshot save \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  /opt/snapshot-pre-boot.db
+~~~~
+
+
+
+- Editando
+
+~~~~bash
+ETCDCTL_API=3 etcdctl snapshot save --endpoints=127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  /opt/snapshot-pre-boot.db
+~~~~
+
+
+
+- Saída
+
+~~~~bash
+
+controlplane ~ ✖ ETCDCTL_API=3 etcdctl snapshot save --endpoints=127.0.0.1:2379 \
+>   --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+>   --cert=/etc/kubernetes/pki/etcd/server.crt \
+>   --key=/etc/kubernetes/pki/etcd/server.key \
+>   /opt/snapshot-pre-boot.db
+Snapshot saved at /opt/snapshot-pre-boot.db
+
+controlplane ~ ➜  
+~~~~
+
+
+- OK, funcionou!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Great! Let us now wait for the maintenance window to finish. Go get some sleep. (Don't go for real)
+
+Click Ok to Continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+It's about 2 AM at Midnight! You get a call!
+It's about 2 AM at Midnight! You get a call!
+It's about 2 AM at Midnight! You get a call!
+
+
+
+
+
+
+
+
+
+
+Wake up! We have a conference call! After the reboot the master nodes came back online, but none of our applications are accessible. Check the status of the applications on the cluster. What's wrong?
+
+
+controlplane ~ ➜  kubectl get deploy
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get pods
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   71s
+
+controlplane ~ ➜  
+
+
+- RESPOSTA
+All of the above
+
+
+
+
+
+
+
+
+
+
+
+
+Luckily we took a backup. Restore the original state of the cluster using the backup file.
+
+    Deployments: 2
+
+    Services: 3
+
+
+
+
+
+
+
+
+
+
+
+## Restore - ETCD
+
+    To restore etcd from the backup at later in time. First stop kube-apiserver service
+~~~~BASH
+    $ service kube-apiserver stop
+~~~~
+
+
+Run the etcdctl snapshot restore command
+
+~~~~BASH
+ETCDCTL_API=3 etcdctl \
+  snapshot restore snapshot.db \
+  --data-dir /var/lib/etcd-from-backup
+~~~~
+
+Update the etcd service
+    usar conf de exemplo
+
+Reload system configs
+
+~~~~BASH
+$ systemctl daemon-reload
+~~~~
+
+Restart etcd
+
+~~~~BASH
+$ service etcd restart
+~~~~
+
+
+Start the kube-apiserver
+
+~~~~BASH
+$ service kube-apiserver start
+~~~~
+
+
+
+
+- Testando:
+
+ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \
+  snapshot restore snapshot-pre-boot.db \
+  --data-dir /opt
+
+- ERROS:
+
+controlplane ~ ✖ ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \
+>   snapshot restore snapshot-pre-boot.db \
+>   --data-dir /opt/
+Error: data-dir "/opt/" exists
+
+controlplane ~ ✖ ls /opt
+cni  containerd  snapshot-pre-boot.db
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \
+>   snapshot restore snapshot-pre-boot.db \
+>   --data-dir /opt
+Error: data-dir "/opt" exists
+
+controlplane ~ ✖ 
+
+
+
+
+
+
+
+ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \
+  snapshot restore /opt/snapshot-pre-boot.db \
+  --data-dir /var/lib/etcd
+
+
+- ERRO
+
+controlplane ~ ✖ ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \
+>   snapshot restore /opt/snapshot-pre-boot.db \
+>   --data-dir /var/lib/etcd
+Error: data-dir "/var/lib/etcd" exists
+
+controlplane ~ ✖ 
+
+
+
+- Vai ser necessário mudar a estratégia.
+- Terei que mudar o diretório onde o Pod busca o dado.
+- Não é necessário contatar o endpoint desta vez, pois agora a comunicação é local, não vai se comunicar com o etcd server.
+
+
+
+
+
+ETCDCTL_API=3 etcdctl \
+  snapshot restore /opt/snapshot-pre-boot.db \
+  --data-dir /var/lib/etcd-from-backup
+
+
+
+controlplane ~ ✖ ETCDCTL_API=3 etcdctl \
+>   snapshot restore /opt/snapshot-pre-boot.db \
+>   --data-dir /var/lib/etcd-from-backup
+2023-07-21 19:25:32.421832 I | mvcc: restore compact to 1601
+2023-07-21 19:25:32.427880 I | etcdserver/membership: added member 8e9e05c52164694d [http://localhost:2380] to cluster cdf818194e3a8c32
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  ls -lhasp /var/lib/etcd-from-backup
+total 16K
+4.0K drwx------ 3 root root 4.0K Jul 21 19:25 ./
+8.0K drwxr-xr-x 1 root root 4.0K Jul 21 19:25 ../
+4.0K drwx------ 4 root root 4.0K Jul 21 19:25 member/
+
+controlplane ~ ➜  
