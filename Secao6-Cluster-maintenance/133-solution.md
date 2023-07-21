@@ -63,3 +63,9 @@ export
 
 formando o comando
 10:40 , terminou
+
+
+
+
+## QUESTÃO 9
+- Tem que mudar o path no hostPath

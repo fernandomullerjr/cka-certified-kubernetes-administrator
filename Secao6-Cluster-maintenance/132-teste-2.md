@@ -1,0 +1,231 @@
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9 
+
+We have a working Kubernetes cluster with a set of web applications running. Let us first explore the setup.
+
+How many deployments exist in the cluster?
+
+
+controlplane ~ ➜  kubectl get deploy
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+blue   3/3     3            3           16s
+red    2/2     2            2           16s
+
+controlplane ~ ➜  kubectl get deploy -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+default       blue      3/3     3            3           18s
+default       red       2/2     2            2           18s
+kube-system   coredns   2/2     2            2           16m
+
+controlplane ~ ➜  
+
+
+- RESPOSTA
+2
+
+
+
+
+
+
+
+
+
+
+What is the version of ETCD running on the cluster?
+
+Check the ETCD Pod or Process
+
+
+
+controlplane ~ ➜   kubectl get pods -A 
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+default        blue-6b478c8dbf-n5h9j                  1/1     Running   0          54s
+default        blue-6b478c8dbf-qj5bn                  1/1     Running   0          54s
+default        blue-6b478c8dbf-rdnl4                  1/1     Running   0          54s
+default        red-6684f7669d-9lmqs                   1/1     Running   0          54s
+default        red-6684f7669d-qm7jh                   1/1     Running   0          54s
+kube-flannel   kube-flannel-ds-6vpg7                  1/1     Running   0          16m
+kube-system    coredns-5d78c9869d-bhmz5               1/1     Running   0          16m
+kube-system    coredns-5d78c9869d-h8rnh               1/1     Running   0          16m
+kube-system    etcd-controlplane                      1/1     Running   0          16m
+kube-system    kube-apiserver-controlplane            1/1     Running   0          16m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          16m
+kube-system    kube-proxy-lhtzq                       1/1     Running   0          16m
+kube-system    kube-scheduler-controlplane            1/1     Running   0          16m
+
+controlplane ~ ➜  kubectl get pods -A | grep etcd
+kube-system    etcd-controlplane                      1/1     Running   0          16m
+
+controlplane ~ ➜  kubectl describe pod etcd-controlplane -n kube-system
+Name:                 etcd-controlplane
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 controlplane/192.1.29.3
+Start Time:           Fri, 21 Jul 2023 18:50:41 -0400
+Labels:               component=etcd
+                      tier=control-plane
+Annotations:          kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.1.29.3:2379
+                      kubernetes.io/config.hash: 8c992d11868c5abd9f5f66239320fbc5
+                      kubernetes.io/config.mirror: 8c992d11868c5abd9f5f66239320fbc5
+                      kubernetes.io/config.seen: 2023-07-21T18:50:40.896513222-04:00
+                      kubernetes.io/config.source: file
+Status:               Running
+SeccompProfile:       RuntimeDefault
+IP:                   192.1.29.3
+IPs:
+  IP:           192.1.29.3
+Controlled By:  Node/controlplane
+Containers:
+  etcd:
+    Container ID:  containerd://da931335d39ebcb194916d2ce6033a46c68bdb2a6870de268a06e4bf4f854cbe
+    Image:         registry.k8s.io/etcd:3.5.7-0
+    Image ID:      registry.k8s.io/etcd@sha256:51eae8381dcb1078289fa7b4f3df2630cdc18d09fb56f8e56b41c40e191d6c83
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      etcd
+      --advertise-client-urls=https://192.1.29.3:2379
+      --cert-file=/etc/kubernetes/pki/etcd/server.crt
+      --client-cert-auth=true
+      --data-dir=/var/lib/etcd
+      --experimental-initial-corrupt-check=true
+      --experimental-watch-progress-notify-interval=5s
+      --initial-advertise-peer-urls=https://192.1.29.3:2380
+      --initial-cluster=controlplane=https://192.1.29.3:2380
+      --key-file=/etc/kubernetes/pki/etcd/server.key
+      --listen-client-urls=https://127.0.0.1:2379,https://192.1.29.3:2379
+      --listen-metrics-urls=http://127.0.0.1:2381
+      --listen-peer-urls=https://192.1.29.3:2380
+      --name=controlplane
+      --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+      --peer-client-cert-auth=true
+      --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+      --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      --snapshot-count=10000
+      --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    State:          Running
+      Started:      Fri, 21 Jul 2023 18:50:31 -0400
+    Ready:          True
+    Restart Count:  0
+    Requests:
+      cpu:        100m
+      memory:     100Mi
+    Liveness:     http-get http://127.0.0.1:2381/health%3Fexclude=NOSPACE&serializable=true delay=10s timeout=15s period=10s #success=1 #failure=8
+    Startup:      http-get http://127.0.0.1:2381/health%3Fserializable=false delay=10s timeout=15s period=10s #success=1 #failure=24
+    Environment:  <none>
+    Mounts:
+      /etc/kubernetes/pki/etcd from etcd-certs (rw)
+      /var/lib/etcd from etcd-data (rw)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  etcd-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/pki/etcd
+    HostPathType:  DirectoryOrCreate
+  etcd-data:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/etcd
+    HostPathType:  DirectoryOrCreate
+QoS Class:         Burstable
+Node-Selectors:    <none>
+Tolerations:       :NoExecute op=Exists
+Events:
+  Type    Reason   Age   From     Message
+  ----    ------   ----  ----     -------
+  Normal  Pulled   17m   kubelet  Container image "registry.k8s.io/etcd:3.5.7-0" already present on machine
+  Normal  Created  17m   kubelet  Created container etcd
+  Normal  Started  17m   kubelet  Started container etcd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+At what address can you reach the ETCD cluster from the controlplane node?
+
+Check the ETCD Service configuration in the ETCD POD
+
+
+- RESPOSTA
+https://127.0.0.1:2379
+
+
+
+
+
+
+
+
+
+
+Where is the ETCD server certificate file located?
+
+Note this path down as you will need to use it later
+
+
+- resposta
+/etc/kubernetes/pki/etcd/server.crt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Where is the ETCD CA Certificate file located?
+
+Note this path down as you will need to use it later.
+
+- resposta
+      --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The master node in our cluster is planned for a regular maintenance reboot tonight. While we do not anticipate anything to go wrong, we are required to take the necessary backups. Take a snapshot of the ETCD database using the built-in snapshot functionality.
+
+Store the backup file at location /opt/snapshot-pre-boot.db
