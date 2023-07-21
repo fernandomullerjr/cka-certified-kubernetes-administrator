@@ -492,3 +492,181 @@ total 16K
 4.0K drwx------ 4 root root 4.0K Jul 21 19:25 member/
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+ls -lhasp /etc/kuber
+
+ls -lhasp /etc/kubernetes/manifests/etcd.yaml 
+
+
+
+controlplane ~ ➜  ls -lhasp /etc/kubernetes/manifests/
+total 28K
+4.0K drwxr-xr-x 1 root root 4.0K Jul 21 18:50 ./
+8.0K drwxr-xr-x 1 root root 4.0K Jul 21 18:50 ../
+4.0K -rw------- 1 root root 2.4K Jul 21 18:50 etcd.yaml
+4.0K -rw------- 1 root root 3.8K Jul 21 18:50 kube-apiserver.yaml
+4.0K -rw------- 1 root root 3.4K Jul 21 18:50 kube-controller-manager.yaml
+4.0K -rw------- 1 root root 1.5K Jul 21 18:50 kube-scheduler.yaml
+
+controlplane ~ ➜  ls -lhasp /etc/kubernetes/manifests/etcd.yaml 
+4.0K -rw------- 1 root root 2.4K Jul 21 18:50 /etc/kubernetes/manifests/etcd.yaml
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/etcd.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.1.29.3:2379
+  creationTimestamp: null
+  labels:
+    component: etcd
+    tier: control-plane
+  name: etcd
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - etcd
+    - --advertise-client-urls=https://192.1.29.3:2379
+    - --cert-file=/etc/kubernetes/pki/etcd/server.crt
+    - --client-cert-auth=true
+    - --data-dir=/var/lib/etcd
+    - --experimental-initial-corrupt-check=true
+    - --experimental-watch-progress-notify-interval=5s
+    - --initial-advertise-peer-urls=https://192.1.29.3:2380
+    - --initial-cluster=controlplane=https://192.1.29.3:2380
+    - --key-file=/etc/kubernetes/pki/etcd/server.key
+    - --listen-client-urls=https://127.0.0.1:2379,https://192.1.29.3:2379
+    - --listen-metrics-urls=http://127.0.0.1:2381
+    - --listen-peer-urls=https://192.1.29.3:2380
+    - --name=controlplane
+    - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+    - --peer-client-cert-auth=true
+    - --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+    - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    - --snapshot-count=10000
+    - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    image: registry.k8s.io/etcd:3.5.7-0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /health?exclude=NOSPACE&serializable=true
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: etcd
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /health?serializable=false
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /var/lib/etcd
+      name: etcd-data
+    - mountPath: /etc/kubernetes/pki/etcd
+      name: etcd-certs
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/pki/etcd
+      type: DirectoryOrCreate
+    name: etcd-certs
+  - hostPath:
+      path: /var/lib/etcd
+      type: DirectoryOrCreate
+    name: etcd-data
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+controlplane ~ ➜  vi /etc/kubernetes/manifests/etcd.yaml 
+
+controlplane ~ ➜  vi /etc/kubernetes/manifests/etcd.yaml 
+
+controlplane ~ ➜  
+controlplane ~ ➜  cat /etc/kubernetes/manifests/etcd.yaml | tail
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/pki/etcd
+      type: DirectoryOrCreate
+    name: etcd-certs
+  - hostPath:
+      path: /var/lib/etcd-from-backup
+      type: DirectoryOrCreate
+    name: etcd-data
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+- Essa linha diz a origem da montagem, não necessariamente a conf em si.
+
+
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          50m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          50m
+etcd-controlplane                      1/1     Running   0          51m
+kube-apiserver-controlplane            1/1     Running   0          51m
+kube-controller-manager-controlplane   1/1     Running   0          51m
+kube-proxy-lhtzq                       1/1     Running   0          50m
+kube-scheduler-controlplane            1/1     Running   0          51m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          51m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          51m
+etcd-controlplane                      0/1     Pending   0          46s
+kube-apiserver-controlplane            1/1     Running   0          51m
+kube-controller-manager-controlplane   1/1     Running   1          51m
+kube-proxy-lhtzq                       1/1     Running   0          51m
+kube-scheduler-controlplane            1/1     Running   1          51m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get pods -n kube-system --watch
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          52m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          52m
+etcd-controlplane                      0/1     Pending   0          2m1s
+kube-apiserver-controlplane            1/1     Running   0          53m
+kube-controller-manager-controlplane   1/1     Running   1          53m
+kube-proxy-lhtzq                       1/1     Running   0          52m
+kube-scheduler-controlplane            1/1     Running   1          53m
