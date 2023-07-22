@@ -1,3 +1,13 @@
+
+
+
+
+## SEGUNDA TENTATIVA
+## SEGUNDA TENTATIVA
+## SEGUNDA TENTATIVA
+
+
+
     1
     2
     3
@@ -670,3 +680,156 @@ kube-apiserver-controlplane            1/1     Running   0          53m
 kube-controller-manager-controlplane   1/1     Running   1          53m
 kube-proxy-lhtzq                       1/1     Running   0          52m
 kube-scheduler-controlplane            1/1     Running   1          53m
+
+
+
+
+controlplane ~ ✖ kubectl delete pods -n kube-system etcd-controlplane
+pod "etcd-controlplane" deleted
+
+
+
+controlplane ~ ✖ kubectl get pods -n kube-system
+NAME                                   READY   STATUS        RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running       0          54m
+coredns-5d78c9869d-h8rnh               1/1     Running       0          54m
+etcd-controlplane                      0/1     Terminating   0          3m33s
+kube-apiserver-controlplane            1/1     Running       0          54m
+kube-controller-manager-controlplane   1/1     Running       1          54m
+kube-proxy-lhtzq                       1/1     Running       0          54m
+kube-scheduler-controlplane            1/1     Running       1          54m
+
+controlplane ~ ➜  controlplane ~ ➜  kubectl delete pods -n kube-system etcd-controlplane --force=true
+Warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
+pod "etcd-controlplane" force deleted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -n kube-system 
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          56m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          56m
+kube-apiserver-controlplane            1/1     Running   0          56m
+kube-controller-manager-controlplane   1/1     Running   1          56m
+kube-proxy-lhtzq                       1/1     Running   0          56m
+kube-scheduler-controlplane            1/1     Running   1          56m
+
+controlplane ~ ➜  kubectl get pods -n kube-system 
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          56m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          56m
+kube-apiserver-controlplane            1/1     Running   0          56m
+kube-controller-manager-controlplane   1/1     Running   1          56m
+kube-proxy-lhtzq                       1/1     Running   0          56m
+kube-scheduler-controlplane            1/1     Running   1          56m
+
+controlplane ~ ➜  kubectl get pods -n kube-system 
+
+controlplane ~ ➜  kubectl get pods -n kube-system 
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          56m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          56m
+kube-apiserver-controlplane            1/1     Running   0          57m
+kube-controller-manager-controlplane   1/1     Running   1          57m
+kube-proxy-lhtzq                       1/1     Running   0          56m
+kube-scheduler-controlplane            1/1     Running   1          57m
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/etcd.yaml | tail
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/pki/etcd
+      type: DirectoryOrCreate
+    name: etcd-certs
+  - hostPath:
+      path: /var/lib/etcd-from-backup
+      type: DirectoryOrCreate
+    name: etcd-data
+status: {}
+
+controlplane ~ ➜  ls -lhasp /var/lib/etcd-from-backup
+total 16K
+4.0K drwx------ 3 root root 4.0K Jul 21 19:41 ./
+8.0K drwxr-xr-x 1 root root 4.0K Jul 21 19:25 ../
+4.0K drwx------ 4 root root 4.0K Jul 21 19:41 member/
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f /etc/kubernetes/manifests/etcd.yaml 
+pod/etcd created
+
+controlplane ~ ➜  kubectl get pods -n kube-system 
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          57m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          57m
+etcd                                   0/1     Pending   0          3s
+kube-apiserver-controlplane            1/1     Running   0          58m
+kube-controller-manager-controlplane   1/1     Running   1          58m
+kube-proxy-lhtzq                       1/1     Running   0          57m
+kube-scheduler-controlplane            1/1     Running   1          58m
+
+controlplane ~ ➜  kubectl get pods -n kube-system --watch
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-bhmz5               1/1     Running   0          57m
+coredns-5d78c9869d-h8rnh               1/1     Running   0          57m
+etcd                                   0/1     Pending   0          9s
+kube-apiserver-controlplane            1/1     Running   0          58m
+kube-controller-manager-controlplane   1/1     Running   1          58m
+kube-proxy-lhtzq                       1/1     Running   0          57m
+kube-scheduler-controlplane            1/1     Running   1          58m
+
+
+
+
+
+
+
+
+
+controlplane ~ ➜  crictl ps 
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+632b35587ee8e       86b6af7dd652c       20 minutes ago      Running             etcd                      0                   795e085c15a00       etcd-controlplane
+981398795b11a       95fe52ed44570       21 minutes ago      Running             kube-controller-manager   1                   bbbde7132692e       kube-controller-manager-controlplane
+4c59feab5f23c       f73f1b39c3fe8       21 minutes ago      Running             kube-scheduler            1                   a35079ddf08bf       kube-scheduler-controlplane
+ad921eb3ac852       ead0a4a53df89       About an hour ago   Running             coredns                   0                   30453baf0f967       coredns-5d78c9869d-bhmz5
+4882ba875da3d       ead0a4a53df89       About an hour ago   Running             coredns                   0                   e63daf93f4cc4       coredns-5d78c9869d-h8rnh
+d571c6b32b2dd       8b675dda11bb1       About an hour ago   Running             kube-flannel              0                   6e6c7e711930c       kube-flannel-ds-6vpg7
+cc6b1728f3f81       5f82fc39fa816       About an hour ago   Running             kube-proxy                0                   805fa9b9514c3       kube-proxy-lhtzq
+e8e51fc078e75       6f707f569b572       About an hour ago   Running             kube-apiserver            0                   5aebf72cecc33       kube-apiserver-controlplane
+
+controlplane ~ ➜  crictl ps ^C
+
+controlplane ~ ✖ crictl ps ^C
+
+controlplane ~ ✖ kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+default        blue-6b478c8dbf-n5h9j                  1/1     Running   0          55m
+default        blue-6b478c8dbf-qj5bn                  1/1     Running   0          55m
+default        blue-6b478c8dbf-rdnl4                  1/1     Running   0          55m
+default        red-6684f7669d-9lmqs                   1/1     Running   0          55m
+default        red-6684f7669d-qm7jh                   1/1     Running   0          55m
+kube-flannel   kube-flannel-ds-6vpg7                  1/1     Running   0          71m
+kube-system    coredns-5d78c9869d-bhmz5               1/1     Running   0          71m
+kube-system    coredns-5d78c9869d-h8rnh               1/1     Running   0          71m
+kube-system    etcd                                   0/1     Pending   0          2m23s
+kube-system    kube-apiserver-controlplane            1/1     Running   0          71m
+kube-system    kube-controller-manager-controlplane   1/1     Running   1          71m
+kube-system    kube-proxy-lhtzq                       1/1     Running   0          71m
+kube-system    kube-scheduler-controlplane            1/1     Running   1          71m
+
+controlplane ~ ➜  
+
+
+
+
+
+- Apesar do pod em pending, o check da questão9 passou.
+
+
+# PENDENTE
+- Tratar questão 9
+pod do etcd nao sobe
+- Material de apoio
+https://github.com/kodekloudhub/community-faq/blob/main/docs/etcd-faq.md
+<https://github.com/kodekloudhub/community-faq/blob/main/docs/etcd-faq.md>
