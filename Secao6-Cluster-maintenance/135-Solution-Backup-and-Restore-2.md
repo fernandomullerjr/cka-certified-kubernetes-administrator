@@ -298,3 +298,27 @@ Que retorna apenas 1 membro da lista.
 
 ## CONTINUA EM
 09:36
+
+
+
+# Dia 04/08/2023
+
+
+
+
+Take a backup of etcd on cluster1 and save it on the student-node at the path /opt/cluster1.db
+
+If needed, make sure to set the context to cluster1 (on the student-node):
+
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  
+
+
+
+- Coletar os dados do etcd
+    advertise-url, para usar no endpoints
+    key
+    cert
+    cacert
