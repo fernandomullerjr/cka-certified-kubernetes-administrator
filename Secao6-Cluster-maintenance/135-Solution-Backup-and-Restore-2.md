@@ -315,10 +315,40 @@ Switched to context "cluster1".
 
 student-node ~ ➜  
 
-
-
-- Coletar os dados do etcd
+- Coletar os dados do etcd, para poder formar o comando etcdctl com os parametros necessários:
     advertise-url, para usar no endpoints
     key
     cert
     cacert
+
+- A partir do próprio host student-node, verificar os Pods usando:
+kubectl get pods -n kube-system
+
+- Como tem um Pod do etcd, indica que é um Stacked Etcd.
+- Depois de verificar o Pod, é necessário efetuar um describe nele, para obter os dados informados antes.
+kubectl describe pod etcd-cluster1-controlplane -n kube-system
+
+Obtendo:
+      
+    - --advertise-client-urls=https://192.2.217.8:2379
+    - --cert-file=/etc/kubernetes/pki/etcd/server.crt
+    - --key-file=/etc/kubernetes/pki/etcd/server.key
+    - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+
+- Com as informações acima, idéia é formar um comando estilo este abaixo e enviar o arquivo via SCP para o host student:
+
+~~~~bash
+ssh cluster1-controlplane
+
+ETCDCTL_API=3 etcdctl snapshot save \
+  --cacert /etc/kubernetes/pki/etcd/ca.crt \
+  --cert /etc/kubernetes/pki/etcd/server.crt \
+  --key /etc/kubernetes/pki/etcd/server.key \
+  cluster1.db
+
+# Return to student node
+exit
+
+scp cluster1-controlplane:~/cluster1.db /opt/
+
+~~~~
