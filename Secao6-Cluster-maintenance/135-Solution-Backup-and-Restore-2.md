@@ -33,7 +33,7 @@ kubectl config get-contexts
 - Para verificar os clusters configurados, melhor maneira é usar os comandos:
 kubectl config get-contexts
 kubectl config view
-
+kubectl config view # Show Merged kubeconfig settings.
 
 
 If you want to see what the configuration file contains, then you can use the following command.
@@ -248,8 +248,6 @@ This question is somewhat contentious. It ought not to contain the word other. T
 
     1
 
-
-
 - Na questão original, fiz assim:
 
 ~~~~bash
@@ -291,8 +289,9 @@ etcd-server ~ ➜
 
 Comando ajustado, ficaria algo parecido com isto:
 
-ETCDCTL_API=3 etcdctl snapshot save --endpoints=127.0.0.1:2379 --cacert=/etc/etcd/pki/ca.pem --cert=/etc/etcd/pki/etcd.pem --key=/etc/etcd/pki/etcd-key.pem member list
+ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 --cacert=/etc/etcd/pki/ca.pem --cert=/etc/etcd/pki/etcd.pem --key=/etc/etcd/pki/etcd-key.pem member list
 
+Que retorna apenas 1 membro da lista.
 
 
 
