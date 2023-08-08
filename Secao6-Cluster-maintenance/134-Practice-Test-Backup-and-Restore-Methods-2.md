@@ -1096,3 +1096,736 @@ Make sure to switch the context to cluster1:
 
 kubectl config use-context cluster1
 
+student-node ~ ➜  kubectl get nodes -A
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster1-controlplane   Ready    control-plane   68m   v1.24.0
+cluster1-node01         Ready    <none>          67m   v1.24.0
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+What is the name of the controlplane node in cluster2?
+
+Make sure to switch the context to cluster2:
+
+kubectl config use-context cluster2
+
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  kubectl get nodes -A
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster2-controlplane   Ready    control-plane   68m   v1.24.0
+cluster2-node01         Ready    <none>          68m   v1.24.0
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+You can SSH to all the nodes (of both clusters) from the student-node.
+
+
+For example:
+
+student-node ~ ➜  ssh cluster1-controlplane
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1086-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+cluster1-controlplane ~ ➜ 
+
+To get back to the student node, use the logout or exit command, or, hit Control +D
+
+cluster1-controlplane ~ ➜  logout
+Connection to cluster1-controlplane closed.
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+How is ETCD configured for cluster1?
+
+Remember, you can access the clusters from student-node using the kubectl tool. You can also ssh to the cluster nodes from the student-node.
+
+
+Make sure to switch the context to cluster1:
+
+kubectl config use-context cluster1
+
+
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-2nvtk                        1/1     Running   0             69m
+kube-system   coredns-6d4b75cb6d-f7mrk                        1/1     Running   0             69m
+kube-system   etcd-cluster1-controlplane                      1/1     Running   0             69m
+kube-system   kube-apiserver-cluster1-controlplane            1/1     Running   0             69m
+kube-system   kube-controller-manager-cluster1-controlplane   1/1     Running   0             69m
+kube-system   kube-proxy-5wzbj                                1/1     Running   0             69m
+kube-system   kube-proxy-6xcxg                                1/1     Running   0             68m
+kube-system   kube-scheduler-cluster1-controlplane            1/1     Running   0             69m
+kube-system   weave-net-wfbrs                                 2/2     Running   0             68m
+kube-system   weave-net-zbwbc                                 2/2     Running   1 (69m ago)   69m
+
+student-node ~ ➜  
+
+
+-R:
+Stacked ETCD
+
+
+
+
+
+
+
+
+
+
+
+
+
+How is ETCD configured for cluster2?
+
+Remember, you can access the clusters from student-node using the kubectl tool. You can also ssh to the cluster nodes from the student-node.
+
+
+Make sure to switch the context to cluster2:
+
+kubectl config use-context cluster2
+
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+critical      critical-deployment-240616-5bf45c9459-m9dsl     1/1     Running   0             6m43s
+critical      critical-deployment-240616-5bf45c9459-t29p5     1/1     Running   0             6m43s
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running   0             71m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running   0             71m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running   0             71m
+kube-system   kube-controller-manager-cluster2-controlplane   1/1     Running   1 (64m ago)   71m
+kube-system   kube-proxy-g4p62                                1/1     Running   0             71m
+kube-system   kube-proxy-khv29                                1/1     Running   0             71m
+kube-system   kube-scheduler-cluster2-controlplane            1/1     Running   1 (64m ago)   71m
+kube-system   weave-net-fcpwg                                 2/2     Running   0             71m
+kube-system   weave-net-l8g8l                                 2/2     Running   1 (71m ago)   71m
+
+student-node ~ ➜  
+
+student-node ~ ➜  ssh cluster2-controlplane
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+cluster2-controlplane ~ ➜  ps -ef | grep etcd
+root        1780    1385  9 01:19 ?        00:04:02 kube-apiserver --advertise-address=192.4.53.22 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.pem --etcd-certfile=/etc/kubernetes/pki/etcd/etcd.pem --etcd-keyfile=/etc/kubernetes/pki/etcd/etcd-key.pem --etcd-servers=https://192.4.53.12:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root        9459    9357  0 02:31 pts/0    00:00:00 grep etcd
+
+cluster2-controlplane ~ ➜  
+cluster2-controlplane ~ ➜  ls /etc/kubernetes/
+admin.conf               controller-manager.conf  kubelet.conf             manifests/               pki/                     scheduler.conf
+
+cluster2-controlplane ~ ➜  ls /etc/kubernetes/manifests/
+kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+cluster2-controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What is the IP address of the External ETCD datastore used in cluster2?
+
+What is the default data directory used the for ETCD datastore used in cluster1?
+Remember, this cluster uses a Stacked ETCD topology.
+
+Make sure to switch the context to cluster1:
+
+kubectl config use-context cluster1
+
+
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  kubectl get pods -n kube-system
+NAME                                            READY   STATUS    RESTARTS      AGE
+coredns-6d4b75cb6d-2nvtk                        1/1     Running   0             75m
+coredns-6d4b75cb6d-f7mrk                        1/1     Running   0             75m
+etcd-cluster1-controlplane                      1/1     Running   0             75m
+kube-apiserver-cluster1-controlplane            1/1     Running   0             75m
+kube-controller-manager-cluster1-controlplane   1/1     Running   0             75m
+kube-proxy-5wzbj                                1/1     Running   0             75m
+kube-proxy-6xcxg                                1/1     Running   0             74m
+kube-scheduler-cluster1-controlplane            1/1     Running   0             75m
+weave-net-wfbrs                                 2/2     Running   0             74m
+weave-net-zbwbc                                 2/2     Running   1 (75m ago)   75m
+
+student-node ~ ➜  kubectl describe pod etcd-cluster1-controlplane -n kube-system 
+Name:                 etcd-cluster1-controlplane
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 cluster1-controlplane/192.4.53.19
+Start Time:           Tue, 08 Aug 2023 01:19:17 +0000
+Labels:               component=etcd
+                      tier=control-plane
+Annotations:          kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.4.53.19:2379
+                      kubernetes.io/config.hash: 739f139c858312d902ba6eb6a36a2e32
+                      kubernetes.io/config.mirror: 739f139c858312d902ba6eb6a36a2e32
+                      kubernetes.io/config.seen: 2023-08-08T01:19:16.622419070Z
+                      kubernetes.io/config.source: file
+                      seccomp.security.alpha.kubernetes.io/pod: runtime/default
+Status:               Running
+IP:                   192.4.53.19
+IPs:
+  IP:           192.4.53.19
+Controlled By:  Node/cluster1-controlplane
+Containers:
+  etcd:
+    Container ID:  containerd://b632bf6a13d060aeca239f077016fc168463e776f2219c24fbc7c8753a7fbd96
+    Image:         k8s.gcr.io/etcd:3.5.3-0
+    Image ID:      k8s.gcr.io/etcd@sha256:13f53ed1d91e2e11aac476ee9a0269fdda6cc4874eba903efd40daf50c55eee5
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      etcd
+      --advertise-client-urls=https://192.4.53.19:2379
+      --cert-file=/etc/kubernetes/pki/etcd/server.crt
+      --client-cert-auth=true
+      --data-dir=/var/lib/etcd
+      --experimental-initial-corrupt-check=true
+      --initial-advertise-peer-urls=https://192.4.53.19:2380
+      --initial-cluster=cluster1-controlplane=https://192.4.53.19:2380
+      --key-file=/etc/kubernetes/pki/etcd/server.key
+      --listen-client-urls=https://127.0.0.1:2379,https://192.4.53.19:2379
+      --listen-metrics-urls=http://127.0.0.1:2381
+      --listen-peer-urls=https://192.4.53.19:2380
+      --name=cluster1-controlplane
+      --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+      --peer-client-cert-auth=true
+      --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+      --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      --snapshot-count=10000
+      --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    State:          Running
+      Started:      Tue, 08 Aug 2023 01:19:06 +0000
+    Ready:          True
+    Restart Count:  0
+    Requests:
+      cpu:        100m
+      memory:     100Mi
+    Liveness:     http-get http://127.0.0.1:2381/health delay=10s timeout=15s period=10s #success=1 #failure=8
+    Startup:      http-get http://127.0.0.1:2381/health delay=10s timeout=15s period=10s #success=1 #failure=24
+    Environment:  <none>
+    Mounts:
+      /etc/kubernetes/pki/etcd from etcd-certs (rw)
+      /var/lib/etcd from etcd-data (rw)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  etcd-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/pki/etcd
+    HostPathType:  DirectoryOrCreate
+  etcd-data:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/etcd
+    HostPathType:  DirectoryOrCreate
+QoS Class:         Burstable
+Node-Selectors:    <none>
+Tolerations:       :NoExecute op=Exists
+Events:            <none>
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+For the subsequent questions, you would need to login to the External ETCD server.
+
+To do this, open a new terminal (using the + button located above the default terminal).
+
+From the new terminal you can now SSH from the student-node to either the IP of the ETCD datastore (that you identified in the previous questions) OR the hostname etcd-server:
+
+etcd3
+
+student-node ~ ➜  ssh etcd-server
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+etcd-server ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What is the default data directory used the for ETCD datastore used in cluster2?
+Remember, this cluster uses an External ETCD topology.
+
+etcd-server ~ ➜  ls /etc/kub
+ls: cannot access '/etc/kub': No such file or directory
+
+etcd-server ~ ✖ ps -ef | grep etcd
+etcd         917       1  3 01:26 ?        00:01:24 /usr/local/bin/etcd --name etcd-server --data-dir=/var/lib/etcd-data --cert-file=/etc/etcd/pki/etcd.pem --key-file=/etc/etcd/pki/etcd-key.pem --peer-cert-file=/etc/etcd/pki/etcd.pem --peer-key-file=/etc/etcd/pki/etcd-key.pem --trusted-ca-file=/etc/etcd/pki/ca.pem --peer-trusted-ca-file=/etc/etcd/pki/ca.pem --peer-client-cert-auth --client-cert-auth --initial-advertise-peer-urls https://192.4.53.12:2380 --listen-peer-urls https://192.4.53.12:2380 --advertise-client-urls https://192.4.53.12:2379 --listen-client-urls https://192.4.53.12:2379,https://127.0.0.1:2379 --initial-cluster-token etcd-cluster-1 --initial-cluster etcd-server=https://192.4.53.12:2380 --initial-cluster-state new
+root        1156    1023  0 02:37 pts/0    00:00:00 grep etcd
+
+etcd-server ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+How many nodes are part of the ETCD cluster that etcd-server is a part of?
+
+- ERROS
+
+etcd-server ~ ➜  etcdctl member list
+{"level":"warn","ts":"2023-08-08T02:38:30.356Z","caller":"clientv3/retry_interceptor.go:62","msg":"retrying of unary invoker failed","target":"endpoint://client-c3b067cd-fe4a-422f-ae04-e6c89e47302b/127.0.0.1:2379","attempt":0,"error":"rpc error: code = DeadlineExceeded desc = latest balancer error: all SubConns are in TransientFailure, latest connection error: connection closed"}
+Error: context deadline exceeded
+
+etcd-server ~ ✖ ETCDCTL_API=3 etcdctl member list
+{"level":"warn","ts":"2023-08-08T02:39:00.939Z","caller":"clientv3/retry_interceptor.go:62","msg":"retrying of unary invoker failed","target":"endpoint://client-506b9439-6d90-45f2-8f96-133cc30b2ecf/127.0.0.1:2379","attempt":0,"error":"rpc error: code = DeadlineExceeded desc = latest balancer error: all SubConns are in TransientFailure, latest connection error: connection closed"}
+Error: context deadline exceeded
+
+etcd-server ~ ✖ 
+
+
+
+etcd-server ~ ✖ ps -ef
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 01:18 ?        00:00:00 /sbin/init --log-level=err
+root         238       1  0 01:18 ?        00:00:00 /lib/systemd/systemd-journald
+root         332       1  0 01:18 ?        00:00:00 /lib/systemd/systemd-udevd
+systemd+     486       1  0 01:18 ?        00:00:00 /lib/systemd/systemd-resolved
+message+     645       1  0 01:18 ?        00:00:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activ
+root         659       1  0 01:18 ?        00:00:00 /usr/bin/ttyd -p 8080 --ping-interval 30 -t fontSize=16 -t theme={"foreground": "#eff
+root         660       1  0 01:18 ?        00:00:00 /lib/systemd/systemd-logind
+root         661       1  0 01:18 ?        00:00:00 /usr/sbin/sshd -D
+etcd         917       1  3 01:26 ?        00:01:28 /usr/local/bin/etcd --name etcd-server --data-dir=/var/lib/etcd-data --cert-file=/etc
+root        1012     661  0 02:36 ?        00:00:00 sshd: root@pts/0
+root        1023    1012  0 02:36 pts/0    00:00:00 -bash
+root        1403    1023  0 02:40 pts/0    00:00:00 ps -ef
+
+etcd-server ~ ➜  ps -ef | grep etcd
+etcd         917       1  3 01:26 ?        00:01:28 /usr/local/bin/etcd --name etcd-server --data-dir=/var/lib/etcd-data --cert-file=/etc/etcd/pki/etcd.pem --key-file=/etc/etcd/pki/etcd-key.pem --peer-cert-file=/etc/etcd/pki/etcd.pem --peer-key-file=/etc/etcd/pki/etcd-key.pem --trusted-ca-file=/etc/etcd/pki/ca.pem --peer-trusted-ca-file=/etc/etcd/pki/ca.pem --peer-client-cert-auth --client-cert-auth --initial-advertise-peer-urls https://192.4.53.12:2380 --listen-peer-urls https://192.4.53.12:2380 --advertise-client-urls https://192.4.53.12:2379 --listen-client-urls https://192.4.53.12:2379,https://127.0.0.1:2379 --initial-cluster-token etcd-cluster-1 --initial-cluster etcd-server=https://192.4.53.12:2380 --initial-cluster-state new
+root        1460    1023  0 02:40 pts/0    00:00:00 grep etcd
+
+etcd-server ~ ➜  
+
+
+- OK, agora trouxe:
+
+ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 --cacert=/etc/etcd/pki/ca.pem --cert=/etc/etcd/pki/etcd.pem --key=/etc/etcd/pki/etcd-key.pem member list
+
+etcd-server ~ ➜  ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 --cacert=/etc/etcd/pki/ca.pem --cert=/etc/etcd/pki/etcd.pem --key=/etc/etcd/pki/etcd-key.pem member list
+5eefd60ca2e37a45, started, etcd-server, https://192.4.53.12:2380, https://192.4.53.12:2379, false
+
+etcd-server ~ ➜  
+
+
+
+
+
+
+
+Take a backup of etcd on cluster1 and save it on the student-node at the path /opt/cluster1.db
+
+
+If needed, make sure to set the context to cluster1 (on the student-node):
+
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  
+
+    task completed?
+
+
+
+student-node ~ ➜  kubectl config use-context cluster1
+Switched to context "cluster1".
+
+student-node ~ ➜  ssh cluster1-controlplane
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+cluster1-controlplane ~ ➜  
+
+cluster1-controlplane ~ ➜  ETCDCTL_API=3 etcdctl snapshot save \
+>   --cacert /etc/kubernetes/pki/etcd/ca.crt \
+>   --cert /etc/kubernetes/pki/etcd/server.crt \
+>   --key /etc/kubernetes/pki/etcd/server.key \
+>   cluster1.db
+Snapshot saved at cluster1.db
+
+cluster1-controlplane ~ ➜  exit
+logout
+Connection to cluster1-controlplane closed.
+
+student-node ~ ➜  scp cluster1-controlplane:~/cluster1.db /opt/
+cluster1.db                                                                                            100% 2092KB 146.4MB/s   00:00    
+
+student-node ~ ➜  ls /opt
+cluster1.db
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An ETCD backup for cluster2 is stored at /opt/cluster2.db. Use this snapshot file to carryout a restore on cluster2 to a new path /var/lib/etcd-data-new.
+
+
+Once the restore is complete, ensure that the controlplane components on cluster2 are running.
+
+
+The snapshot was taken when there were objects created in the critical namespace on cluster2. These objects should be available post restore.
+
+
+If needed, make sure to set the context to cluster2 (on the student-node):
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  
+
+    etcd restored to the new directory ?
+
+    kube-apiserver running on cluster2?
+
+    objects restored?
+
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  ls /opt
+cluster1.db  cluster2.db
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running   0             90m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running   0             90m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running   0             90m
+kube-system   kube-controller-manager-cluster2-controlplane   1/1     Running   1 (83m ago)   90m
+kube-system   kube-proxy-g4p62                                1/1     Running   0             90m
+kube-system   kube-proxy-khv29                                1/1     Running   0             90m
+kube-system   kube-scheduler-cluster2-controlplane            1/1     Running   1 (83m ago)   90m
+kube-system   weave-net-fcpwg                                 2/2     Running   0             90m
+kube-system   weave-net-l8g8l                                 2/2     Running   1 (90m ago)   90m
+
+student-node ~ ➜  
+
+
+student-node ~ ➜  scp /opt/cluster2.db cluster2-controlplane:/root
+cluster2.db                                                                                            100% 2104KB  73.8MB/s   00:00    
+
+student-node ~ ➜  ssh cluster2-controlplane
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Aug  8 02:31:33 2023 from 192.4.53.10
+
+cluster2-controlplane ~ ➜  ls /root
+cluster2.db  install-etcd.sh
+
+cluster2-controlplane ~ ➜  pwd
+/root
+
+cluster2-controlplane ~ ➜  ls
+cluster2.db  install-etcd.sh
+
+cluster2-controlplane ~ ➜  
+
+https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#restoring-an-etcd-cluster
+
+ETCDCTL_API=3 etcdctl snapshot restore --data-dir <data-dir-location> snapshotdb
+ETCDCTL_API=3 etcdctl snapshot restore --data-dir /var/lib/etcd-data-new cluster2.db
+
+cluster2-controlplane ~ ➜  ls /etc/kubernetes/
+admin.conf  controller-manager.conf  kubelet.conf  manifests  pki  scheduler.conf
+
+cluster2-controlplane ~ ➜  ls /etc/kubernetes/manifests/
+kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+cluster2-controlplane ~ ➜  ETCDCTL_API=3 etcdctl snapshot restore --data-dir /var/lib/etcd-data-new cluster2.db
+2023-08-08 02:53:35.133066 I | mvcc: restore compact to 6734
+2023-08-08 02:53:35.140442 I | etcdserver/membership: added member 8e9e05c52164694d [http://localhost:2380] to cluster cdf818194e3a8c32
+
+cluster2-controlplane ~ ➜  
+
+
+
+cluster2-controlplane ~ ➜  systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+  Drop-In: /etc/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: active (running) since Tue 2023-08-08 01:19:12 UTC; 1h 35min ago
+     Docs: https://kubernetes.io/docs/home/
+ Main PID: 2128 (kubelet)
+    Tasks: 47 (limit: 251379)
+   CGroup: /system.slice/kubelet.service
+           └─2128 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.con
+f --config=/var/lib/kubelet/config.yaml --container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.soc
+k --pod-infra-container-image=k8s.gcr.io/pause:3.7
+
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.585290    2128 kuberuntime_manager.go:815] "CreatePodSandbox for pod 
+failed" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"8d0336f7ea31d797140762e4edde0190046fe2ced2e3ba7b4a35f
+441583e9c5a\": plugin type=\"weave-net\" name=\"weave\" failed (add): unable to allocate IP address: Post \"http://127.0.0.1:6784/ip/8d03
+36f7ea31d797140762e4edde0190046fe2ced2e3ba7b4a35f441583e9c5a\": dial tcp 127.0.0.1:6784: connect: connection refused" pod="kube-system/co
+redns-6d4b75cb6d-tpt5p"
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.585364    2128 pod_workers.go:951] "Error syncing pod, skipping" err=
+"failed to \"CreatePodSandbox\" for \"coredns-6d4b75cb6d-tpt5p_kube-system(3164da41-8a55-4167-a6e6-37d50f0bb7ef)\" with CreatePodSandboxE
+rror: \"Failed to create sandbox for pod \\\"coredns-6d4b75cb6d-tpt5p_kube-system(3164da41-8a55-4167-a6e6-37d50f0bb7ef)\\\": rpc error: c
+ode = Unknown desc = failed to setup network for sandbox \\\"8d0336f7ea31d797140762e4edde0190046fe2ced2e3ba7b4a35f441583e9c5a\\\": plugin
+ type=\\\"weave-net\\\" name=\\\"weave\\\" failed (add): unable to allocate IP address: Post \\\"http://127.0.0.1:6784/ip/8d0336f7ea31d79
+7140762e4edde0190046fe2ced2e3ba7b4a35f441583e9c5a\\\": dial tcp 127.0.0.1:6784: connect: connection refused\"" pod="kube-system/coredns-6
+d4b75cb6d-tpt5p" podUID=3164da41-8a55-4167-a6e6-37d50f0bb7ef
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.892255    2128 remote_runtime.go:201] "RunPodSandbox from runtime ser
+vice failed" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"f453c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b
+55bb51a28c38244f\": plugin type=\"weave-net\" name=\"weave\" failed (add): unable to allocate IP address: Post \"http://127.0.0.1:6784/ip
+/f453c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb51a28c38244f\": dial tcp 127.0.0.1:6784: connect: connection refused"
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.892338    2128 kuberuntime_sandbox.go:70] "Failed to create sandbox f
+or pod" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"f453c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb5
+1a28c38244f\": plugin type=\"weave-net\" name=\"weave\" failed (add): unable to allocate IP address: Post \"http://127.0.0.1:6784/ip/f453
+c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb51a28c38244f\": dial tcp 127.0.0.1:6784: connect: connection refused" pod="kube-system/co
+redns-6d4b75cb6d-9sn4z"
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.892368    2128 kuberuntime_manager.go:815] "CreatePodSandbox for pod 
+failed" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"f453c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb5
+1a28c38244f\": plugin type=\"weave-net\" name=\"weave\" failed (add): unable to allocate IP address: Post \"http://127.0.0.1:6784/ip/f453
+c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb51a28c38244f\": dial tcp 127.0.0.1:6784: connect: connection refused" pod="kube-system/co
+redns-6d4b75cb6d-9sn4z"
+Aug 08 01:19:34 cluster2-controlplane kubelet[2128]: E0808 01:19:34.892474    2128 pod_workers.go:951] "Error syncing pod, skipping" err=
+"failed to \"CreatePodSandbox\" for \"coredns-6d4b75cb6d-9sn4z_kube-system(af4dc646-365e-4845-92b6-c78895d2e841)\" with CreatePodSandboxE
+rror: \"Failed to create sandbox for pod \\\"coredns-6d4b75cb6d-9sn4z_kube-system(af4dc646-365e-4845-92b6-c78895d2e841)\\\": rpc error: c
+ode = Unknown desc = failed to setup network for sandbox \\\"f453c354061501bb5b5ea8fc9befc7a84813d1fd38b05d5b55bb51a28c38244f\\\": plugin
+ type=\\\"weave-net\\\" name=\\\"weave\\\" failed (add): unable to allocate IP address: Post \\\"http://127.0.0.1:6784/ip/f453c354061501b
+
+cluster2-controlplane ~ ➜  systemctl restart kubelet
+
+cluster2-controlplane ~ ➜  systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+  Drop-In: /etc/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: active (running) since Tue 2023-08-08 02:55:01 UTC; 1s ago
+     Docs: https://kubernetes.io/docs/home/
+ Main PID: 11775 (kubelet)
+    Tasks: 30 (limit: 251379)
+   CGroup: /system.slice/kubelet.service
+           └─11775 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.co
+nf --config=/var/lib/kubelet/config.yaml --container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.so
+ck --pod-infra-container-image=k8s.gcr.io/pause:3.7
+
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.086185   11775 manager.go:610] "Failed to read data from checkpoint"
+ checkpoint="kubelet_internal_checkpoint" err="checkpoint is not found"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.088188   11775 plugin_manager.go:114] "Starting Kubelet Plugin Manag
+er"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.112879   11775 apiserver.go:52] "Watching apiserver"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.282616   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.282895   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.282971   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.283229   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.284996   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.285378   11775 topology_manager.go:200] "Topology Admit Handler"
+Aug 08 02:55:03 cluster2-controlplane kubelet[11775]: I0808 02:55:03.285762   11775 topology_manager.go:200] "Topology Admit Handler"
+
+cluster2-controlplane ~ ➜  
+
+
+student-node ~ ✖ kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running   0             96m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running   0             96m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running   0             96m
+kube-system   kube-controller-manager-cluster2-controlplane   1/1     Running   1 (89m ago)   96m
+kube-system   kube-proxy-g4p62                                1/1     Running   0             95m
+kube-system   kube-proxy-khv29                                1/1     Running   0             96m
+kube-system   kube-scheduler-cluster2-controlplane            1/1     Running   1 (89m ago)   96m
+kube-system   weave-net-fcpwg                                 2/2     Running   0             95m
+kube-system   weave-net-l8g8l                                 2/2     Running   1 (96m ago)   96m
+
+student-node ~ ➜  kubectl delete pods kube-controller-manager-cluster2-controlplane kube-scheduler-cluster2-controlplane -n kube-system
+pod "kube-controller-manager-cluster2-controlplane" deleted
+pod "kube-scheduler-cluster2-controlplane" deleted
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running   0             96m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running   0             96m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running   0             96m
+kube-system   kube-controller-manager-cluster2-controlplane   0/1     Pending   0             3s
+kube-system   kube-proxy-g4p62                                1/1     Running   0             96m
+kube-system   kube-proxy-khv29                                1/1     Running   0             96m
+kube-system   kube-scheduler-cluster2-controlplane            0/1     Pending   0             3s
+kube-system   weave-net-fcpwg                                 2/2     Running   0             96m
+kube-system   weave-net-l8g8l                                 2/2     Running   1 (96m ago)   96m
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running   0             96m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running   0             96m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running   0             96m
+kube-system   kube-controller-manager-cluster2-controlplane   1/1     Running   1 (89m ago)   9s
+kube-system   kube-proxy-g4p62                                1/1     Running   0             96m
+kube-system   kube-proxy-khv29                                1/1     Running   0             96m
+kube-system   kube-scheduler-cluster2-controlplane            1/1     Running   1 (89m ago)   9s
+kube-system   weave-net-fcpwg                                 2/2     Running   0             96m
+kube-system   weave-net-l8g8l                                 2/2     Running   1 (96m ago)   96m
+
+student-node ~ ➜  date
+Tue Aug  8 02:56:10 UTC 2023
+
+student-node ~ ➜  
