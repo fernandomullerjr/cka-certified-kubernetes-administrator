@@ -957,6 +957,7 @@ student-node ~ ✖
 - Revisar a questão "What is the IP address of the External ETCD datastore used in cluster2?", como foi verificado o ip???
 - Ver porque a questão "How many nodes are part of the ETCD cluster that etcd-server is a part of?" a resposta era 1.
 - Ver como fazer backup no node local, na questão "Take a backup of etcd on cluster1 and save it on the student-node at the path /opt/cluster1.db".
+- Refazer o teste prático da questão 134.
 
 
 
@@ -967,4 +968,131 @@ student-node ~ ✖
 
 
 
+
+
+# ########################################################################################################################################
+# ########################################################################################################################################
+# ########################################################################################################################################
+# ########################################################################################################################################
+# ########################################################################################################################################
+# ########################################################################################################################################
+## Dia 07/08/2023
+
+- 2º tentativa do teste prático
+
+
+
+In this lab environment, you will get to work with multiple kubernetes clusters where we will practice backing up and restoring the ETCD database.
+
+
+
+
+
+
+
+
+You will notice that, you are logged in to the student-node (instead of the controlplane).
+
+
+The student-node has the kubectl client and has access to all the Kubernetes clusters that are configured in this lab environment.
+
+Before proceeding to the next question, explore the student-node and the clusters it has access to. 
+
+
+student-node ~ ➜  kubectl get nodes
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster1-controlplane   Ready    control-plane   65m   v1.24.0
+cluster1-node01         Ready    <none>          65m   v1.24.0
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS    RESTARTS      AGE
+kube-system   coredns-6d4b75cb6d-2nvtk                        1/1     Running   0             65m
+kube-system   coredns-6d4b75cb6d-f7mrk                        1/1     Running   0             65m
+kube-system   etcd-cluster1-controlplane                      1/1     Running   0             65m
+kube-system   kube-apiserver-cluster1-controlplane            1/1     Running   0             65m
+kube-system   kube-controller-manager-cluster1-controlplane   1/1     Running   0             65m
+kube-system   kube-proxy-5wzbj                                1/1     Running   0             65m
+kube-system   kube-proxy-6xcxg                                1/1     Running   0             65m
+kube-system   kube-scheduler-cluster1-controlplane            1/1     Running   0             65m
+kube-system   weave-net-wfbrs                                 2/2     Running   0             65m
+kube-system   weave-net-zbwbc                                 2/2     Running   1 (65m ago)   65m
+
+student-node ~ ➜  
+
+student-node ~ ➜  date
+Tue Aug  8 02:25:13 UTC 2023
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+How many clusters are defined in the kubeconfig on the student-node?
+
+You can make use of the kubectl config command.
+
+
+student-node ~ ➜  kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://cluster1-controlplane:6443
+  name: cluster1
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://192.4.53.22:6443
+  name: cluster2
+contexts:
+- context:
+    cluster: cluster1
+    user: cluster1
+  name: cluster1
+- context:
+    cluster: cluster2
+    user: cluster2
+  name: cluster2
+current-context: cluster1
+kind: Config
+preferences: {}
+users:
+- name: cluster1
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+- name: cluster2
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+
+student-node ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+How many nodes (both controlplane and worker) are part of cluster1?
+
+Make sure to switch the context to cluster1:
+
+kubectl config use-context cluster1
 

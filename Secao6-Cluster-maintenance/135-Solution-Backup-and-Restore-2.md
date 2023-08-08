@@ -352,3 +352,184 @@ exit
 scp cluster1-controlplane:~/cluster1.db /opt/
 
 ~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+15. An ETCD backup for cluster2 is stored at /opt/cluster2.db. Use this snapshot file to carry out a restore on cluster2 to a new path /var/lib/etcd-data-new.
+
+1.  <details>
+    <summary>An ETCD backup for cluster2 is stored at /opt/cluster2.db. Use this snapshot file to carry out a restore on cluster2 to a new path <b>/var/lib/etcd-data-new</b>.</summary>
+
+    As you recall, `cluster2` is using _external_ etcd. This means
+    * `etcd` does not have to be on the control plane node of the cluster. In this case, it is not.
+    * `etcd` runs as an operating system service not a pod, therefore there is no manifest file to edit. Changes are instead made to a service unit file.</br></br>
+
+    There are several parts to this question. Let's go through them one at a time.
+
+    1.  <details>
+        <summary>Move the backup to the etcd-server node</summary>
+
+        ```bash
+        scp /opt/cluster2.db etcd-server:~/
+        ```
+        </details>
+    1.  <details>
+        <summary>Log into etcd-server node</summary>
+
+        ```bash
+        ssh etcd-server
+        ```
+
+        </details>
+    1.  <details>
+        <summary>Check the ownership of the current etcd-data directory</summary>
+
+        We will need to ensure correct ownership of our restored data. We determined the location of the data directory in Q12
+
+        ```bash
+        ls -ld /var/lib/etcd-data/
+        ```
+
+        > Note that owner and group are both `etcd`
+        </details>
+    1.  <details>
+        <summary>Do the restore</summary>
+
+        ```bash
+        ETCDCTL_API=3 etcdctl snapshot restore \
+            --data-dir /var/lib/etcd-data-new \
+            cluster2.db
+        ```
+
+        </details>
+    1.  <details>
+        <summary>Set ownership on the restored directory</summary>
+
+        ```bash
+        chown -R etcd:etcd /var/lib/etcd-data-new
+        ```
+
+        </detials>
+    1.  <details>
+        <summary>Reconfigure and restart etcd</summary>
+
+        We will need the location of the service unit file which we also determined in Q12
+
+        ```bash
+        vi /etc/systemd/system/etcd.service
+        ```
+
+        Edit the `--data-dir` argument to the newly restored directory, and save.
+
+        Finally, reload and restart the `etcd` service. Whenever you have edited a service unit file, a `daemon-reload` is required to reload the in-memory configuration of the `systemd` service.
+
+        ```bash
+        systemctl daemon-reload
+        systemctl restart etcd.service
+        ```
+
+        Return to the student node:
+
+        ```bash
+        exit
+        ```
+
+        </details>
+    1.  <details>
+        <summary>Verify the restore</summary>
+
+        ```bash
+        kubectl config use-context cluster2
+        kubectl get all -n critical
+        ```
+
+        </details>
+    </details>
+
+
+
+15. 
+An ETCD backup for cluster2 is stored at /opt/cluster2.db. Use this snapshot file to carry out a restore on cluster2 to a new path /var/lib/etcd-data-new.
+
+As you recall, cluster2 is using external etcd. This means
+
+    etcd does not have to be on the control plane node of the cluster. In this case, it is not.
+    etcd runs as an operating system service not a pod, therefore there is no manifest file to edit. Changes are instead made to a service unit file.
+
+There are several parts to this question. Let's go through them one at a time.
+
+    Move the backup to the etcd-server node
+
+    scp /opt/cluster2.db etcd-server:~/
+
+Log into etcd-server node
+
+ssh etcd-server
+
+Check the ownership of the current etcd-data directory
+
+We will need to ensure correct ownership of our restored data. We determined the location of the data directory in Q12
+
+ls -ld /var/lib/etcd-data/
+
+    Note that owner and group are both etcd
+
+Do the restore
+
+ETCDCTL_API=3 etcdctl snapshot restore \
+    --data-dir /var/lib/etcd-data-new \
+    cluster2.db
+
+Set ownership on the restored directory
+
+chown -R etcd:etcd /var/lib/etcd-data-new
+
+Reconfigure and restart etcd
+
+We will need the location of the service unit file which we also determined in Q12
+
+vi /etc/systemd/system/etcd.service
+
+Edit the --data-dir argument to the newly restored directory, and save.
+
+Finally, reload and restart the etcd service. Whenever you have edited a service unit file, a daemon-reload is required to reload the in-memory configuration of the systemd service.
+
+systemctl daemon-reload
+systemctl restart etcd.service
+
+Return to the student node:
+
+exit
+
+Verify the restore
+
+kubectl config use-context cluster2
+kubectl get all -n critical
+
+
+
+- Efetuar restart dos seguintes serviços, após ajustar o ETCD External:
+1. kube-controller-manager
+2. scheduler
+
+kubectl delete pods kube-controller-manager scheduler -n kube-system
+
+- Depois é necessário acessar o controlplane do cluster2 via SSH:
+ssh cluster2-controlplane
+
+- Reiniciar o serviço do Kubelet
+systemctl restart kubelet
+systemctl status kubelet
