@@ -1829,3 +1829,316 @@ student-node ~ ➜  date
 Tue Aug  8 02:56:10 UTC 2023
 
 student-node ~ ➜  
+
+cluster2-controlplane ~ ➜  systemctl | grep api
+var-lib-kubelet-pods-07922376\x2dae07\x2d466d\x2da3f2\x2dd9ca801e7372-volumes-kubernetes.io\x7eprojected-kube\x2dapi\x2daccess\x2ddtg69.mount loaded active     mounted   /var/lib/kubelet/pods/07922376-ae07-466d-a3f2-d9ca801e7372/volumes/kubernetes.io~projected/kube-api-access-dtg69            
+var-lib-kubelet-pods-3164da41\x2d8a55\x2d4167\x2da6e6\x2d37d50f0bb7ef-volumes-kubernetes.io\x7eprojected-kube\x2dapi\x2daccess\x2dt8qqj.mount loaded active     mounted   /var/lib/kubelet/pods/3164da41-8a55-4167-a6e6-37d50f0bb7ef/volumes/kubernetes.io~projected/kube-api-access-t8qqj            
+var-lib-kubelet-pods-978c38b9\x2d530a\x2d427d\x2d83f3\x2d0fec826fa848-volumes-kubernetes.io\x7eprojected-kube\x2dapi\x2daccess\x2dsw6kd.mount loaded active     mounted   /var/lib/kubelet/pods/978c38b9-530a-427d-83f3-0fec826fa848/volumes/kubernetes.io~projected/kube-api-access-sw6kd            
+var-lib-kubelet-pods-af4dc646\x2d365e\x2d4845\x2d92b6\x2dc78895d2e841-volumes-kubernetes.io\x7eprojected-kube\x2dapi\x2daccess\x2dtmbhv.mount loaded active     mounted   /var/lib/kubelet/pods/af4dc646-365e-4845-92b6-c78895d2e841/volumes/kubernetes.io~projected/kube-api-access-tmbhv            
+
+cluster2-controlplane ~ ➜  ps -ef | grep api
+root        1780    1385  7 01:19 ?        00:05:27 kube-apiserver --advertise-address=192.4.53.22 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.pem --etcd-certfile=/etc/kubernetes/pki/etcd/etcd.pem --etcd-keyfile=/etc/kubernetes/pki/etcd/etcd-key.pem --etcd-servers=https://192.4.53.12:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root        3855    3750  0 01:19 ?        00:00:05 /home/weave/weaver --port=6783 --datapath=datapath --name=aa:78:96:30:4f:d9 --http-addr=127.0.0.1:6784 --metrics-addr=0.0.0.0:6782 --docker-api= --no-dns --db-prefix=/weavedb/weave-net --ipalloc-range=10.50.0.0/16 --nickname=cluster2-controlplane --ipalloc-init consensus=0 --conn-limit=200 --expect-npc --no-masq-local
+root       12269   11017  0 02:56 pts/1    00:00:00 grep api
+
+cluster2-controlplane ~ ➜  systemctl status kube-apiserver
+Unit kube-apiserver.service could not be found.
+
+cluster2-controlplane ~ ✖ 
+
+
+Move the backup to the etcd-server node
+
+scp /opt/cluster2.db etcd-server:~/
+
+
+ssh etcd-server
+
+ls -ld /var/lib/etcd-data/
+
+    Note that owner and group are both etcd
+
+Do the restore
+
+ETCDCTL_API=3 etcdctl snapshot restore \
+    --data-dir /var/lib/etcd-data-new \
+    cluster2.db
+
+Set ownership on the restored directory
+
+chown -R etcd:etcd /var/lib/etcd-data-new
+
+Reconfigure and restart etcd
+
+We will need the location of the service unit file which we also determined in Q12
+
+vi /etc/systemd/system/etcd.service
+
+Edit the --data-dir argument to the newly restored directory, and save.
+
+
+student-node /opt ➜  ssh etcd-server
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Aug  8 02:36:31 2023 from 192.4.53.17
+
+etcd-server ~ ➜  ls -ld /var/lib/etcd-data/
+drwx------ 1 etcd etcd 4096 Aug  8 01:26 /var/lib/etcd-data/
+
+etcd-server ~ ➜  
+
+etcd-server ~ ➜  ETCDCTL_API=3 etcdctl snapshot restore \
+>     --data-dir /var/lib/etcd-data-new \
+>     cluster2.db
+{"level":"info","ts":1691463683.071083,"caller":"snapshot/v3_snapshot.go:296","msg":"restoring snapshot","path":"cluster2.db","wal-dir":"/var/lib/etcd-data-new/member/wal","data-dir":"/var/lib/etcd-data-new","snap-dir":"/var/lib/etcd-data-new/member/snap"}
+{"level":"info","ts":1691463683.0985966,"caller":"mvcc/kvstore.go:388","msg":"restored last compact revision","meta-bucket-name":"meta","meta-bucket-name-key":"finishedCompactRev","restored-compact-revision":6734}
+{"level":"info","ts":1691463683.1098518,"caller":"membership/cluster.go:392","msg":"added member","cluster-id":"cdf818194e3a8c32","local-member-id":"0","added-peer-id":"8e9e05c52164694d","added-peer-peer-urls":["http://localhost:2380"]}
+{"level":"info","ts":1691463683.1270738,"caller":"snapshot/v3_snapshot.go:309","msg":"restored snapshot","path":"cluster2.db","wal-dir":"/var/lib/etcd-data-new/member/wal","data-dir":"/var/lib/etcd-data-new","snap-dir":"/var/lib/etcd-data-new/member/snap"}
+
+etcd-server ~ ➜  ls -lhasp /var/lib/etcd-data-new
+total 16K
+4.0K drwx------ 3 root root 4.0K Aug  8 03:01 ./
+8.0K drwxr-xr-x 1 root root 4.0K Aug  8 03:01 ../
+4.0K drwx------ 4 root root 4.0K Aug  8 03:01 member/
+
+etcd-server ~ ➜  chown -R etcd:etcd /var/lib/etcd-data-new
+
+etcd-server ~ ➜  vi /etc/systemd/system/etcd.service
+
+etcd-server ~ ➜  
+
+etcd-server ~ ➜  vi /etc/systemd/system/etcd.service
+
+etcd-server ~ ➜  
+
+etcd-server ~ ➜  
+
+etcd-server ~ ➜  cat /etc/systemd/system/etcd.service
+[Unit]
+Description=etcd key-value store
+Documentation=https://github.com/etcd-io/etcd
+After=network.target
+
+[Service]
+User=etcd
+Type=notify
+ExecStart=/usr/local/bin/etcd \
+  --name etcd-server \
+  --data-dir=/var/lib/etcd-data-new \
+  --cert-file=/etc/etcd/pki/etcd.pem \
+  --key-file=/etc/etcd/pki/etcd-key.pem \
+  --peer-cert-file=/etc/etcd/pki/etcd.pem \
+  --peer-key-file=/etc/etcd/pki/etcd-key.pem \
+  --trusted-ca-file=/etc/etcd/pki/ca.pem \
+  --peer-trusted-ca-file=/etc/etcd/pki/ca.pem \
+  --peer-client-cert-auth \
+  --client-cert-auth \
+  --initial-advertise-peer-urls https://192.4.53.12:2380 \
+  --listen-peer-urls https://192.4.53.12:2380 \
+  --advertise-client-urls https://192.4.53.12:2379 \
+  --listen-client-urls https://192.4.53.12:2379,https://127.0.0.1:2379 \
+  --initial-cluster-token etcd-cluster-1 \
+  --initial-cluster etcd-server=https://192.4.53.12:2380 \
+  --initial-cluster-state new
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=40000
+
+[Install]
+WantedBy=multi-user.target
+
+etcd-server ~ ➜  
+etcd-server ~ ➜  
+
+etcd-server ~ ➜  systemctl daemon-reload
+
+etcd-server ~ ➜  systemctl restart etcd.service
+
+etcd-server ~ ➜  
+
+
+kubectl config use-context cluster2
+kubectl get all -n critical
+
+
+
+- Efetuar restart dos seguintes serviços, após ajustar o ETCD External:
+1. kube-controller-manager
+2. scheduler
+
+kubectl delete pods kube-controller-manager scheduler -n kube-system
+
+- Depois é necessário acessar o controlplane do cluster2 via SSH:
+ssh cluster2-controlplane
+
+- Reiniciar o serviço do Kubelet
+systemctl restart kubelet
+systemctl status kubelet
+
+
+etcd-server ~ ➜  systemctl status daemon-reload
+Unit daemon-reload.service could not be found.
+
+etcd-server ~ ✖ systemctl status etcd.service
+● etcd.service - etcd key-value store
+   Loaded: loaded (/etc/systemd/system/etcd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Tue 2023-08-08 03:03:22 UTC; 5min ago
+     Docs: https://github.com/etcd-io/etcd
+ Main PID: 2921 (etcd)
+    Tasks: 45 (limit: 251379)
+   CGroup: /system.slice/etcd.service
+           └─2921 /usr/local/bin/etcd --name etcd-server --data-dir=/var/lib/etcd-data-new --cert-file=/etc/etcd/pki/etcd.pem --key-file=
+/etc/etcd/pki/etcd-key.pem --peer-cert-file=/etc/etcd/pki/etcd.pem --peer-key-file=/etc/etcd/pki/etcd-key.pem --trusted-ca-file=/etc/etcd
+/pki/ca.pem --peer-trusted-ca-file=/etc/etcd/pki/ca.pem --peer-client-cert-auth --client-cert-auth --initial-advertise-peer-urls https://
+192.4.53.12:2380 --listen-peer-urls https://192.4.53.12:2380 --advertise-client-urls https://192.4.53.12:2379 --listen-client-urls https:
+//192.4.53.12:2379,https://127.0.0.1:2379 --initial-cluster-token etcd-cluster-1 --initial-cluster etcd-server=https://192.4.53.12:2380 -
+-initial-cluster-state new
+
+Aug 08 03:03:22 etcd-server etcd[2921]: setting up the initial cluster version to 3.4
+Aug 08 03:03:22 etcd-server etcd[2921]: ready to serve client requests
+Aug 08 03:03:22 etcd-server etcd[2921]: published {Name:etcd-server ClientURLs:[https://192.4.53.12:2379]} to cluster cdf818194e3a8c32
+Aug 08 03:03:22 etcd-server etcd[2921]: ready to serve client requests
+Aug 08 03:03:22 etcd-server etcd[2921]: set the initial cluster version to 3.4
+Aug 08 03:03:22 etcd-server etcd[2921]: enabled capabilities for version 3.4
+Aug 08 03:03:22 etcd-server etcd[2921]: serving client requests on 127.0.0.1:2379
+Aug 08 03:03:22 etcd-server etcd[2921]: serving client requests on 192.4.53.12:2379
+Aug 08 03:09:04 etcd-server etcd[2921]: store.index: compact 7374
+Aug 08 03:09:04 etcd-server etcd[2921]: finished scheduled compaction at 7374 (took 1.491249ms)
+
+etcd-server ~ ➜  
+
+student-node ~ ➜  ssh cluster2-controlplane
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Aug  8 02:50:54 2023 from 192.4.53.10
+
+cluster2-controlplane ~ ➜  systemctl restart kubelet
+
+cluster2-controlplane ~ ➜  systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+  Drop-In: /etc/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: active (running) since Tue 2023-08-08 03:09:48 UTC; 255ms ago
+     Docs: https://kubernetes.io/docs/home/
+ Main PID: 13341 (kubelet)
+    Tasks: 15 (limit: 251379)
+   CGroup: /system.slice/kubelet.service
+           └─13341 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.co
+nf --config=/var/lib/kubelet/config.yaml --container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.so
+ck --pod-infra-container-image=k8s.gcr.io/pause:3.7
+
+cluster2-controlplane ~ ➜  systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+  Drop-In: /etc/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: active (running) since Tue 2023-08-08 03:09:48 UTC; 5s ago
+     Docs: https://kubernetes.io/docs/home/
+ Main PID: 13341 (kubelet)
+    Tasks: 31 (limit: 251379)
+   CGroup: /system.slice/kubelet.service
+           └─13341 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.co
+nf --config=/var/lib/kubelet/config.yaml --container-runtime=remote --container-runtime-endpoint=unix:///var/run/containerd/containerd.so
+ck --pod-infra-container-image=k8s.gcr.io/pause:3.7
+
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182522   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"kube-api-access-sw6kd\" (UniqueName: \"kubernetes.io/projected/978c38b9-530a-427d-83f3-0fec826fa848-
+kube-api-access-sw6kd\") pod \"kube-proxy-khv29\" (UID: \"978c38b9-530a-427d-83f3-0fec826fa848\") " pod="kube-system/kube-proxy-khv29"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182571   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"kube-api-access-dtg69\" (UniqueName: \"kubernetes.io/projected/07922376-ae07-466d-a3f2-d9ca801e7372-
+kube-api-access-dtg69\") pod \"weave-net-l8g8l\" (UID: \"07922376-ae07-466d-a3f2-d9ca801e7372\") " pod="kube-system/weave-net-l8g8l"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182638   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"config-volume\" (UniqueName: \"kubernetes.io/configmap/3164da41-8a55-4167-a6e6-37d50f0bb7ef-config-v
+olume\") pod \"coredns-6d4b75cb6d-tpt5p\" (UID: \"3164da41-8a55-4167-a6e6-37d50f0bb7ef\") " pod="kube-system/coredns-6d4b75cb6d-tpt5p"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182714   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"kube-api-access-t8qqj\" (UniqueName: \"kubernetes.io/projected/3164da41-8a55-4167-a6e6-37d50f0bb7ef-
+kube-api-access-t8qqj\") pod \"coredns-6d4b75cb6d-tpt5p\" (UID: \"3164da41-8a55-4167-a6e6-37d50f0bb7ef\") " pod="kube-system/coredns-6d4b
+75cb6d-tpt5p"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182768   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"kube-proxy\" (UniqueName: \"kubernetes.io/configmap/978c38b9-530a-427d-83f3-0fec826fa848-kube-proxy\
+") pod \"kube-proxy-khv29\" (UID: \"978c38b9-530a-427d-83f3-0fec826fa848\") " pod="kube-system/kube-proxy-khv29"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182868   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"xtables-lock\" (UniqueName: \"kubernetes.io/host-path/07922376-ae07-466d-a3f2-d9ca801e7372-xtables-l
+ock\") pod \"weave-net-l8g8l\" (UID: \"07922376-ae07-466d-a3f2-d9ca801e7372\") " pod="kube-system/weave-net-l8g8l"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182911   13341 reconciler.go:270] "operationExecutor.VerifyControlle
+rAttachedVolume started for volume \"config-volume\" (UniqueName: \"kubernetes.io/configmap/af4dc646-365e-4845-92b6-c78895d2e841-config-v
+olume\") pod \"coredns-6d4b75cb6d-9sn4z\" (UID: \"af4dc646-365e-4845-92b6-c78895d2e841\") " pod="kube-system/coredns-6d4b75cb6d-9sn4z"
+Aug 08 03:09:50 cluster2-controlplane kubelet[13341]: I0808 03:09:50.182937   13341 reconciler.go:157] "Reconciler: start to sync state"
+Aug 08 03:09:51 cluster2-controlplane kubelet[13341]: I0808 03:09:51.883373   13341 prober_manager.go:255] "Failed to trigger a manual ru
+n" probe="Readiness"
+Aug 08 03:09:51 cluster2-controlplane kubelet[13341]: I0808 03:09:51.883404   13341 prober_manager.go:255] "Failed to trigger a manual ru
+n" probe="Readiness"
+
+cluster2-controlplane ~ ➜  
+
+
+- Pods do controller e do scheduler só ficam em terminating:
+
+
+student-node ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                            READY   STATUS        RESTARTS       AGE
+critical      critical-deployment-240616-5bf45c9459-m9dsl     1/1     Running       0              46m
+critical      critical-deployment-240616-5bf45c9459-t29p5     1/1     Running       0              46m
+kube-system   coredns-6d4b75cb6d-9sn4z                        1/1     Running       0              111m
+kube-system   coredns-6d4b75cb6d-tpt5p                        1/1     Running       0              111m
+kube-system   kube-apiserver-cluster2-controlplane            1/1     Running       0              111m
+kube-system   kube-controller-manager-cluster2-controlplane   1/1     Terminating   1 (104m ago)   111m
+kube-system   kube-proxy-g4p62                                1/1     Running       0              110m
+kube-system   kube-proxy-khv29                                1/1     Running       0              111m
+kube-system   kube-scheduler-cluster2-controlplane            1/1     Terminating   1 (104m ago)   111m
+kube-system   weave-net-fcpwg                                 2/2     Running       0              110m
+kube-system   weave-net-l8g8l                                 2/2     Running       1 (110m ago)   111m
+
+student-node ~ ➜  
+
+
+- Deletados alguns pods com o --force
+
+student-node /opt ➜  kubectl get pods -n kube-system
+NAME                                            READY   STATUS    RESTARTS       AGE
+coredns-6d4b75cb6d-9sn4z                        1/1     Running   0              116m
+coredns-6d4b75cb6d-tpt5p                        1/1     Running   0              116m
+kube-controller-manager-cluster2-controlplane   1/1     Running   1 (109m ago)   23s
+kube-proxy-g4p62                                1/1     Running   0              116m
+kube-proxy-khv29                                1/1     Running   0              116m
+kube-scheduler-cluster2-controlplane            1/1     Running   1 (109m ago)   7s
+weave-net-fcpwg                                 2/2     Running   0              116m
+weave-net-l8g8l                                 2/2     Running   1 (116m ago)   116m
+
+student-node /opt ➜  date
+Tue Aug  8 03:16:10 UTC 2023
+student-node /opt ➜  
+
+student-node /opt ➜  kubectl get pods -n kube-system
+NAME                                            READY   STATUS    RESTARTS       AGE
+coredns-6d4b75cb6d-9sn4z                        1/1     Running   0              117m
+coredns-6d4b75cb6d-tpt5p                        1/1     Running   0              117m
+kube-apiserver-cluster2-controlplane            1/1     Running   0              13s
+kube-controller-manager-cluster2-controlplane   1/1     Running   1 (110m ago)   49s
+kube-proxy-g4p62                                1/1     Running   0              116m
+kube-proxy-khv29                                1/1     Running   0              117m
+kube-scheduler-cluster2-controlplane            1/1     Running   1 (110m ago)   33s
+weave-net-fcpwg                                 2/2     Running   0              116m
+weave-net-l8g8l                                 2/2     Running   1 (117m ago)   117m
+
+student-node /opt ➜  date
+Tue Aug  8 03:16:35 UTC 2023
+
+student-node /opt ➜  
+
+student-node /opt ➜  
