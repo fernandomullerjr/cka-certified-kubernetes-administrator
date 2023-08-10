@@ -79,3 +79,17 @@ Who can access?
         Service Accounts
 
 
+What can they do?
+        RBAC Authorization
+        ABAC Authorization
+        Node Authorization
+        Webhook Mode
+
+
+TLS
+- Todas as comunicações entre os componentes do Kubernetes são feitas com encriptação TLS(TLS Encryption).
+
+
+
+- Todos os Pods podem acessar todos os Pods do Cluster.
+- Com as Network Policies, é possível restringir o acesso a alguns Pods do Cluster.
