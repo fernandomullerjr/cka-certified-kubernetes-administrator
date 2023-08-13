@@ -80,3 +80,18 @@ In this section, we will take a look at authentication in a kubernetes cluster
 - Acessos de Usuários(Admins, Developers) são gerenciados pelo kube-apiserver.
 
 - Tanto o acesso via kubectl, como o acesso via API, são realizados via kube-apiserver.
+
+- Métodos de autenticação
+    Static Password File
+    Static Token File
+    Certificates
+    Identity Services
+
+
+## Static Password File
+https://gcore.com/learning/kubernetes-authentication/
+
+- Formato que é configurado o arquivo csv:
+password,user,uid,"group1,group2,group3"
+
+
