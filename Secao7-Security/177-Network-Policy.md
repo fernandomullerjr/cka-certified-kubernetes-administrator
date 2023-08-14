@@ -89,3 +89,37 @@ git status
   
   
   
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+# 177. Network Policy
+
+- Exemplo de Policy que é aplicada no Pod do Banco de dados, liberando o acesso na porta 3306 apenas ao Pod da API no sentido ingress:
+
+~~~~YAML
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: api-pod
+    ports:
+    - protocol: TCP
+      port: 3306
+~~~~
+
+
+- OBSERVAÇÃO:
+Como a policy fala somente de ingress policyTypes, o tráfego de egress não é influenciado por esta policy.
