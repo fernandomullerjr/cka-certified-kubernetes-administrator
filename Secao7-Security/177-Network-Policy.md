@@ -123,3 +123,25 @@ spec:
 
 - OBSERVAÇÃO:
 Como a policy fala somente de ingress policyTypes, o tráfego de egress não é influenciado por esta policy.
+
+
+
+- Soluções que suportam o Network Policies
+        Some of the CNI plugins that support network policies are:
+
+            Weave
+
+            Calico
+
+            Cilium
+
+            Romana
+
+            Kube-router
+
+
+- Solução que NÃO suporta o Network Policies:
+        Flannel
+
+
+
