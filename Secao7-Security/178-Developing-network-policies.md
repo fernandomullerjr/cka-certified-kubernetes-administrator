@@ -24,3 +24,30 @@ git status
 # 178. Developing network policies
 
 
+Seguindo este manifesto como base:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: api-pod
+    ports:
+    - protocol: TCP
+      port: 3306
+~~~~
+
+
+
+
+- Quando liberamos um tráfego de entrada(ingress), não precisamos liberar o tráfego da resposta desta comunicação. A resposta é liberada automaticamente.
