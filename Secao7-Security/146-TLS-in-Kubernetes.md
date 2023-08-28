@@ -65,3 +65,18 @@ client-key.pem
 server.key
 server-key.pem
 client-key.pem
+
+
+
+
+
+
+- Existe 1 CA por cluster.
+- É possível adicionar mais de 1 CA, se achar necessário.
+
+- Cada componente do Kubernetes tem um par de certificado + chave.
+
+- A própria CA tem seu par de certificado + chave.
+exemplo:
+ca.crt
+ca.key
