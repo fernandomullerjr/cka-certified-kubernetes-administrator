@@ -202,3 +202,36 @@ O=system:masters
 - We follow the same procedure to generate client certificate for all other components that access the kube-apiserver.
 
 - Para todos os componentes do cluster, o procedimento de geração de certificados de cliente é o mesmo.
+
+
+
+
+
+4:39
+
+
+curl https://192.168.64.4:8443/apis --key /Users/$USER/.minikube/certs/ca-key.pem --cert /Users/$USER/.minikube/certs/cert.pem --cacert /Users/$USER/.minikube/certs/ca.pem --cert-type PEM
+
+
+curl https://kube-apiserver:6443/api/v1/pods 1 --key admin.key --cert admin.crt --cacert ca.crt
+
+
+
+
+
+5:17
+cópia que os clientes precisam
+
+especificar o CA ROOT certificate
+
+
+
+
+
+
+- Para comunicações entre membros de um Cluster, é necessário um certificado adicional:
+Peer Certificates
+
+
+
+- Clients apontam o certificado Root CA nos arquivos de configuração.
