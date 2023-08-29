@@ -154,3 +154,51 @@ $ openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
 
 
 
+
+
+
+
+# Generating Client Certificates
+
+## Admin User Certificates
+
+    Generate Keys
+
+~~~~bash
+    $ openssl genrsa -out admin.key 2048
+~~~~
+
+
+## Generate CSR
+
+~~~~bash
+$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+~~~~
+
+
+## Sign certificates
+
+~~~~bash
+$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+~~~~
+
+
+## Certificate with admin privilages
+
+~~~~bash
+$ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+~~~~
+
+
+- Esta parte do comando que diz que este certificado é para um admin:
+O=system:masters
+
+
+
+
+
+
+
+- We follow the same procedure to generate client certificate for all other components that access the kube-apiserver.
+
+- Para todos os componentes do cluster, o procedimento de geração de certificados de cliente é o mesmo.
