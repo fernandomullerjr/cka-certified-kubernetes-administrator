@@ -602,6 +602,9 @@ controlplane ~ ➜
 
 
 
+
+- Verificando logs do container kube-apiserver 
+
 crictl logs f19197851aebd
 
 
@@ -624,3 +627,284 @@ W0908 02:59:21.658586       1 logging.go:59] [core] [Channel #5 SubChannel #6] g
   "Metadata": null
 }. Err: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:2379: connect: connection refused"
 E0908 02:59:24.539335       1 run.go:74] "command failed" err="context deadline exceeded"
+
+
+
+
+
+- Verificando logs do container etcd
+
+crictl logs 85f8ebad3a139
+
+controlplane ~ ➜  crictl logs 85f8ebad3a139
+E0907 23:02:35.108439   17874 remote_runtime.go:415] "ContainerStatus from runtime service failed" err="rpc error: code = NotFound desc = an error occurred when try to find container \"85f8ebad3a139\": not found" containerID="85f8ebad3a139"
+FATA[0000] rpc error: code = NotFound desc = an error occurred when try to find container "85f8ebad3a139": not found 
+
+controlplane ~ ✖ 
+
+
+
+
+
+controlplane ~ ✖ crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+77f5299cdc439       6f707f569b572       45 seconds ago      Exited              kube-apiserver            7                   6b5c6018d8b95       kube-apiserver-controlplane
+6be96b4274c4b       86b6af7dd652c       2 minutes ago       Exited              etcd                      6                   aa0450dec18cd       etcd-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       9 minutes ago       Running             kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       10 minutes ago      Running             kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       38 minutes ago      Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       38 minutes ago      Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       38 minutes ago      Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       38 minutes ago      Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       38 minutes ago      Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       38 minutes ago      Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+3d8480d72e91c       f73f1b39c3fe8       39 minutes ago      Exited              kube-scheduler            0                   38f8e2ecafcc5       kube-scheduler-controlplane
+e13196ea86605       95fe52ed44570       39 minutes ago      Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
+
+controlplane ~ ➜  
+
+
+
+
+- Verificando logs do container etcd
+
+crictl logs 6be96b4274c4b
+
+
+
+controlplane ~ ➜  crictl logs 6be96b4274c4b
+{"level":"info","ts":"2023-09-08T03:00:19.321Z","caller":"etcdmain/etcd.go:73","msg":"Running: ","args":["etcd","--advertise-client-urls=https://192.4.121.9:2379","--cert-file=/etc/kubernetes/pki/etcd/server-certificate.crt","--client-cert-auth=true","--data-dir=/var/lib/etcd","--experimental-initial-corrupt-check=true","--experimental-watch-progress-notify-interval=5s","--initial-advertise-peer-urls=https://192.4.121.9:2380","--initial-cluster=controlplane=https://192.4.121.9:2380","--key-file=/etc/kubernetes/pki/etcd/server.key","--listen-client-urls=https://127.0.0.1:2379,https://192.4.121.9:2379","--listen-metrics-urls=http://127.0.0.1:2381","--listen-peer-urls=https://192.4.121.9:2380","--name=controlplane","--peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt","--peer-client-cert-auth=true","--peer-key-file=/etc/kubernetes/pki/etcd/peer.key","--peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt","--snapshot-count=10000","--trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt"]}
+{"level":"info","ts":"2023-09-08T03:00:19.322Z","caller":"etcdmain/etcd.go:116","msg":"server has been already initialized","data-dir":"/var/lib/etcd","dir-type":"member"}
+{"level":"info","ts":"2023-09-08T03:00:19.323Z","caller":"embed/etcd.go:124","msg":"configuring peer listeners","listen-peer-urls":["https://192.4.121.9:2380"]}
+{"level":"info","ts":"2023-09-08T03:00:19.323Z","caller":"embed/etcd.go:484","msg":"starting with peer TLS","tls-info":"cert = /etc/kubernetes/pki/etcd/peer.crt, key = /etc/kubernetes/pki/etcd/peer.key, client-cert=, client-key=, trusted-ca = /etc/kubernetes/pki/etcd/ca.crt, client-cert-auth = true, crl-file = ","cipher-suites":[]}
+{"level":"info","ts":"2023-09-08T03:00:19.327Z","caller":"embed/etcd.go:132","msg":"configuring client listeners","listen-client-urls":["https://127.0.0.1:2379","https://192.4.121.9:2379"]}
+{"level":"info","ts":"2023-09-08T03:00:19.328Z","caller":"embed/etcd.go:306","msg":"starting an etcd server","etcd-version":"3.5.7","git-sha":"215b53cf3","go-version":"go1.17.13","go-os":"linux","go-arch":"amd64","max-cpu-set":36,"max-cpu-available":36,"member-initialized":true,"name":"controlplane","data-dir":"/var/lib/etcd","wal-dir":"","wal-dir-dedicated":"","member-dir":"/var/lib/etcd/member","force-new-cluster":false,"heartbeat-interval":"100ms","election-timeout":"1s","initial-election-tick-advance":true,"snapshot-count":10000,"max-wals":5,"max-snapshots":5,"snapshot-catchup-entries":5000,"initial-advertise-peer-urls":["https://192.4.121.9:2380"],"listen-peer-urls":["https://192.4.121.9:2380"],"advertise-client-urls":["https://192.4.121.9:2379"],"listen-client-urls":["https://127.0.0.1:2379","https://192.4.121.9:2379"],"listen-metrics-urls":["http://127.0.0.1:2381"],"cors":["*"],"host-whitelist":["*"],"initial-cluster":"","initial-cluster-state":"new","initial-cluster-token":"","quota-backend-bytes":2147483648,"max-request-bytes":1572864,"max-concurrent-streams":4294967295,"pre-vote":true,"initial-corrupt-check":true,"corrupt-check-time-interval":"0s","compact-check-time-enabled":false,"compact-check-time-interval":"1m0s","auto-compaction-mode":"periodic","auto-compaction-retention":"0s","auto-compaction-interval":"0s","discovery-url":"","discovery-proxy":"","downgrade-check-interval":"5s"}
+{"level":"info","ts":"2023-09-08T03:00:19.344Z","caller":"etcdserver/backend.go:81","msg":"opened backend db","path":"/var/lib/etcd/member/snap/db","took":"13.902804ms"}
+{"level":"info","ts":"2023-09-08T03:00:19.361Z","caller":"etcdserver/server.go:530","msg":"No snapshot found. Recovering WAL from scratch!"}
+{"level":"info","ts":"2023-09-08T03:00:19.375Z","caller":"etcdserver/raft.go:529","msg":"restarting local member","cluster-id":"ddf05ee95628ace","local-member-id":"5a66c5a502692d6f","commit-index":3064}
+{"level":"info","ts":"2023-09-08T03:00:19.376Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f switched to configuration voters=()"}
+{"level":"info","ts":"2023-09-08T03:00:19.377Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f became follower at term 8"}
+{"level":"info","ts":"2023-09-08T03:00:19.377Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"newRaft 5a66c5a502692d6f [peers: [], term: 8, commit: 3064, applied: 0, lastindex: 3064, lastterm: 8]"}
+{"level":"warn","ts":"2023-09-08T03:00:19.379Z","caller":"auth/store.go:1234","msg":"simple token is not cryptographically signed"}
+{"level":"info","ts":"2023-09-08T03:00:19.379Z","caller":"mvcc/kvstore.go:323","msg":"restored last compact revision","meta-bucket-name":"meta","meta-bucket-name-key":"finishedCompactRev","restored-compact-revision":1994}
+{"level":"info","ts":"2023-09-08T03:00:19.383Z","caller":"mvcc/kvstore.go:393","msg":"kvstore restored","current-rev":2694}
+{"level":"info","ts":"2023-09-08T03:00:19.385Z","caller":"etcdserver/quota.go:94","msg":"enabled backend quota with default value","quota-name":"v3-applier","quota-size-bytes":2147483648,"quota-size":"2.1 GB"}
+{"level":"info","ts":"2023-09-08T03:00:19.386Z","caller":"etcdserver/corrupt.go:95","msg":"starting initial corruption check","local-member-id":"5a66c5a502692d6f","timeout":"7s"}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"etcdserver/corrupt.go:165","msg":"initial corruption checking passed; no corruption","local-member-id":"5a66c5a502692d6f"}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"etcdserver/server.go:854","msg":"starting etcd server","local-member-id":"5a66c5a502692d6f","local-server-version":"3.5.7","cluster-version":"to_be_decided"}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"etcdserver/server.go:754","msg":"starting initial election tick advance","election-ticks":10}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"/var/lib/etcd/member/snap","suffix":"snap.db","max":5,"interval":"30s"}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"/var/lib/etcd/member/snap","suffix":"snap","max":5,"interval":"30s"}
+{"level":"info","ts":"2023-09-08T03:00:19.387Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"/var/lib/etcd/member/wal","suffix":"wal","max":5,"interval":"30s"}
+{"level":"info","ts":"2023-09-08T03:00:19.388Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f switched to configuration voters=(6514111223538724207)"}
+{"level":"info","ts":"2023-09-08T03:00:19.388Z","caller":"membership/cluster.go:421","msg":"added member","cluster-id":"ddf05ee95628ace","local-member-id":"5a66c5a502692d6f","added-peer-id":"5a66c5a502692d6f","added-peer-peer-urls":["https://192.4.121.9:2380"]}
+{"level":"info","ts":"2023-09-08T03:00:19.388Z","caller":"membership/cluster.go:584","msg":"set initial cluster version","cluster-id":"ddf05ee95628ace","local-member-id":"5a66c5a502692d6f","cluster-version":"3.5"}
+{"level":"info","ts":"2023-09-08T03:00:19.388Z","caller":"api/capability.go:75","msg":"enabled capabilities for version","cluster-version":"3.5"}
+{"level":"info","ts":"2023-09-08T03:00:19.389Z","caller":"embed/etcd.go:687","msg":"starting with client TLS","tls-info":"cert = /etc/kubernetes/pki/etcd/server-certificate.crt, key = /etc/kubernetes/pki/etcd/server.key, client-cert=, client-key=, trusted-ca = /etc/kubernetes/pki/etcd/ca.crt, client-cert-auth = true, crl-file = ","cipher-suites":[]}
+{"level":"info","ts":"2023-09-08T03:00:19.389Z","caller":"embed/etcd.go:586","msg":"serving peer traffic","address":"192.4.121.9:2380"}
+{"level":"info","ts":"2023-09-08T03:00:19.389Z","caller":"embed/etcd.go:558","msg":"cmux::serve","address":"192.4.121.9:2380"}
+{"level":"info","ts":"2023-09-08T03:00:19.389Z","caller":"embed/etcd.go:275","msg":"now serving peer/client/metrics","local-member-id":"5a66c5a502692d6f","initial-advertise-peer-urls":["https://192.4.121.9:2380"],"listen-peer-urls":["https://192.4.121.9:2380"],"advertise-client-urls":["https://192.4.121.9:2379"],"listen-client-urls":["https://127.0.0.1:2379","https://192.4.121.9:2379"],"listen-metrics-urls":["http://127.0.0.1:2381"]}
+{"level":"info","ts":"2023-09-08T03:00:19.389Z","caller":"embed/etcd.go:762","msg":"serving metrics","address":"http://127.0.0.1:2381"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f is starting a new election at term 8"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f became pre-candidate at term 8"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f received MsgPreVoteResp from 5a66c5a502692d6f at term 8"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f became candidate at term 9"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f received MsgVoteResp from 5a66c5a502692d6f at term 9"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"5a66c5a502692d6f became leader at term 9"}
+{"level":"info","ts":"2023-09-08T03:00:21.078Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"raft.node: 5a66c5a502692d6f elected leader 5a66c5a502692d6f at term 9"}
+{"level":"info","ts":"2023-09-08T03:00:21.079Z","caller":"etcdserver/server.go:2062","msg":"published local member to cluster through raft","local-member-id":"5a66c5a502692d6f","local-member-attributes":"{Name:controlplane ClientURLs:[https://192.4.121.9:2379]}","request-path":"/0/members/5a66c5a502692d6f/attributes","cluster-id":"ddf05ee95628ace","publish-timeout":"7s"}
+{"level":"info","ts":"2023-09-08T03:00:21.079Z","caller":"embed/serve.go:100","msg":"ready to serve client requests"}
+{"level":"info","ts":"2023-09-08T03:00:21.079Z","caller":"embed/serve.go:100","msg":"ready to serve client requests"}
+{"level":"info","ts":"2023-09-08T03:00:21.079Z","caller":"etcdmain/main.go:44","msg":"notifying init daemon"}
+{"level":"info","ts":"2023-09-08T03:00:21.079Z","caller":"etcdmain/main.go:50","msg":"successfully notified init daemon"}
+{"level":"fatal","ts":"2023-09-08T03:00:21.079Z","caller":"etcdmain/etcd.go:219","msg":"listener failed","error":"open /etc/kubernetes/pki/etcd/server-certificate.crt: no such file or directory","stacktrace":"go.etcd.io/etcd/server/v3/etcdmain.startEtcdOrProxyV2\n\tgo.etcd.io/etcd/server/v3/etcdmain/etcd.go:219\ngo.etcd.io/etcd/server/v3/etcdmain.Main\n\tgo.etcd.io/etcd/server/v3/etcdmain/main.go:40\nmain.main\n\tgo.etcd.io/etcd/server/v3/main.go:32\nruntime.main\n\truntime/proc.go:255"}
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+{"level":"warn","ts":"2023-09-08T03:00:19.379Z","caller":"auth/store.go:1234","msg":"simple token is not cryptographically signed"}
+
+
+{"level":"fatal","ts":"2023-09-08T03:00:21.079Z","caller":"etcdmain/etcd.go:219","msg":"listener failed","error":"open /etc/kubernetes/pki/etcd/server-certificate.crt: no such file or directory","stacktrace":"go.etcd.io/etcd/server/v3/etcdmain.startEtcdOrProxyV2\n\tgo.etcd.io/etcd/server/v3/etcdmain/etcd.go:219\ngo.etcd.io/etcd/server/v3/etcdmain.Main\n\tgo.etcd.io/etcd/server/v3/etcdmain/main.go:40\nmain.main\n\tgo.etcd.io/etcd/server/v3/main.go:32\nruntime.main\n\truntime/proc.go:255"}
+
+
+
+"msg":"listener failed","error":"open /etc/kubernetes/pki/etcd/server-certificate.crt: no such file or directory"
+
+
+
+
+- O manifesto tá com esta configuração errada, que deve estar gerando o problema:
+    - --cert-file=/etc/kubernetes/pki/etcd/server-certificate.crt
+
+
+- Via ps-ef, antes estava assim:
+--cert-file=/etc/kubernetes/pki/etcd/server.crt
+
+
+
+- Ajustando:
+vi /etc/kubernetes/manifests/etcd.yaml 
+
+
+cat /etc/kubernetes/manifests/etcd.yaml 
+
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/etcd.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.4.121.9:2379
+  creationTimestamp: null
+  labels:
+    component: etcd
+    tier: control-plane
+  name: etcd
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - etcd
+    - --advertise-client-urls=https://192.4.121.9:2379
+    - --cert-file=/etc/kubernetes/pki/etcd/server.crt
+    - --client-cert-auth=true
+    - --data-dir=/var/lib/etcd
+    - --experimental-initial-corrupt-check=true
+    - --experimental-watch-progress-notify-interval=5s
+    - --initial-advertise-peer-urls=https://192.4.121.9:2380
+    - --initial-cluster=controlplane=https://192.4.121.9:2380
+    - --key-file=/etc/kubernetes/pki/etcd/server.key
+    - --listen-client-urls=https://127.0.0.1:2379,https://192.4.121.9:2379
+    - --listen-metrics-urls=http://127.0.0.1:2381
+    - --listen-peer-urls=https://192.4.121.9:2380
+    - --name=controlplane
+    - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+    - --peer-client-cert-auth=true
+    - --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+    - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    - --snapshot-count=10000
+    - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+    image: registry.k8s.io/etcd:3.5.7-0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /health?exclude=NOSPACE&serializable=true
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: etcd
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /health?serializable=false
+        port: 2381
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /var/lib/etcd
+      name: etcd-data
+    - mountPath: /etc/kubernetes/pki/etcd
+      name: etcd-certs
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/pki/etcd
+      type: DirectoryOrCreate
+    name: etcd-certs
+  - hostPath:
+      path: /var/lib/etcd
+      type: DirectoryOrCreate
+    name: etcd-data
+status: {}
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods
+The connection to the server controlplane:6443 was refused - did you specify the right host or port?
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl get pods
+The connection to the server controlplane:6443 was refused - did you specify the right host or port?
+
+controlplane ~ ✖ crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+9d11b273e09a3       86b6af7dd652c       13 seconds ago      Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+77f5299cdc439       6f707f569b572       4 minutes ago       Exited              kube-apiserver            7                   6b5c6018d8b95       kube-apiserver-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       14 minutes ago      Running             kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       14 minutes ago      Running             kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       42 minutes ago      Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       42 minutes ago      Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       42 minutes ago      Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       42 minutes ago      Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       42 minutes ago      Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       43 minutes ago      Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+3d8480d72e91c       f73f1b39c3fe8       43 minutes ago      Exited              kube-scheduler            0                   38f8e2ecafcc5       kube-scheduler-controlplane
+e13196ea86605       95fe52ed44570       43 minutes ago      Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
+
+controlplane ~ ➜  date
+Thu 07 Sep 2023 11:07:11 PM EDT
+
+controlplane ~ ➜  kubectl get pods
+The connection to the server controlplane:6443 was refused - did you specify the right host or port?
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+9d11b273e09a3       86b6af7dd652c       37 seconds ago      Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+77f5299cdc439       6f707f569b572       5 minutes ago       Exited              kube-apiserver            7                   6b5c6018d8b95       kube-apiserver-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       14 minutes ago      Running             kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       14 minutes ago      Running             kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       43 minutes ago      Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       43 minutes ago      Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       43 minutes ago      Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       43 minutes ago      Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       43 minutes ago      Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       43 minutes ago      Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+3d8480d72e91c       f73f1b39c3fe8       43 minutes ago      Exited              kube-scheduler            0                   38f8e2ecafcc5       kube-scheduler-controlplane
+e13196ea86605       95fe52ed44570       43 minutes ago      Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
+
+controlplane ~ ➜  
+
+
+
+- Ainda não está OK o kubectl
+- Verificando
