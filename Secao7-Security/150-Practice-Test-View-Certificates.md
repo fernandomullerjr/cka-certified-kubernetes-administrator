@@ -27,7 +27,7 @@ git status
  Identify the certificate file used for the kube-api server.
 
 
-
+~~~~bash
 controlplane ~ ➜  ls /etc/kubernetes/
 admin.conf  controller-manager.conf  kubelet.conf  manifests  pki  scheduler.conf
 
@@ -36,7 +36,7 @@ root        3515    3047  0 22:23 ?        00:00:35 kube-apiserver --advertise-a
 root        8435    8194  0 22:35 pts/0    00:00:00 grep --color=auto api
 
 controlplane ~ ➜  
-
+~~~~
 
 
 - RESPOSTA:
@@ -87,14 +87,14 @@ Identify the key used to authenticate kubeapi-server to the kubelet server.
 
 Identify the ETCD Server Certificate used to host ETCD server.
 
-
+~~~~bash
 controlplane ~ ➜  ps -ef | grep -i etcd
 root        3515    3047  0 22:23 ?        00:00:48 kube-apiserver --advertise-address=192.4.121.9 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
 root        3554    3031  0 22:23 ?        00:00:26 etcd --advertise-client-urls=https://192.4.121.9:2379 --cert-file=/etc/kubernetes/pki/etcd/server.crt --client-cert-auth=true --data-dir=/var/lib/etcd --experimental-initial-corrupt-check=true --experimental-watch-progress-notify-interval=5s --initial-advertise-peer-urls=https://192.4.121.9:2380 --initial-cluster=controlplane=https://192.4.121.9:2380 --key-file=/etc/kubernetes/pki/etcd/server.key --listen-client-urls=https://127.0.0.1:2379,https://192.4.121.9:2379 --listen-metrics-urls=http://127.0.0.1:2381 --listen-peer-urls=https://192.4.121.9:2380 --name=controlplane --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt --peer-client-cert-auth=true --peer-key-file=/etc/kubernetes/pki/etcd/peer.key --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt --snapshot-count=10000 --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
 root        9893    8194  0 22:41 pts/0    00:00:00 grep --color=auto -i etcd
 
 controlplane ~ ➜  
-
+~~~~
 
 - ERRADAS:
 --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
@@ -142,6 +142,7 @@ OpenSSL Syntax: openssl x509 -in file-path.crt -text -noout
 
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
 
+~~~~bash
 controlplane ~ ➜  openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
 Certificate:
     Data:
@@ -206,7 +207,7 @@ Certificate:
          13:53:86:e7
 
 controlplane ~ ➜  
-
+~~~~
 
 - resposta:
 
@@ -250,7 +251,7 @@ What is the Common Name (CN) configured on the ETCD Server certificate?
 openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -text -noout
 
 
-
+~~~~bash
 controlplane ~ ➜  openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -text -noout
 Certificate:
     Data:
@@ -315,7 +316,7 @@ Certificate:
          da:28:67:4d
 
 controlplane ~ ➜  
-
+~~~~
 
 
 - RESPOSTA:
@@ -359,7 +360,7 @@ File: /etc/kubernetes/pki/ca.crt
 
 openssl x509 -in /etc/kubernetes/pki/ca.crt -text -noout
 
-
+~~~~bash
 controlplane ~ ➜  
 
 controlplane ~ ➜  openssl x509 -in /etc/kubernetes/pki/ca.crt -text -noout
@@ -423,7 +424,7 @@ Certificate:
          ca:39:e8:06
 
 controlplane ~ ➜  
-
+~~~~
 
 - RESPOSTA:
 10 years
@@ -446,7 +447,7 @@ You are asked to investigate and fix the issue. Once you fix the issue wait for 
 
 
 
-
+~~~~bash
 controlplane ~ ➜  kubectl get pods
 ^C
 
@@ -535,7 +536,7 @@ spec:
 status: {}
 
 controlplane ~ ➜  
-
+~~~~
 
 
 
@@ -544,19 +545,22 @@ controlplane ~ ➜
 
 journalctl -u etcd.service -l
 
+~~~~bash
 controlplane ~ ➜  journalctl -u etcd.service -l
 -- Logs begin at Thu 2023-09-07 22:23:19 EDT, end at Thu 2023-09-07 22:54:28 EDT. --
 -- No entries --
 
 controlplane ~ ➜  
+~~~~
 
 
 
+~~~~bash
 controlplane ~ ➜  kubectl logs etcd-master
 The connection to the server controlplane:6443 was refused - did you specify the right host or port?
 
 controlplane ~ ✖ 
-
+~~~~
 
 
 
@@ -565,7 +569,7 @@ controlplane ~ ✖
 https://kubernetes.io/docs/tasks/debug/debug-cluster/crictl/
 <https://kubernetes.io/docs/tasks/debug/debug-cluster/crictl/>
 
-
+~~~~bash
 controlplane ~ ➜  crictl pods
 POD ID              CREATED             STATE               NAME                                   NAMESPACE           ATTEMPT             RUNTIME
 aa0450dec18cd       4 minutes ago       Ready               etcd-controlplane                      kube-system         0                   (default)
@@ -599,7 +603,7 @@ controlplane ~ ➜  date
 Thu 07 Sep 2023 10:59:31 PM EDT
 
 controlplane ~ ➜  
-
+~~~~
 
 
 
@@ -607,7 +611,7 @@ controlplane ~ ➜
 
 crictl logs f19197851aebd
 
-
+~~~~bash
   "Metadata": null
 }. Err: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:2379: connect: connection refused"
 W0908 02:59:20.819492       1 logging.go:59] [core] [Channel #3 SubChannel #4] grpc: addrConn.createTransport failed to connect to {
@@ -628,7 +632,7 @@ W0908 02:59:21.658586       1 logging.go:59] [core] [Channel #5 SubChannel #6] g
 }. Err: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:2379: connect: connection refused"
 E0908 02:59:24.539335       1 run.go:74] "command failed" err="context deadline exceeded"
 
-
+~~~~
 
 
 
@@ -636,16 +640,17 @@ E0908 02:59:24.539335       1 run.go:74] "command failed" err="context deadline 
 
 crictl logs 85f8ebad3a139
 
+~~~~bash
 controlplane ~ ➜  crictl logs 85f8ebad3a139
 E0907 23:02:35.108439   17874 remote_runtime.go:415] "ContainerStatus from runtime service failed" err="rpc error: code = NotFound desc = an error occurred when try to find container \"85f8ebad3a139\": not found" containerID="85f8ebad3a139"
 FATA[0000] rpc error: code = NotFound desc = an error occurred when try to find container "85f8ebad3a139": not found 
 
 controlplane ~ ✖ 
+~~~~
 
 
 
-
-
+~~~~bash
 controlplane ~ ✖ crictl ps -a
 CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
 77f5299cdc439       6f707f569b572       45 seconds ago      Exited              kube-apiserver            7                   6b5c6018d8b95       kube-apiserver-controlplane
@@ -662,7 +667,7 @@ d1deb07ceaa4d       8b675dda11bb1       38 minutes ago      Exited              
 e13196ea86605       95fe52ed44570       39 minutes ago      Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
 
 controlplane ~ ➜  
-
+~~~~
 
 
 
@@ -670,7 +675,7 @@ controlplane ~ ➜
 
 crictl logs 6be96b4274c4b
 
-
+~~~~bash
 
 controlplane ~ ➜  crictl logs 6be96b4274c4b
 {"level":"info","ts":"2023-09-08T03:00:19.321Z","caller":"etcdmain/etcd.go:73","msg":"Running: ","args":["etcd","--advertise-client-urls=https://192.4.121.9:2379","--cert-file=/etc/kubernetes/pki/etcd/server-certificate.crt","--client-cert-auth=true","--data-dir=/var/lib/etcd","--experimental-initial-corrupt-check=true","--experimental-watch-progress-notify-interval=5s","--initial-advertise-peer-urls=https://192.4.121.9:2380","--initial-cluster=controlplane=https://192.4.121.9:2380","--key-file=/etc/kubernetes/pki/etcd/server.key","--listen-client-urls=https://127.0.0.1:2379,https://192.4.121.9:2379","--listen-metrics-urls=http://127.0.0.1:2381","--listen-peer-urls=https://192.4.121.9:2380","--name=controlplane","--peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt","--peer-client-cert-auth=true","--peer-key-file=/etc/kubernetes/pki/etcd/peer.key","--peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt","--snapshot-count=10000","--trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt"]}
@@ -720,13 +725,13 @@ controlplane ~ ➜  crictl logs 6be96b4274c4b
 {"level":"fatal","ts":"2023-09-08T03:00:21.079Z","caller":"etcdmain/etcd.go:219","msg":"listener failed","error":"open /etc/kubernetes/pki/etcd/server-certificate.crt: no such file or directory","stacktrace":"go.etcd.io/etcd/server/v3/etcdmain.startEtcdOrProxyV2\n\tgo.etcd.io/etcd/server/v3/etcdmain/etcd.go:219\ngo.etcd.io/etcd/server/v3/etcdmain.Main\n\tgo.etcd.io/etcd/server/v3/etcdmain/main.go:40\nmain.main\n\tgo.etcd.io/etcd/server/v3/main.go:32\nruntime.main\n\truntime/proc.go:255"}
 
 controlplane ~ ➜  
+~~~~
 
 
 
 
 
-
-
+~~~~bash
 
 
 {"level":"warn","ts":"2023-09-08T03:00:19.379Z","caller":"auth/store.go:1234","msg":"simple token is not cryptographically signed"}
@@ -737,6 +742,7 @@ controlplane ~ ➜
 
 
 "msg":"listener failed","error":"open /etc/kubernetes/pki/etcd/server-certificate.crt: no such file or directory"
+~~~~
 
 
 
@@ -757,7 +763,7 @@ vi /etc/kubernetes/manifests/etcd.yaml
 cat /etc/kubernetes/manifests/etcd.yaml 
 
 
-
+~~~~bash
 controlplane ~ ➜  cat /etc/kubernetes/manifests/etcd.yaml 
 apiVersion: v1
 kind: Pod
@@ -903,7 +909,7 @@ d1deb07ceaa4d       8b675dda11bb1       43 minutes ago      Exited              
 e13196ea86605       95fe52ed44570       43 minutes ago      Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
 
 controlplane ~ ➜  
-
+~~~~
 
 
 - Ainda não está OK o kubectl
@@ -911,7 +917,7 @@ controlplane ~ ➜
 
 
 
-
+~~~~bash
 
 
 controlplane ~ ➜  crictl ps -a
@@ -934,13 +940,13 @@ controlplane ~ ➜  date
 Thu 07 Sep 2023 11:09:09 PM EDT
 
 controlplane ~ ➜  
-
+~~~~
 
 
 
 - Agora normalizou
 
-
+~~~~bash
 controlplane ~ ➜  kubectl get pods
 No resources found in default namespace.
 
@@ -960,7 +966,7 @@ Thu 07 Sep 2023 11:09:28 PM EDT
 
 controlplane ~ ➜  
 
-
+~~~~
 
 
 
