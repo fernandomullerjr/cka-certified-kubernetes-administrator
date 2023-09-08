@@ -908,3 +908,485 @@ controlplane ~ ➜
 
 - Ainda não está OK o kubectl
 - Verificando
+
+
+
+
+
+
+controlplane ~ ➜  crictl ps -a
+CONTAINER           IMAGE               CREATED              STATE               NAME                      ATTEMPT             POD ID              POD
+fd3566e37f157       6f707f569b572       About a minute ago   Running             kube-apiserver            8                   6b5c6018d8b95       kube-apiserver-controlplane
+9d11b273e09a3       86b6af7dd652c       2 minutes ago        Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+77f5299cdc439       6f707f569b572       6 minutes ago        Exited              kube-apiserver            7                   6b5c6018d8b95       kube-apiserver-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       16 minutes ago       Running             kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       16 minutes ago       Running             kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       44 minutes ago       Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       44 minutes ago       Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       44 minutes ago       Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       44 minutes ago       Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       44 minutes ago       Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       44 minutes ago       Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+3d8480d72e91c       f73f1b39c3fe8       45 minutes ago       Exited              kube-scheduler            0                   38f8e2ecafcc5       kube-scheduler-controlplane
+e13196ea86605       95fe52ed44570       45 minutes ago       Exited              kube-controller-manager   0                   c482bafd666a9       kube-controller-manager-controlplane
+
+controlplane ~ ➜  date
+Thu 07 Sep 2023 11:09:09 PM EDT
+
+controlplane ~ ➜  
+
+
+
+
+- Agora normalizou
+
+
+controlplane ~ ➜  kubectl get pods
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS        AGE
+kube-flannel   kube-flannel-ds-842v9                  1/1     Running   0               45m
+kube-system    coredns-5d78c9869d-9cs6z               1/1     Running   0               45m
+kube-system    coredns-5d78c9869d-jzvdm               1/1     Running   0               45m
+kube-system    etcd-controlplane                      1/1     Running   0               45m
+kube-system    kube-apiserver-controlplane            1/1     Running   8 (6m57s ago)   45m
+kube-system    kube-controller-manager-controlplane   1/1     Running   1 (16m ago)     45m
+kube-system    kube-proxy-bq69z                       1/1     Running   0               45m
+kube-system    kube-scheduler-controlplane            1/1     Running   1 (16m ago)     45m
+
+controlplane ~ ➜  date
+Thu 07 Sep 2023 11:09:28 PM EDT
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+The kube-api server stopped again! Check it out. Inspect the kube-api server logs and identify the root cause and fix the issue.
+
+Run crictl ps -a command to identify the kube-api server container. Run crictl logs container-id command to view the logs.
+
+    Fix the kube-api server
+
+
+
+
+controlplane ~ ➜  kubectl get pods -A
+The connection to the server controlplane:6443 was refused - did you specify the right host or port?
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+89c225087057b       f73f1b39c3fe8       27 seconds ago      Running             kube-scheduler            2                   38f8e2ecafcc5       kube-scheduler-controlplane
+eb7725fb4113f       95fe52ed44570       27 seconds ago      Running             kube-controller-manager   2                   c482bafd666a9       kube-controller-manager-controlplane
+9d11b273e09a3       86b6af7dd652c       3 minutes ago       Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       17 minutes ago      Exited              kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       17 minutes ago      Exited              kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       46 minutes ago      Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       46 minutes ago      Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       46 minutes ago      Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       46 minutes ago      Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       46 minutes ago      Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       46 minutes ago      Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ crictl pods
+POD ID              CREATED             STATE               NAME                                   NAMESPACE           ATTEMPT             RUNTIME
+80f868001db71       38 seconds ago      Ready               kube-apiserver-controlplane            kube-system         0                   (default)
+c6c15ac3eba16       4 minutes ago       Ready               etcd-controlplane                      kube-system         0                   (default)
+49d5002026258       46 minutes ago      Ready               coredns-5d78c9869d-jzvdm               kube-system         0                   (default)
+06e4287a9b47a       46 minutes ago      Ready               coredns-5d78c9869d-9cs6z               kube-system         0                   (default)
+9eb04025e0e11       47 minutes ago      Ready               kube-proxy-bq69z                       kube-system         0                   (default)
+89bcdc505fcd5       47 minutes ago      Ready               kube-flannel-ds-842v9                  kube-flannel        0                   (default)
+38f8e2ecafcc5       47 minutes ago      Ready               kube-scheduler-controlplane            kube-system         0                   (default)
+c482bafd666a9       47 minutes ago      Ready               kube-controller-manager-controlplane   kube-system         0                   (default)
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  crictl ps -a
+CONTAINER           IMAGE               CREATED              STATE               NAME                      ATTEMPT             POD ID              POD
+91626737ddcbd       6f707f569b572       23 seconds ago       Exited              kube-apiserver            1                   80f868001db71       kube-apiserver-controlplane
+89c225087057b       f73f1b39c3fe8       About a minute ago   Running             kube-scheduler            2                   38f8e2ecafcc5       kube-scheduler-controlplane
+eb7725fb4113f       95fe52ed44570       About a minute ago   Running             kube-controller-manager   2                   c482bafd666a9       kube-controller-manager-controlplane
+9d11b273e09a3       86b6af7dd652c       4 minutes ago        Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       18 minutes ago       Exited              kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       18 minutes ago       Exited              kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       46 minutes ago       Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       46 minutes ago       Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       47 minutes ago       Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       47 minutes ago       Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       47 minutes ago       Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       47 minutes ago       Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+
+controlplane ~ ➜  
+
+
+
+crictl logs 91626737ddcbd
+
+controlplane ~ ➜  crictl logs 91626737ddcbd
+I0908 03:10:49.180369       1 server.go:551] external host was not specified, using 192.4.121.9
+I0908 03:10:49.181645       1 server.go:165] Version: v1.27.0
+I0908 03:10:49.181674       1 server.go:167] "Golang settings" GOGC="" GOMAXPROCS="" GOTRACEBACK=""
+I0908 03:10:49.565023       1 shared_informer.go:311] Waiting for caches to sync for node_authorizer
+I0908 03:10:49.581740       1 plugins.go:158] Loaded 12 mutating admission controller(s) successfully in the following order: NamespaceLifecycle,LimitRanger,ServiceAccount,NodeRestriction,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,StorageObjectInUseProtection,RuntimeClass,DefaultIngressClass,MutatingAdmissionWebhook.
+I0908 03:10:49.581774       1 plugins.go:161] Loaded 13 validating admission controller(s) successfully in the following order: LimitRanger,ServiceAccount,PodSecurity,Priority,PersistentVolumeClaimResize,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook,ResourceQuota.
+W0908 03:10:49.630649       1 logging.go:59] [core] [Channel #1 SubChannel #2] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+W0908 03:11:00.054672       1 logging.go:59] [core] [Channel #4 SubChannel #5] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+W0908 03:11:00.658950       1 logging.go:59] [core] [Channel #3 SubChannel #6] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+W0908 03:11:06.511710       1 logging.go:59] [core] [Channel #4 SubChannel #5] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+W0908 03:11:06.765546       1 logging.go:59] [core] [Channel #1 SubChannel #2] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+W0908 03:11:07.476000       1 logging.go:59] [core] [Channel #3 SubChannel #6] grpc: addrConn.createTransport failed to connect to {
+  "Addr": "127.0.0.1:2379",
+  "ServerName": "127.0.0.1",
+  "Attributes": null,
+  "BalancerAttributes": null,
+  "Type": 0,
+  "Metadata": null
+}. Err: connection error: desc = "transport: authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority"
+E0908 03:11:09.628092       1 run.go:74] "command failed" err="context deadline exceeded"
+
+controlplane ~ ➜  
+
+
+
+
+
+
+authentication handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority
+
+
+
+
+controlplane ~ ➜  cd /etc/kubernetes/manifests/
+
+controlplane /etc/kubernetes/manifests ➜  ls
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+controlplane /etc/kubernetes/manifests ➜  cat kube-apiserver.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 192.4.121.9:6443
+  creationTimestamp: null
+  labels:
+    component: kube-apiserver
+    tier: control-plane
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+    - --advertise-address=192.4.121.9
+    - --allow-privileged=true
+    - --authorization-mode=Node,RBAC
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --enable-admission-plugins=NodeRestriction
+    - --enable-bootstrap-token-auth=true
+    - --etcd-cafile=/etc/kubernetes/pki/ca.crt
+    - --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+    - --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+    - --etcd-servers=https://127.0.0.1:2379
+    - --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt
+    - --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key
+    - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+    - --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt
+    - --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key
+    - --requestheader-allowed-names=front-proxy-client
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --requestheader-extra-headers-prefix=X-Remote-Extra-
+    - --requestheader-group-headers=X-Remote-Group
+    - --requestheader-username-headers=X-Remote-User
+    - --secure-port=6443
+    - --service-account-issuer=https://kubernetes.default.svc.cluster.local
+    - --service-account-key-file=/etc/kubernetes/pki/sa.pub
+    - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
+    - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+    image: registry.k8s.io/kube-apiserver:v1.27.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 192.4.121.9
+        path: /livez
+        port: 6443
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-apiserver
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        host: 192.4.121.9
+        path: /readyz
+        port: 6443
+        scheme: HTTPS
+      periodSeconds: 1
+      timeoutSeconds: 15
+    resources:
+      requests:
+        cpu: 250m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 192.4.121.9
+        path: /livez
+        port: 6443
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane /etc/kubernetes/manifests ➜  
+
+
+
+
+
+
+openssl x509 -in /etc/kubernetes/pki/ca.crt -text -noout
+
+
+controlplane /etc/kubernetes/manifests ➜  openssl x509 -in /etc/kubernetes/pki/ca.crt -text -noout
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 0 (0x0)
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN = kubernetes
+        Validity
+            Not Before: Sep  8 02:23:32 2023 GMT
+            Not After : Sep  5 02:23:32 2033 GMT
+        Subject: CN = kubernetes
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:b5:79:9a:33:d9:8f:7e:cf:73:b5:2f:16:80:63:
+                    c0:8d:a3:1b:bd:0e:d9:a1:55:35:f8:02:45:6b:17:
+                    91:66:13:60:ba:2d:73:33:ec:f8:e3:d5:00:96:d5:
+                    c9:52:6a:42:24:9b:e6:66:7b:49:e4:ed:63:95:5f:
+                    16:a2:4b:92:d9:51:f5:96:e9:05:f8:7c:47:41:16:
+                    e2:0a:29:2f:fc:52:18:43:60:70:2c:f3:67:54:67:
+                    31:0f:32:53:85:4f:c4:d4:32:9c:a1:58:19:ca:f1:
+                    68:69:f8:17:4f:47:7c:85:3c:c9:91:59:d2:af:e7:
+                    9c:e2:45:a6:36:28:3f:d9:8d:37:ea:b7:b1:39:34:
+                    9b:39:7d:33:4a:34:3b:c1:f1:71:32:53:b0:68:6c:
+                    d3:76:1f:08:fa:d4:50:a4:dd:f6:1f:53:c6:07:2f:
+                    93:07:b8:f9:08:05:fa:b7:fd:a4:7b:00:9d:d6:e9:
+                    7b:f1:18:ba:fd:61:f4:1d:90:74:ab:86:7c:92:7c:
+                    33:d2:0c:c9:e5:2a:92:c1:a8:ca:2b:4c:45:b9:1c:
+                    16:28:31:ba:96:b8:2e:85:0a:05:39:4a:46:40:79:
+                    70:26:ba:8c:24:08:1a:f4:8a:9b:63:30:26:cd:00:
+                    15:89:e6:fc:0f:19:98:1a:79:ce:60:93:bb:8a:75:
+                    9f:85
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment, Certificate Sign
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Subject Key Identifier: 
+                8F:7E:00:F0:0F:BD:E3:1F:9E:C6:10:69:23:69:FE:48:09:6E:3C:02
+            X509v3 Subject Alternative Name: 
+                DNS:kubernetes
+    Signature Algorithm: sha256WithRSAEncryption
+         20:31:ba:51:5b:4e:67:83:6c:47:02:a4:67:46:cb:c4:7b:90:
+         c5:a2:f1:24:5b:cb:a0:fe:58:4c:49:ce:81:42:7a:d1:f5:04:
+         c7:6c:b2:db:cc:b0:85:2f:64:b0:17:ad:76:47:db:5d:e9:5d:
+         ea:13:d0:c0:1b:04:98:fe:07:6b:61:95:43:cf:fc:50:95:d0:
+         89:e8:b3:46:f6:68:eb:18:6f:bf:3a:cb:78:7d:ee:35:08:83:
+         3b:6e:b1:53:e0:6d:46:82:63:74:45:9d:50:88:32:b4:54:c7:
+         db:87:26:47:54:d4:53:b3:fa:38:a4:d7:d4:82:f3:97:ba:15:
+         b4:e3:aa:15:51:27:5c:38:37:a7:76:dc:a9:15:f3:a7:ba:ea:
+         00:73:05:17:77:ba:ec:b1:fe:79:c2:e7:ff:32:bb:e4:49:28:
+         01:09:29:cb:8a:5c:d4:e6:40:5c:a1:4e:54:ce:12:23:ae:0d:
+         0d:0d:b5:b5:a9:f1:7f:23:08:12:14:4c:df:08:56:fb:c9:18:
+         17:55:d1:1b:3c:fc:03:2b:53:38:c6:b4:90:31:06:6f:fc:ce:
+         04:3f:a2:bd:12:86:7f:2e:bf:d7:ee:b6:60:e7:30:89:ae:83:
+         2d:9a:fe:0c:3e:a5:1f:16:d4:ed:29:31:1e:ca:99:59:35:90:
+         ca:39:e8:06
+
+controlplane /etc/kubernetes/manifests ➜  
+
+
+
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/
+<https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/>
+
+
+
+- Antes, via ps-ef estava assim o kube-apiserver:
+
+controlplane ~ ➜  ps -ef | grep api
+root        3515    3047  0 22:23 ?        00:00:35 kube-apiserver --advertise-address=192.4.121.9 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root        8435    8194  0 22:35 pts/0    00:00:00 grep --color=auto api
+
+controlplane ~ ➜  
+
+
+- Ajustar a etcd-cafile
+
+- ANTES: 
+    - --etcd-cafile=/etc/kubernetes/pki/ca.crt
+- DEPOIS:
+      --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt 
+
+
+
+controlplane /etc/kubernetes/manifests ➜  vi kube-apiserver.yaml 
+
+controlplane /etc/kubernetes/manifests ➜  
+
+controlplane /etc/kubernetes/manifests ➜  
+
+controlplane /etc/kubernetes/manifests ➜  
+
+controlplane /etc/kubernetes/manifests ➜  date
+Thu 07 Sep 2023 11:21:03 PM EDT
+
+controlplane /etc/kubernetes/manifests ➜  
+
+
+controlplane /etc/kubernetes/manifests ➜  crictl ps -a
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID              POD
+906cccd65e7ab       6f707f569b572       8 seconds ago       Running             kube-apiserver            0                   241a85e0c8d5c       kube-apiserver-controlplane
+fb1690b1b5d5c       6f707f569b572       3 minutes ago       Exited              kube-apiserver            6                   80f868001db71       kube-apiserver-controlplane
+89c225087057b       f73f1b39c3fe8       11 minutes ago      Running             kube-scheduler            2                   38f8e2ecafcc5       kube-scheduler-controlplane
+eb7725fb4113f       95fe52ed44570       11 minutes ago      Running             kube-controller-manager   2                   c482bafd666a9       kube-controller-manager-controlplane
+9d11b273e09a3       86b6af7dd652c       14 minutes ago      Running             etcd                      0                   c6c15ac3eba16       etcd-controlplane
+0e65cc7d63b5f       f73f1b39c3fe8       28 minutes ago      Exited              kube-scheduler            1                   38f8e2ecafcc5       kube-scheduler-controlplane
+eee8ec45c0b50       95fe52ed44570       28 minutes ago      Exited              kube-controller-manager   1                   c482bafd666a9       kube-controller-manager-controlplane
+08b4b523818b7       ead0a4a53df89       56 minutes ago      Running             coredns                   0                   49d5002026258       coredns-5d78c9869d-jzvdm
+30442ee048708       ead0a4a53df89       56 minutes ago      Running             coredns                   0                   06e4287a9b47a       coredns-5d78c9869d-9cs6z
+c5706cff92963       8b675dda11bb1       57 minutes ago      Running             kube-flannel              0                   89bcdc505fcd5       kube-flannel-ds-842v9
+d1deb07ceaa4d       8b675dda11bb1       57 minutes ago      Exited              install-cni               0                   89bcdc505fcd5       kube-flannel-ds-842v9
+45fce4591ad72       fcecffc7ad4af       57 minutes ago      Exited              install-cni-plugin        0                   89bcdc505fcd5       kube-flannel-ds-842v9
+29c0dbf756976       5f82fc39fa816       57 minutes ago      Running             kube-proxy                0                   9eb04025e0e11       kube-proxy-bq69z
+
+controlplane /etc/kubernetes/manifests ➜  date
+Thu 07 Sep 2023 11:21:21 PM EDT
+
+controlplane /etc/kubernetes/manifests ➜  
+
+controlplane /etc/kubernetes/manifests ➜  kubectl get pods
+No resources found in default namespace.
+
+controlplane /etc/kubernetes/manifests ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS      AGE
+kube-flannel   kube-flannel-ds-842v9                  1/1     Running   0             57m
+kube-system    coredns-5d78c9869d-9cs6z               1/1     Running   0             57m
+kube-system    coredns-5d78c9869d-jzvdm               1/1     Running   0             57m
+kube-system    etcd-controlplane                      1/1     Running   0             57m
+kube-system    kube-apiserver-controlplane            1/1     Running   0             57m
+kube-system    kube-controller-manager-controlplane   1/1     Running   2 (11m ago)   57m
+kube-system    kube-proxy-bq69z                       1/1     Running   0             57m
+kube-system    kube-scheduler-controlplane            1/1     Running   2 (11m ago)   57m
+
+controlplane /etc/kubernetes/manifests ➜  
