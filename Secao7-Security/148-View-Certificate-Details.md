@@ -690,14 +690,14 @@ journalctl -u etcd.service -l
 ~~~~
 
 
-
+~~~~bash
 root@debian10x64:/etc/kubernetes# journalctl -u etcd.service -l
 -- Logs begin at Sun 2023-09-03 13:16:51 -03, end at Sun 2023-09-03 14:54:46 -03. --
 -- No entries --
 root@debian10x64:/etc/kubernetes# date
 Sun 03 Sep 2023 02:54:49 PM -03
 root@debian10x64:/etc/kubernetes#
-
+~~~~
 
 
 
