@@ -1396,3 +1396,9 @@ kube-system    kube-proxy-bq69z                       1/1     Running   0       
 kube-system    kube-scheduler-controlplane            1/1     Running   2 (11m ago)   57m
 
 controlplane /etc/kubernetes/manifests ➜  
+
+
+
+
+- O ETCD tem o seu próprio CA file
+

@@ -200,6 +200,27 @@ Na linha
 
 
 
+
+
 Run the command openssl x509 -in file-path.crt -text -noout
 
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
+
+
+
+
+
+
+
+
+
+
+
+
+
+- O ETCD tem o seu próprio CA file
+
+- ANTES: 
+    - --etcd-cafile=/etc/kubernetes/pki/ca.crt
+- DEPOIS:
+      --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt 
