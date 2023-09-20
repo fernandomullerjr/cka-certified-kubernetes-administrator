@@ -310,3 +310,163 @@ akshay      46s   kubernetes.io/kube-apiserver-client           kubernetes-admin
 csr-x6xhh   37m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+What is the Condition of the newly created Certificate Signing Request object?
+
+-RESPOSTA
+Pending
+
+
+
+
+
+
+
+
+
+
+
+https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/#approval-rejection-kubectl
+To approve a CSR with kubectl:
+
+kubectl certificate approve <certificate-signing-request-name>
+
+
+kubectl certificate approve akshay
+
+
+controlplane ~ ➜  kubectl certificate approve akshay
+certificatesigningrequest.certificates.k8s.io/akshay approved
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get csr
+NAME        AGE     SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+akshay      8m12s   kubernetes.io/kube-apiserver-client           kubernetes-admin           24h                 Approved,Issued
+csr-x6xhh   44m     kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+How many CSR requests are available on the cluster?
+
+Including approved and pending
+
+- RESPOSTA
+2
+
+
+
+
+
+
+
+
+
+
+During a routine check you realized that there is a new CSR request in place. What is the name of this request?
+
+
+
+controlplane ~ ➜  kubectl get csr
+NAME          AGE   SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+agent-smith   20s   kubernetes.io/kube-apiserver-client           agent-x                    <none>              Pending
+akshay        9m    kubernetes.io/kube-apiserver-client           kubernetes-admin           24h                 Approved,Issued
+csr-x6xhh     45m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+
+controlplane ~ ➜  
+
+- RESPOSTA
+agent-smith
+
+
+
+
+
+
+Hmmm.. You are not aware of a request coming in. What groups is this CSR requesting access to?
+
+Check the details about the request. Preferebly in YAML.
+
+kubectl get csr/agent-smith -o yaml
+
+
+
+controlplane ~ ✖ kubectl get csr/agent-smith -o yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  creationTimestamp: "2023-09-20T00:40:50Z"
+  name: agent-smith
+  resourceVersion: "3969"
+  uid: 2e02df90-4410-4049-866a-e6d3e00bdaa5
+spec:
+  groups:
+  - system:masters
+  - system:authenticated
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1dEQ0NBVUFDQVFBd0V6RVJNQThHQTFVRUF3d0libVYzTFhWelpYSXdnZ0VpTUEwR0NTcUdTSWIzRFFFQgpBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRE8wV0pXK0RYc0FKU0lyanBObzV2UklCcGxuemcrNnhjOStVVndrS2kwCkxmQzI3dCsxZUVuT041TXVxOTlOZXZtTUVPbnJEVU8vdGh5VnFQMncyWE5JRFJYall5RjQwRmJtRCs1eld5Q0sKeTNCaWhoQjkzTUo3T3FsM1VUdlo4VEVMcXlhRGtuUmwvanYvU3hnWGtvazBBQlVUcFdNeDRCcFNpS2IwVSt0RQpJRjVueEF0dE1Wa0RQUTdOYmVaUkc0M2IrUVdsVkdSL3o2RFdPZkpuYmZlek90YUF5ZEdMVFpGQy93VHB6NTJrCkVjQ1hBd3FDaGpCTGt6MkJIUFI0Sjg5RDZYYjhrMzlwdTZqcHluZ1Y2dVAwdEliT3pwcU52MFkwcWRFWnB3bXcKajJxRUwraFpFV2trRno4MGxOTnR5VDVMeE1xRU5EQ25JZ3dDNEdaaVJHYnJBZ01CQUFHZ0FEQU5CZ2txaGtpRwo5dzBCQVFzRkFBT0NBUUVBUzlpUzZDMXV4VHVmNUJCWVNVN1FGUUhVemFsTnhBZFlzYU9SUlFOd0had0hxR2k0CmhPSzRhMnp5TnlpNDRPT2lqeWFENnRVVzhEU3hrcjhCTEs4S2czc3JSRXRKcWw1ckxaeTlMUlZyc0pnaEQ0Z1kKUDlOTCthRFJTeFJPVlNxQmFCMm5XZVlwTTVjSjVURjUzbGVzTlNOTUxRMisrUk1uakRRSjdqdVBFaWM4L2RoawpXcjJFVU02VWF3enlrcmRISW13VHYybWxNWTBSK0ROdFYxWWllKzBIOS9ZRWx0K0ZTR2poNUw1WVV2STFEcWl5CjRsM0UveTNxTDcxV2ZBY3VIM09zVnBVVW5RSVNNZFFzMHFXQ3NiRTU2Q0M1RGhQR1pJcFVibktVcEF3a2ErOEUKdndRMDdqRytocGtueG11RkFlWHhnVXdvZEFMYUo3anUvVERJY3c9PQotLS0tLUVORCBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0K
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  username: agent-x
+status: {}
+
+controlplane ~ ➜ 
+
+
+
+
+
+
+
+
+
+
+
+
+That doesn't look very right. Reject that request.
+
+    Request Denied
+
+to deny a CSR:
+
+kubectl certificate deny <certificate-signing-request-name>
+kubectl certificate deny agent-smith
+controlplane ~ ➜  kubectl certificate deny agent-smith
+certificatesigningrequest.certificates.k8s.io/agent-smith denied
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+Let's get rid of it. Delete the new CSR object
+
+    CSR agent-smith deleted
+
+kubectl delete csr agent-smith
+
+
+controlplane ~ ➜  kubectl delete csr agent-smith
+certificatesigningrequest.certificates.k8s.io "agent-smith" deleted
+
+controlplane ~ ➜  
