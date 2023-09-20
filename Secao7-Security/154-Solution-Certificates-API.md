@@ -119,3 +119,9 @@ Solutions to the practice test - certificate API
 # 154. Solution Certificates API
 
 
+cat akshay.csr | base64 -w 0	
+
+
+ este comando lê o conteúdo do arquivo ""akshay.csr"", converte-o em formato Base64 e produz a saída em uma única linha, sem quebras de linha, devido à opção -w 0.
+
+base64 -w 0: Isso codifica o conteúdo do arquivo em formato Base64, mas com uma opção específica. A opção -w 0 é usada para especificar que não deve haver quebras de linha na saída codificada em Base64. Portanto, o resultado será uma única linha de texto contendo a representação Base64 do conteúdo do arquivo ""akshay.csr"", sem quebras de linha.
