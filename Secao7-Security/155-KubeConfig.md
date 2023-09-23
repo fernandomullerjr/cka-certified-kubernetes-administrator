@@ -633,3 +633,484 @@ Fri 22 Sep 2023 08:29:19 PM -03
 root@debian10x64:/home/fernando#
 
 ~~~~
+
+
+
+
+
+
+
+
+
+sudo kubeadm init
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.92.129:6443 --token hb026g.19rh1gi8lpn855ry \
+        --discovery-token-ca-cert-hash sha256:000324cfe5e20d04bae4f5cb644fd965f2a9c12b91d18da9e3d8a0e71fd436df
+
+
+
+
+
+
+
+- Aula 148 tem detalhes sobre 
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-View-Certificate-Details.md
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-Kubeadm-instalacao-e-tshoot.md
+
+
+
+# ############################################################################
+# ############################################################################
+# ############################################################################
+# RESUMO
+
+sudo kubeadm init
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+helm repo add cilium https://helm.cilium.io/
+helm install cilium cilium/cilium --version 1.14.2 --namespace kube-system
+kubectl get pod cilium-operator-788c4f69bc-jv5tk -n kube-system -o yaml
+
+- Ajustando número de réplicas do Cilium:
+
+helm upgrade --install cilium cilium/cilium -n kube-system -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-cilium-values.yaml
+
+cilium status
+cilium connectivity test
+kubectl get pods -n cilium-test
+kubectl describe pod pod-to-b-multi-node-clusterip-7cb4bf5495-h4mp8 -n cilium-test
+
+- Removendo
+
+kubectl taint nodes debian10x64 node-role.kubernetes.io/control-plane-
+
+cilium status
+
+
+
+
+
+root@debian10x64:/home/fernando# helm repo add cilium https://helm.cilium.io/
+"cilium" already exists with the same configuration, skipping
+root@debian10x64:/home/fernando# helm install cilium cilium/cilium --version 1.14.2 --namespace kube-system
+Error: INSTALLATION FAILED: chart "cilium" matching 1.14.2 not found in cilium index. (try 'helm repo update'): no chart version found for cilium-1.14.2
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+helm install cilium cilium/cilium --version 1.14.1 --namespace kube-system
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# helm install cilium cilium/cilium --version 1.14.1 --namespace kube-system
+Error: INSTALLATION FAILED: Kubernetes cluster unreachable: Get "https://192.168.92.129:6443/version": x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "kubernetes")
+root@debian10x64:/home/fernando#
+
+
+root@debian10x64:/home/fernando# kubectl get pods
+Unable to connect to the server: x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "kubernetes")
+root@debian10x64:/home/fernando# kubectl get pods -A
+Unable to connect to the server: x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "kubernetes")
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+## PENDENTE
+
+- TSHOOT do Kubernetes via Kubeadm, erro no certificado.
+- Instalar Cilium no Kubeadm via Helm.
+    Tutorial:
+    /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-Kubeadm-instalacao-e-tshoot.md
+- Subir cluster via Kubeadm.
+- Criar certificado de client, baseado na aula 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+
+
+
+
+
+- TSHOOT
+
+~~~~bash
+root@debian10x64:/home/fernando# kubectl get pods
+Unable to connect to the server: x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "kubernetes")
+root@debian10x64:/home/fernando# kubectl get pods -A
+Unable to connect to the server: x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "kubernetes")
+root@debian10x64:/home/fernando#
+~~~~
+
+
+- Resolvido:
+
+~~~~bash
+
+root@debian10x64:/home/fernando# export KUBECONFIG=/etc/kubernetes/admin.conf
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods
+No resources found in default namespace.
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS              RESTARTS   AGE
+kube-system   coredns-5dd5756b68-4c6sw              0/1     ContainerCreating   0          21m
+kube-system   coredns-5dd5756b68-8jr6c              0/1     ContainerCreating   0          21m
+kube-system   etcd-debian10x64                      1/1     Running             3          21m
+kube-system   kube-apiserver-debian10x64            1/1     Running             2          21m
+kube-system   kube-controller-manager-debian10x64   1/1     Running             2          21m
+kube-system   kube-proxy-fcbjq                      1/1     Running             0          21m
+kube-system   kube-scheduler-debian10x64            1/1     Running             2          21m
+root@debian10x64:/home/fernando# date
+Fri 22 Sep 2023 08:55:04 PM -03
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# history | tail
+  343  kubectl get pods -A
+  344  CAT $HOME/.kube/config
+  345  cat $HOME/.kube/config
+  346  unset KUBECONFIG
+  347  cat /etc/kubernetes/admin.conf
+  348  export KUBECONFIG=/etc/kubernetes/admin.conf
+  349  kubectl get pods
+  350  kubectl get pods -A
+  351  date
+  352  history | tail
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# helm install cilium cilium/cilium --version 1.14.1 --namespace kube-system
+NAME: cilium
+LAST DEPLOYED: Fri Sep 22 20:57:59 2023
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+You have successfully installed Cilium with Hubble.
+
+Your release version is 1.14.1.
+
+For any further help, visit https://docs.cilium.io/en/v1.14/gettinghelp
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS              RESTARTS   AGE
+kube-system   cilium-krwv4                          0/1     Init:0/6            0          53s
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running             0          53s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending             0          53s
+kube-system   coredns-5dd5756b68-4c6sw              0/1     ContainerCreating   0          25m
+kube-system   coredns-5dd5756b68-8jr6c              0/1     ContainerCreating   0          25m
+kube-system   etcd-debian10x64                      1/1     Running             3          25m
+kube-system   kube-apiserver-debian10x64            1/1     Running             2          25m
+kube-system   kube-controller-manager-debian10x64   1/1     Running             2          25m
+kube-system   kube-proxy-fcbjq                      1/1     Running             0          25m
+kube-system   kube-scheduler-debian10x64            1/1     Running             2          25m
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS              RESTARTS   AGE
+kube-system   cilium-krwv4                          0/1     Init:0/6            0          62s
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running             0          62s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending             0          62s
+kube-system   coredns-5dd5756b68-4c6sw              0/1     ContainerCreating   0          26m
+kube-system   coredns-5dd5756b68-8jr6c              0/1     ContainerCreating   0          26m
+kube-system   etcd-debian10x64                      1/1     Running             3          26m
+kube-system   kube-apiserver-debian10x64            1/1     Running             2          26m
+kube-system   kube-controller-manager-debian10x64   1/1     Running             2          26m
+kube-system   kube-proxy-fcbjq                      1/1     Running             0          26m
+kube-system   kube-scheduler-debian10x64            1/1     Running             2          26m
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# cilium status
+    /¯¯\
+ /¯¯\__/¯¯\    Cilium:             1 errors, 1 warnings
+ \__/¯¯\__/    Operator:           1 errors, 1 warnings
+ /¯¯\__/¯¯\    Envoy DaemonSet:    disabled (using embedded mode)
+ \__/¯¯\__/    Hubble Relay:       disabled
+    \__/       ClusterMesh:        disabled
+
+DaemonSet              cilium             Desired: 1, Unavailable: 1/1
+Deployment             cilium-operator    Desired: 2, Ready: 1/2, Available: 1/2, Unavailable: 1/2
+Containers:            cilium             Pending: 1
+                       cilium-operator    Running: 1, Pending: 1
+Cluster Pods:          0/2 managed by Cilium
+Helm chart version:    1.14.1
+Image versions         cilium             quay.io/cilium/cilium:v1.14.1@sha256:edc1d05ea1365c4a8f6ac6982247d5c145181704894bb698619c3827b6963a72: 1
+                       cilium-operator    quay.io/cilium/operator-generic:v1.14.1@sha256:e061de0a930534c7e3f8feda8330976367971238ccafff42659f104effd4b5f7: 2
+Errors:                cilium-operator    cilium-operator                     1 pods of Deployment cilium-operator are not ready
+                       cilium             cilium                              1 pods of DaemonSet cilium are not ready
+Warnings:              cilium             cilium-krwv4                        pod is pending
+                       cilium-operator    cilium-operator-788c4f69bc-sgk6z    pod is pending
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS              RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running             0          106s
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running             0          106s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending             0          106s
+kube-system   coredns-5dd5756b68-4c6sw              0/1     ContainerCreating   0          26m
+kube-system   coredns-5dd5756b68-8jr6c              0/1     ContainerCreating   0          26m
+kube-system   etcd-debian10x64                      1/1     Running             3          26m
+kube-system   kube-apiserver-debian10x64            1/1     Running             2          26m
+kube-system   kube-controller-manager-debian10x64   1/1     Running             2          26m
+kube-system   kube-proxy-fcbjq                      1/1     Running             0          26m
+kube-system   kube-scheduler-debian10x64            1/1     Running             2          26m
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          2m
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          2m
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending   0          2m
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          26m
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          26m
+kube-system   etcd-debian10x64                      1/1     Running   3          27m
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          27m
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          27m
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          26m
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          27m
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# date
+Fri 22 Sep 2023 09:00:10 PM -03
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          2m14s
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          2m14s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending   0          2m14s
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          27m
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          27m
+kube-system   etcd-debian10x64                      1/1     Running   3          27m
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          27m
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          27m
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          27m
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          27m
+root@debian10x64:/home/fernando# cilium status
+    /¯¯\
+ /¯¯\__/¯¯\    Cilium:             OK
+ \__/¯¯\__/    Operator:           1 errors, 1 warnings
+ /¯¯\__/¯¯\    Envoy DaemonSet:    disabled (using embedded mode)
+ \__/¯¯\__/    Hubble Relay:       disabled
+    \__/       ClusterMesh:        disabled
+
+DaemonSet              cilium             Desired: 1, Ready: 1/1, Available: 1/1
+Deployment             cilium-operator    Desired: 2, Ready: 1/2, Available: 1/2, Unavailable: 1/2
+Containers:            cilium             Running: 1
+                       cilium-operator    Running: 1, Pending: 1
+Cluster Pods:          2/2 managed by Cilium
+Helm chart version:    1.14.1
+Image versions         cilium             quay.io/cilium/cilium:v1.14.1@sha256:edc1d05ea1365c4a8f6ac6982247d5c145181704894bb698619c3827b6963a72: 1
+                       cilium-operator    quay.io/cilium/operator-generic:v1.14.1@sha256:e061de0a930534c7e3f8feda8330976367971238ccafff42659f104effd4b5f7: 2
+Errors:                cilium-operator    cilium-operator                     1 pods of Deployment cilium-operator are not ready
+Warnings:              cilium-operator    cilium-operator-788c4f69bc-sgk6z    pod is pending
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          2m39s
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          2m39s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending   0          2m39s
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          27m
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          27m
+kube-system   etcd-debian10x64                      1/1     Running   3          27m
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          27m
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          27m
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          27m
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          27m
+root@debian10x64:/home/fernando# kubectl^C
+
+
+
+
+
+
+
+
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl describe pod cilium-operator-788c4f69bc-sgk6z -n kube-system
+
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 op=Exists
+Events:
+  Type     Reason            Age    From               Message
+  ----     ------            ----   ----               -------
+  Warning  FailedScheduling  3m33s  default-scheduler  0/1 nodes are available: 1 node(s) didn't match pod anti-affinity rules. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod..
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl describe pod cilium-operator-788c4f69bc-sgk6z -n kube-system^C
+root@debian10x64:/home/fernando# kubectl get nodes
+NAME          STATUS   ROLES           AGE   VERSION
+debian10x64   Ready    control-plane   29m   v1.28.1
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl taint nodes debian10x64 node-role.kubernetes.io/control-plane-
+node/debian10x64 untainted
+root@debian10x64:/home/fernando# kubectl get pods -A | grep opera
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          4m23s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending   0          4m23s
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# date
+Fri 22 Sep 2023 09:03:06 PM -03
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A | grep opera
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          5m4s
+kube-system   cilium-operator-788c4f69bc-sgk6z      0/1     Pending   0          5m4s
+root@debian10x64:/home/fernando# kubectl delete pod cilium-operator-788c4f69bc-sgk6z -n kube-system
+pod "cilium-operator-788c4f69bc-sgk6z" deleted
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A | grep opera
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          5m24s
+kube-system   cilium-operator-788c4f69bc-p45wb      0/1     Pending   0          3s
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods -A | grep opera
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          5m28s
+kube-system   cilium-operator-788c4f69bc-p45wb      0/1     Pending   0          7s
+root@debian10x64:/home/fernando#
+s
+root@debian10x64:/home/fernando# helm ls -A
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+cilium  kube-system     1               2023-09-22 20:57:59.97023391 -0300 -03  deployed        cilium-1.14.1   1.14.1
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 op=Exists
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  57s   default-scheduler  0/1 nodes are available: 1 node(s) didn't match pod anti-affinity rules. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod..
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+
+
+
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+## PENDENTE
+
+- TSHOOT do Pod cilium-operator.
+- Instalar Cilium no Kubeadm via Helm.
+    Tutorial:
+    /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-Kubeadm-instalacao-e-tshoot.md
+- Subir cluster via Kubeadm.
+- Criar certificado de client, baseado na aula 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+
+

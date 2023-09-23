@@ -1,13 +1,17 @@
 
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------
-# Dia 03/09/2023
+
+# ############################################################################
+# ############################################################################
+# ############################################################################
+#  Dia 03/09/2023
 
 
-Kubeadm
+
+# ############################################################################
+# ############################################################################
+# ############################################################################
+# Kubeadm
 https://www.padok.fr/en/blog/kubeadm-kubernetes-cluster
 https://www.hostafrica.com/blog/servers/kubernetes-cluster-debian-11-containerd/
 https://kubernetes.io/docs/concepts/cluster-administration/addons/
@@ -932,3 +936,46 @@ kube-scheduler-debian10x64            1/1     Running   0          53m
 root@debian10x64:/home/fernando#
 
 ~~~~
+
+
+
+
+
+
+
+
+# ############################################################################
+# ############################################################################
+# ############################################################################
+# RESUMO
+
+sudo kubeadm init
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+helm repo add cilium https://helm.cilium.io/
+helm install cilium cilium/cilium --version 1.14.2 --namespace kube-system
+kubectl get pod cilium-operator-788c4f69bc-jv5tk -n kube-system -o yaml
+
+- Ajustando número de réplicas do Cilium:
+
+helm upgrade --install cilium cilium/cilium -n kube-system -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-cilium-values.yaml
+
+cilium status
+cilium connectivity test
+kubectl get pods -n cilium-test
+kubectl describe pod pod-to-b-multi-node-clusterip-7cb4bf5495-h4mp8 -n cilium-test
+
+- Removendo
+
+kubectl taint nodes debian10x64 node-role.kubernetes.io/control-plane-
+
+cilium status
