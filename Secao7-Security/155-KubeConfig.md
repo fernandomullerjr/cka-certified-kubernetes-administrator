@@ -1114,3 +1114,287 @@ root@debian10x64:/home/fernando#
 
 
 
+
+
+
+
+
+
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+## dia 23/09/2023
+
+
+- TSHOOT do Pod cilium-operator.
+- Instalar Cilium no Kubeadm via Helm.
+    Tutorial:
+    /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-Kubeadm-instalacao-e-tshoot.md
+
+
+~~~~bash
+
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          18m
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          18m
+kube-system   cilium-operator-788c4f69bc-p45wb      0/1     Pending   0          12m
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          43m
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          43m
+kube-system   etcd-debian10x64                      1/1     Running   3          43m
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          43m
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          43m
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          43m
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          43m
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get nodes
+NAME          STATUS   ROLES           AGE   VERSION
+debian10x64   Ready    control-plane   43m   v1.28.1
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# helm ls -A
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+cilium  kube-system     1               2023-09-22 20:57:59.97023391 -0300 -03  deployed        cilium-1.14.1   1.14.1
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+
+~~~~bash
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl describe pod cilium-operator-788c4f69bc-p45wb -n kube-system
+
+root@debian10x64:/home/fernando# kubectl describe pod cilium-operator-788c4f69bc-p45wb -n kube-system
+Name:                 cilium-operator-788c4f69bc-p45wb
+Namespace:            kube-system
+Priority:             2000000000
+Priority Class Name:  system-cluster-critical
+Node:                 <none>
+Labels:               app.kubernetes.io/name=cilium-operator
+                      app.kubernetes.io/part-of=cilium
+                      io.cilium/app=operator
+                      name=cilium-operator
+                      pod-template-hash=788c4f69bc
+Annotations:          <none>
+Status:               Pending
+IP:
+IPs:                  <none>
+Controlled By:        ReplicaSet/cilium-operator-788c4f69bc
+Containers:
+  cilium-operator:
+    Image:      quay.io/cilium/operator-generic:v1.14.1@sha256:e061de0a930534c7e3f8feda8330976367971238ccafff42659f104effd4b5f7
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      cilium-operator-generic
+    Args:
+      --config-dir=/tmp/cilium/config-map
+      --debug=$(CILIUM_DEBUG)
+    Liveness:   http-get http://127.0.0.1:9234/healthz delay=60s timeout=3s period=10s #success=1 #failure=3
+    Readiness:  http-get http://127.0.0.1:9234/healthz delay=0s timeout=3s period=5s #success=1 #failure=5
+    Environment:
+      K8S_NODE_NAME:          (v1:spec.nodeName)
+      CILIUM_K8S_NAMESPACE:  kube-system (v1:metadata.namespace)
+      CILIUM_DEBUG:          <set to the key 'debug' of config map 'cilium-config'>  Optional: true
+    Mounts:
+      /tmp/cilium/config-map from cilium-config-path (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-shsfj (ro)
+Conditions:
+  Type           Status
+  PodScheduled   False
+Volumes:
+  cilium-config-path:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      cilium-config
+    Optional:  false
+  kube-api-access-shsfj:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 op=Exists
+Events:
+  Type     Reason            Age                  From               Message
+  ----     ------            ----                 ----               -------
+  Warning  FailedScheduling  4m27s (x4 over 19m)  default-scheduler  0/1 nodes are available: 1 node(s) didn't match pod anti-affinity rules. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod..
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+
+- Manifesto do Pod, verificando affinity
+
+~~~~yaml
+
+root@debian10x64:/home/fernando# kubectl get pod cilium-operator-788c4f69bc-p45wb -n kube-system -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-09-23T00:03:26Z"
+  generateName: cilium-operator-788c4f69bc-
+  labels:
+    app.kubernetes.io/name: cilium-operator
+    app.kubernetes.io/part-of: cilium
+    io.cilium/app: operator
+    name: cilium-operator
+    pod-template-hash: 788c4f69bc
+  name: cilium-operator-788c4f69bc-p45wb
+  namespace: kube-system
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: cilium-operator-788c4f69bc
+    uid: db43150e-8c16-4847-abcc-b603a674784a
+  resourceVersion: "3106"
+  uid: 03d1f00e-3e71-4aac-9ca2-9e01975a560f
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            io.cilium/app: operator
+        topologyKey: kubernetes.io/hostname
+  automountServiceAccountToken: true
+  containers:
+  - args:
+    - --config-dir=/tmp/cilium/config-map
+    - --debug=$(CILIUM_DEBUG)
+    command:
+    - cilium-operator-generic
+    env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: CILIUM_K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: CILIUM_DEBUG
+      valueFrom:
+        configMapKeyRef:
+          key: debug
+          name: cilium-config
+          optional: true
+    image: quay.io/cilium/operator-generic:v1.14.1@sha256:e061de0a930534c7e3f8feda8330976367971238ccafff42659f104effd4b5f7
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 9234
+        scheme: HTTP
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 3
+    name: cilium-operator
+    readinessProbe:
+      failureThreshold: 5
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 9234
+        scheme: HTTP
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: FallbackToLogsOnError
+    volumeMounts:
+    - mountPath: /tmp/cilium/config-map
+      name: cilium-config-path
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-shsfj
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostNetwork: true
+  nodeSelector:
+    kubernetes.io/os: linux
+  preemptionPolicy: PreemptLowerPriority
+  priority: 2000000000
+  priorityClassName: system-cluster-critical
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: cilium-operator
+  serviceAccountName: cilium-operator
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - operator: Exists
+  volumes:
+  - configMap:
+      defaultMode: 420
+      name: cilium-config
+    name: cilium-config-path
+  - name: kube-api-access-shsfj
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-09-23T00:03:26Z"
+    message: '0/1 nodes are available: 1 node(s) didn''t match pod anti-affinity rules.
+      preemption: 0/1 nodes are available: 1 No preemption victims found for incoming
+      pod..'
+    reason: Unschedulable
+    status: "False"
+    type: PodScheduled
+  phase: Pending
+  qosClass: BestEffort
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+- Atualmente
+
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            io.cilium/app: operator
+        topologyKey: kubernetes.io/hostname
