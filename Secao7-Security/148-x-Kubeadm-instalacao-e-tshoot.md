@@ -962,7 +962,7 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
   https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
 helm repo add cilium https://helm.cilium.io/
-helm install cilium cilium/cilium --version 1.14.2 --namespace kube-system
+helm install cilium cilium/cilium --version 1.14.1 --namespace kube-system
 kubectl get pod cilium-operator-788c4f69bc-jv5tk -n kube-system -o yaml
 
 - Ajustando número de réplicas do Cilium:

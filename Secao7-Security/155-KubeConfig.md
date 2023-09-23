@@ -1398,3 +1398,313 @@ spec:
           matchLabels:
             io.cilium/app: operator
         topologyKey: kubernetes.io/hostname
+
+
+
+
+- Ajustando número de réplicas do Cilium:
+
+helm upgrade --install cilium cilium/cilium -n kube-system -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-cilium-values.yaml
+
+
+~~~~bash
+
+root@debian10x64:/home/fernando# helm upgrade --install cilium cilium/cilium -n kube-system -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/148-x-cilium-values.yaml
+
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Fri Sep 22 21:30:20 2023
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+You have successfully installed Cilium with Hubble.
+
+Your release version is 1.14.1.
+
+For any further help, visit https://docs.cilium.io/en/v1.14/gettinghelp
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# helm ls -A
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+cilium  kube-system     2               2023-09-22 21:30:20.403151771 -0300 -03 deployed        cilium-1.14.1   1.14.1
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+
+root@debian10x64:/home/fernando# cilium status
+    /¯¯\
+ /¯¯\__/¯¯\    Cilium:             OK
+ \__/¯¯\__/    Operator:           OK
+ /¯¯\__/¯¯\    Envoy DaemonSet:    disabled (using embedded mode)
+ \__/¯¯\__/    Hubble Relay:       disabled
+    \__/       ClusterMesh:        disabled
+
+Deployment             cilium-operator    Desired: 1, Ready: 1/1, Available: 1/1
+DaemonSet              cilium             Desired: 1, Ready: 1/1, Available: 1/1
+Containers:            cilium             Running: 1
+                       cilium-operator    Running: 1
+Cluster Pods:          2/2 managed by Cilium
+Helm chart version:    1.14.1
+Image versions         cilium             quay.io/cilium/cilium:v1.14.1@sha256:edc1d05ea1365c4a8f6ac6982247d5c145181704894bb698619c3827b6963a72: 1
+                       cilium-operator    quay.io/cilium/operator-generic:v1.14.1@sha256:e061de0a930534c7e3f8feda8330976367971238ccafff42659f104effd4b5f7: 1
+root@debian10x64:/home/fernando#
+
+root@debian10x64:/home/fernando# kubectl get pods -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          32m
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          32m
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          57m
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          57m
+kube-system   etcd-debian10x64                      1/1     Running   3          57m
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          57m
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          57m
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          57m
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          57m
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+
+
+- Subir cluster via Kubeadm.
+- Criar certificado de client, baseado na aula 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+~~~~bash
+
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# ps -ef | grep api
+root       5684   5485 41 12:55 ?        00:25:55 kube-apiserver --advertise-address=192.168.92.129 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root      10846  10297  0 13:58 pts/2    00:00:00 grep api
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+- Teste usando o certificado e chave do etcd:
+
+--etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+--etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+--etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
+
+https://192.168.92.129:6443/version
+
+~~~~bash
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key /etc/kubernetes/pki/apiserver-etcd-client.key \
+    --cert /etc/kubernetes/pki/apiserver-etcd-client.crt \
+    --cacert /etc/kubernetes/pki/etcd/ca.crt
+~~~~
+
+- ERRO
+
+~~~~BASH
+
+root@debian10x64:/home/fernando# curl https://192.168.92.129:6443/api/v1/pods \
+>     --key /etc/kubernetes/pki/apiserver-etcd-client.key \
+>     --cert /etc/kubernetes/pki/apiserver-etcd-client.crt \
+>     --cacert /etc/kubernetes/pki/etcd/ca.crt
+curl: (60) SSL certificate problem: unable to get local issuer certificate
+More details here: https://curl.haxx.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the web page mentioned above.
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# date
+Sat 23 Sep 2023 02:05:12 PM -03
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+- Criar certificado de client, baseado na aula 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+
+
+
+- Teste usando o certificado e chave do etcd, mas utilizando a ca.crt diferente agora:
+
+--etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+--etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+--client-ca-file=/etc/kubernetes/pki/ca.crt
+
+https://192.168.92.129:6443/version
+
+~~~~bash
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key /etc/kubernetes/pki/apiserver-etcd-client.key \
+    --cert /etc/kubernetes/pki/apiserver-etcd-client.crt \
+    --cacert /etc/kubernetes/pki/ca.crt
+~~~~
+
+- ERRO
+
+~~~~BASH
+
+root@debian10x64:/home/fernando# curl https://192.168.92.129:6443/api/v1/pods \
+>     --key /etc/kubernetes/pki/apiserver-etcd-client.key \
+>     --cert /etc/kubernetes/pki/apiserver-etcd-client.crt \
+>     --cacert /etc/kubernetes/pki/ca.crt
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "Unauthorized",
+  "reason": "Unauthorized",
+  "code": 401
+}
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+- Criar certificado de client, baseado na aula 147 e 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+
+## Certificate Authority (CA)
+
+    Generate Keys
+
+~~~~bash
+    $ openssl genrsa -out ca.key 2048
+~~~~
+
+
+
+## Generate CSR(Certificate Signing Request)
+
+~~~~bash
+$ openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+~~~~
+
+
+## Sign certificates
+
+~~~~bash
+$ openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+~~~~
+
+
+
+
+
+
+
+# Generating Client Certificates
+
+## Admin User Certificates
+
+    Generate Keys
+
+~~~~bash
+    $ openssl genrsa -out admin.key 2048
+~~~~
+
+
+## Generate CSR
+
+~~~~bash
+$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+~~~~
+
+
+## Sign certificates
+
+~~~~bash
+$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+~~~~
+
+
+## Certificate with admin privilages
+
+~~~~bash
+$ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+~~~~
+
+
+
+
+
+
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl genrsa -out ca.key 2048
+Generating RSA private key, 2048 bit long modulus (2 primes)
+............................................................................+++++
+...........+++++
+e is 65537 (0x010001)
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+
+
+
+
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+Signature ok
+subject=CN = KUBERNETES-CA
+Getting Private key
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+
+
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+Signature ok
+subject=CN = kube-admin
+Getting CA Private Key
+ca.srl: No such file or directory
+140610021127296:error:06067099:digital envelope routines:EVP_PKEY_copy_parameters:different parameters:../crypto/evp/p_lib.c:93:
+140610021127296:error:02001002:system library:fopen:No such file or directory:../crypto/bio/bss_file.c:69:fopen('ca.srl','r')
+140610021127296:error:2006D080:BIO routines:BIO_new_file:no such file:../crypto/bio/bss_file.c:76:
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# ls
+admin.crt  admin.csr  admin.key  ca.crt  ca.csr  ca.key
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin# openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin#
+
+
+
+
+
+
+
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+## PENDENTE
+
+- TSHOOT, erro ao efetuar "Sign certificates".
+      ca.srl: No such file or directory
+- Criar certificado de client, baseado na aula 147 e 152.
+- Tentar comunicar com a api via curl, usando o certificado de client.
+
+

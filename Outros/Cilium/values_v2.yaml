@@ -1,0 +1,7 @@
+
+operator:
+  # -- Enable the cilium-operator component (required).
+  enabled: true
+
+  # -- Number of replicas to run for the cilium-operator deployment
+  replicas: 2
