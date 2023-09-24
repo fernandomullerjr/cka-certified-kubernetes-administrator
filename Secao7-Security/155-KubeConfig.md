@@ -2752,5 +2752,49 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/cert
 
 
 
+- Para usar um contexto diferente
+
+    Use the context for the minikube cluster
+
+    kubectl config use-context minikube
 
 
+
+
+
+
+
+
+- É possível especificar um Namespace para o contexto, indicando qual Namespace será utilizado por padrão naquele contexto:
+
+~~~~YAML
+apiVersion: v1
+[................]
+contexts:
+- context:
+    cluster: development
+    namespace: frontend
+    user: developer
+  name: dev-frontend
+~~~~
+
+A especificação de namespace em um contexto de um kubeconfig é uma configuração que determina em qual namespace as operações do Kubernetes serão executadas quando você usa esse contexto. Isso é útil quando você deseja segmentar seus recursos em namespaces separados, permitindo que diferentes equipes ou aplicativos compartilhem o mesmo cluster Kubernetes de forma isolada.
+
+Aqui está como funciona a especificação de namespace em um contexto do kubeconfig:
+
+    Contexto do Kubeconfig:
+
+    Um arquivo kubeconfig é uma configuração de cluster Kubernetes que armazena informações sobre como acessar o cluster. Ele contém informações sobre o cluster, usuário e contexto.
+
+    Namespace no Contexto:
+
+    No contexto de um kubeconfig, você pode especificar o namespace que deve ser usado por padrão para todas as operações do Kubernetes quando esse contexto estiver ativo. Isso significa que você não precisa especificar o namespace em cada comando, pois ele será aplicado automaticamente.
+
+
+
+
+
+- No arquivo de configuração do Kubeconfig, é possível especificar o certificado de 2 maneiras, informando o arquivo ou o dado do certificado em si:
+
+    certificate-authority:
+    certificate-authority-data:
