@@ -1720,3 +1720,358 @@ root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Ou
 
 - Criar certificado de client, baseado na aula 147 e 152.
 
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md
+<https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md>
+
+
+## 1 - Gerando certificado de client
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+Generating Client Certificates
+Admin User Certificates
+
+~~~~bash
+Generate Keys
+
+$ openssl genrsa -out admin.key 2048
+
+Generate CSR
+
+$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+
+Sign certificates
+
+$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+~~~~
+
+
+- Efetuando procedimento:
+
+~~~~bash
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ pwd
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ openssl genrsa -out admin.key 2048
+Generating RSA private key, 2048 bit long modulus (2 primes)
+...........+++++
+.................................................................+++++
+e is 65537 (0x010001)
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+Signature ok
+subject=CN = kube-admin
+Can't open ca.crt for reading, No such file or directory
+140187953943680:error:02001002:system library:fopen:No such file or directory:../crypto/bio/bss_file.c:69:fopen('ca.crt','r')
+140187953943680:error:2006D080:BIO routines:BIO_new_file:no such file:../crypto/bio/bss_file.c:76:
+unable to load certificate
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ ls
+admin.csr  admin.key  teste.txt
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+- Erro segue ocorrendo, durante o "Sign certificates":
+    Can't open ca.crt for reading, No such file or directory
+
+
+
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+
+
+como descubro a ca.key e ca.crt usados no kubeadm?
+ChatGPT
+
+Para descobrir os arquivos ca.key e ca.crt usados pelo kubeadm, você pode verificar a configuração do Kubernetes no seu nó mestre. Esses arquivos são geralmente gerados automaticamente durante a inicialização do cluster pelo kubeadm. Aqui estão os passos para encontrar esses arquivos:
+
+    Acesse o nó mestre:
+
+    Primeiro, acesse o nó mestre do seu cluster Kubernetes, onde o kubeadm foi usado para iniciar o cluster. Isso geralmente é feito via SSH ou fisicamente, dependendo da sua configuração.
+
+    Navegue até o diretório de configuração do Kubernetes:
+
+    Os arquivos de certificado e chave costumam estar localizados no diretório de configuração do Kubernetes. O diretório padrão é /etc/kubernetes/. Você pode navegar até esse diretório usando o comando cd:
+
+    bash
+
+cd /etc/kubernetes/
+
+Verifique os arquivos ca.key e ca.crt:
+
+Use um comando como ls para listar o conteúdo do diretório e procurar pelos arquivos ca.key e ca.crt:
+
+bash
+
+ls | grep ca
+
+Isso deve listar os arquivos relacionados à autoridade de certificação (CA). Os arquivos que você está procurando geralmente têm nomes como ca.key, ca.crt ou algo semelhante.
+
+Verifique os diretórios adicionais:
+
+Em algumas instalações do kubeadm, os arquivos ca.key e ca.crt podem estar em um diretório específico. Verifique os diretórios dentro de /etc/kubernetes/ para encontrar esses arquivos:
+
+bash
+
+    cd pki/
+    ls | grep ca
+
+    Isso pode ajudar a localizar os arquivos se eles estiverem em um diretório de nível mais profundo.
+
+Lembre-se de que a localização exata dos arquivos pode variar dependendo da versão do Kubernetes e da configuração do kubeadm. Os passos acima devem ajudá-lo a encontrar os arquivos ca.key e ca.crt em sua instalação específica. Certifique-se de manter esses arquivos em segurança, pois eles são essenciais para a segurança do seu cluster Kubernetes.
+
+
+
+
+~~~~bash
+
+fernando@debian10x64:~$ cd /etc/kubernetes/
+fernando@debian10x64:/etc/kubernetes$ ls
+admin.conf  controller-manager.conf  kubelet.conf  manifests  pki  scheduler.conf
+fernando@debian10x64:/etc/kubernetes$ ls pki/
+apiserver.crt              apiserver.key                 ca.crt  front-proxy-ca.crt      front-proxy-client.key
+apiserver-etcd-client.crt  apiserver-kubelet-client.crt  ca.key  front-proxy-ca.key      sa.key
+apiserver-etcd-client.key  apiserver-kubelet-client.key  etcd    front-proxy-client.crt  sa.pub
+fernando@debian10x64:/etc/kubernetes$ date
+Sun 24 Sep 2023 02:10:33 PM -03
+fernando@debian10x64:/etc/kubernetes$
+
+
+fernando@debian10x64:/etc/kubernetes$ ps -ef | grep "ca.crt"
+root       5684   5485 26 11:20 ?        00:44:59 kube-apiserver --advertise-address=192.168.92.129 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root       5733   5517  9 11:20 ?        00:15:22 etcd --advertise-client-urls=https://192.168.92.129:2379 --cert-file=/etc/kubernetes/pki/etcd/server.crt --client-cert-auth=true --data-dir=/var/lib/etcd --experimental-initial-corrupt-check=true --experimental-watch-progress-notify-interval=5s --initial-advertise-peer-urls=https://192.168.92.129:2380 --initial-cluster=debian10x64=https://192.168.92.129:2380 --key-file=/etc/kubernetes/pki/etcd/server.key --listen-client-urls=https://127.0.0.1:2379,https://192.168.92.129:2379 --listen-metrics-urls=http://127.0.0.1:2381 --listen-peer-urls=https://192.168.92.129:2380 --name=debian10x64 --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt --peer-client-cert-auth=true --peer-key-file=/etc/kubernetes/pki/etcd/peer.key --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt --snapshot-count=10000 --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+root       5742   5518  6 11:20 ?        00:10:56 kube-controller-manager --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf --bind-address=127.0.0.1 --client-ca-file=/etc/kubernetes/pki/ca.crt --cluster-name=kubernetes --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt --cluster-signing-key-file=/etc/kubernetes/pki/ca.key --controllers=*,bootstrapsigner,tokencleaner --kubeconfig=/etc/kubernetes/controller-manager.conf --leader-elect=true --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --root-ca-file=/etc/kubernetes/pki/ca.crt --service-account-private-key-file=/etc/kubernetes/pki/sa.key --use-service-account-credentials=true
+fernando  12889  12862  0 14:10 pts/4    00:00:00 grep ca.crt
+fernando@debian10x64:/etc/kubernetes$
+~~~~
+
+
+--client-ca-file=/etc/kubernetes/pki/ca.crt
+--cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+
+
+
+
+- Ajustando o comando
+
+Sign certificates
+openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+
+
+- ERRO de permissão
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+Signature ok
+subject=CN = kube-admin
+Getting CA Private Key
+Can't open /etc/kubernetes/pki/ca.key for reading, Permission denied
+139794878112896:error:0200100D:system library:fopen:Permission denied:../crypto/bio/bss_file.c:69:fopen('/etc/kubernetes/pki/ca.key','r')
+139794878112896:error:2006D002:BIO routines:BIO_new_file:system lib:../crypto/bio/bss_file.c:78:
+unable to load CA Private Key
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+- Usando sudo, ocorre o erro abaixo:
+
+~~~~bash
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+[sudo] password for fernando:
+Signature ok
+subject=CN = kube-admin
+Getting CA Private Key
+/etc/kubernetes/pki/ca.srl: No such file or directory
+140630502274176:error:06067099:digital envelope routines:EVP_PKEY_copy_parameters:different parameters:../crypto/evp/p_lib.c:93:
+140630502274176:error:02001002:system library:fopen:No such file or directory:../crypto/bio/bss_file.c:69:fopen('/etc/kubernetes/pki/ca.srl','r')
+140630502274176:error:2006D080:BIO routines:BIO_new_file:no such file:../crypto/bio/bss_file.c:76:
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ ls
+admin.crt  admin.csr  admin.key  teste.txt
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+
+
+
+- Erro ao tentar gerar 
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+[sudo] password for fernando:
+Signature ok
+subject=CN = kube-admin
+Getting CA Private Key
+/etc/kubernetes/pki/ca.srl: No such file or directory
+140630502274176:error:06067099:digital envelope routines:EVP_PKEY_copy_parameters:different parameters:../crypto/evp/p_lib.c:93:
+140630502274176:error:02001002:system library:fopen:No such file or directory:../crypto/bio/bss_file.c:69:fopen('/etc/kubernetes/pki/ca.srl','r')
+140630502274176:error:2006D080:BIO routines:BIO_new_file:no such file:../crypto/bio/bss_file.c:76:
+ChatGPT
+
+O erro que você está enfrentando está relacionado à ausência do arquivo /etc/kubernetes/pki/ca.srl, que é usado para rastrear o número de série dos certificados emitidos pela autoridade de certificação (CA) do Kubernetes. O arquivo ca.srl é necessário quando você está assinando certificados com a mesma CA.
+
+Para resolver esse problema, você pode criar o arquivo ca.srl manualmente com um número de série inicial. Siga estas etapas:
+
+    Acesse o nó mestre do seu cluster Kubernetes:
+
+    Use SSH ou acesse o nó mestre fisicamente.
+
+    Navegue até o diretório da CA do Kubernetes:
+
+    bash
+
+cd /etc/kubernetes/pki/
+
+Crie o arquivo ca.srl com um número de série inicial (por exemplo, 1000):
+
+bash
+
+echo 1000 > ca.srl
+
+Isso criará o arquivo ca.srl com o número de série inicial definido como 1000. Você pode ajustar esse número de série conforme necessário.
+
+Tente gerar o certificado novamente:
+
+bash
+
+    sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+
+    Agora, o OpenSSL deve conseguir encontrar o arquivo ca.srl e gerar o certificado corretamente.
+
+Certifique-se de manter o arquivo ca.srl seguro, pois ele é usado para garantir que os números de série dos certificados emitidos sejam únicos. Caso contrário, você pode enfrentar problemas com certificados duplicados.
+
+
+
+
+
+
+
+
+- Criando arquivo ca.srl e testando novamenteo, gerou o certificado admin.crt:
+
+~~~~BASH
+fernando@debian10x64:/etc/kubernetes/pki$ sudo su
+[sudo] password for fernando:
+root@debian10x64:/etc/kubernetes/pki# pwd
+/etc/kubernetes/pki
+root@debian10x64:/etc/kubernetes/pki# echo 1000 > ca.srl
+root@debian10x64:/etc/kubernetes/pki# ls -lhasp
+total 72K
+4.0K drwxr-xr-x 3 root root 4.0K Sep 24 14:18 ./
+4.0K drwxr-xr-x 4 root root 4.0K Sep 22 20:32 ../
+4.0K -rw-r--r-- 1 root root 1.3K Sep 22 20:32 apiserver.crt
+4.0K -rw-r--r-- 1 root root 1.2K Sep 22 20:32 apiserver-etcd-client.crt
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 apiserver-etcd-client.key
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 apiserver.key
+4.0K -rw-r--r-- 1 root root 1.2K Sep 22 20:32 apiserver-kubelet-client.crt
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 apiserver-kubelet-client.key
+4.0K -rw-r--r-- 1 root root 1.1K Sep 22 20:32 ca.crt
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 ca.key
+4.0K -rw-r--r-- 1 root root    5 Sep 24 14:18 ca.srl
+4.0K drwxr-xr-x 2 root root 4.0K Sep 22 20:32 etcd/
+4.0K -rw-r--r-- 1 root root 1.1K Sep 22 20:32 front-proxy-ca.crt
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 front-proxy-ca.key
+4.0K -rw-r--r-- 1 root root 1.1K Sep 22 20:32 front-proxy-client.crt
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 front-proxy-client.key
+4.0K -rw------- 1 root root 1.7K Sep 22 20:32 sa.key
+4.0K -rw------- 1 root root  451 Sep 22 20:32 sa.pub
+root@debian10x64:/etc/kubernetes/pki#
+
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+Signature ok
+subject=CN = kube-admin
+Getting CA Private Key
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ date
+Sun 24 Sep 2023 02:18:30 PM -03
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ cat admin.crt
+-----BEGIN CERTIFICATE-----
+[omitido]
+-----END CERTIFICATE-----
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ date
+Sun 24 Sep 2023 02:19:03 PM -03
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+~~~~
+
+
+
+
+
+
+
+- Testando curl com certificado, antes de efetuar request do csr no kubernetes,etc:
+
+
+~~~~bash
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key admin.key \
+    --cert admin.crt \
+    --cacert /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+- ERRO
+
+~~~~BASH
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ curl https://192.168.92.129:6443/api/v1/pods \
+>     --key admin.key \
+>     --cert admin.crt \
+>     --cacert /etc/kubernetes/pki/ca.crt
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "pods is forbidden: User \"kube-admin\" cannot list resource \"pods\" in API group \"\" at the cluster scope",
+  "reason": "Forbidden",
+  "details": {
+    "kind": "pods"
+  },
+  "code": 403
+}fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+
+
+- Gerando o certificado com privilégios de admin:
+
+Certificate with admin privilages
+
+openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+
+~~~~BASH
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+Signature ok
+subject=CN = kube-admin, O = system:masters
+Getting CA Private Key
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
