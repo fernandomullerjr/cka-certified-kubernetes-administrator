@@ -1,0 +1,53 @@
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/11-Certificate-API.md
+
+
+
+This certificate can then be extracted and shared with the user.
+A user first creates a key
+
+$ openssl genrsa -out jane.key 2048
+
+Generates a CSR
+
+$ openssl req -new -key jane.key -subj "/CN=jane" -out jane.csr 
+
+Sends the request to the administrator and the adminsitrator takes the key and creates a CSR object, with kind as "CertificateSigningRequest" and a encoded "jane.csr"
+
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: jane
+spec:
+  groups:
+  - system:authenticated
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  request:
+    <certificate-goes-here>
+
+
+$ cat jane.csr |base64 
+
+$ kubectl create -f jane.yaml
+
+
+
+csr1
+
+    To list the csr's
+
+    $ kubectl get csr
+
+Approve the request
+
+$ kubectl certificate approve jane
+
+To view the certificate
+
+$ kubectl get csr jane -o yaml
+
+To decode it
+
+$ echo "<certificate>" |base64 --decode

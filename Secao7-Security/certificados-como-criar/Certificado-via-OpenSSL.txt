@@ -1,0 +1,28 @@
+
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md
+
+
+
+Generating Client Certificates
+Admin User Certificates
+
+Generate Keys
+
+$ openssl genrsa -out admin.key 2048
+
+Generate CSR
+
+$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+
+Sign certificates
+
+$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+
+- Comando editado:
+sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+
+ca2
+
+Certificate with admin privilages
+
+$ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr

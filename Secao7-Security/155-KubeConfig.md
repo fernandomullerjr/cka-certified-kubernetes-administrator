@@ -2075,3 +2075,318 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/cert
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
 
 ~~~~
+
+
+
+
+
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ cat admin.csr
+-----BEGIN CERTIFICATE REQUEST-----
+MIICczCCAVsCAQAwLjETMBEGA1UEAwwKa3ViZS1hZG1pbjEXMBUGA1UECgwOc3lz
+dGVtOm1hc3RlcnMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCj37wg
+WUvnJ3Ru1Wfu0OgRr2zl6uo/tHrlQHfBgF5myVqkeMGq7ix10riGp7P2nALI4MiB
+8rPMdnTYwszEB3ETt7QKJ/kywALVheYJ3WqFXyll9Klmc1V1F7AJrJ4d3LEVoPG8
+tD5fF5wQauB8JhJOdEJsJFjq2khvIY6F4YyMdg+eL80Nxigkl8BNoEYv9ncLgT16
+jQQAt7D63eefoMjD9Hk0Go8noC86tznB/JiLPIn7LCFHHdRdOJ3Eqbb61B+X5kJb
+z8xoxtPF+F/PRB5Y3WV1S6x1XiQN8aGJ3xaYpYWqeHWYW05gGNCg4K1gQ5jbnG7Z
+Vs3V+Ux/EY47vMS9AgMBAAGgADANBgkqhkiG9w0BAQsFAAOCAQEAoX9AGhbu8Jmr
+zwSpLKJdJir1mYcqic75/IbhMJmiSOQLG3V/0Am7dAtASxHzeZjxpmRRxpnTN2SL
+S0ohFuJ3f6/AObuK6ttlMjTNP1BJrSlhlwaBDAyid5Z9NkR1jOTSbr/SGK2XhWMO
+0LC6r0o8JrEjmVHCNDys9KtQP3TM1x2457mM4TbtXJRGWMvnqF6Lt+8vdPXzDx5v
+WdTeyYK7ELGwkgfVTEoqWnhrHcpNr24BgxWp/0Gcp0ElDoy/yVLLvyoZNTHFCsS6
+lx7Cx2DOovBYzgf8EhHzXET+o1boUl4rKwe1oXnRDOQpegVDWkpkUEbJdnvxIydz
+yMYcFjIEPA==
+-----END CERTIFICATE REQUEST-----
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ cat admin.csr | base64 -w 0
+LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ2N6Q0NBVnNDQVFBd0xqRVRNQkVHQTFVRUF3d0thM1ZpWlMxaFpHMXBiakVYTUJVR0ExVUVDZ3dPYzNsegpkR1Z0T20xaGMzUmxjbk13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQ2ozN3dnCldVdm5KM1J1MVdmdTBPZ1JyMnpsNnVvL3RIcmxRSGZCZ0Y1bXlWcWtlTUdxN2l4MTByaUdwN1AybkFMSTRNaUIKOHJQTWRuVFl3c3pFQjNFVHQ3UUtKL2t5d0FMVmhlWUozV3FGWHlsbDlLbG1jMVYxRjdBSnJKNGQzTEVWb1BHOAp0RDVmRjV3UWF1QjhKaEpPZEVKc0pGanEya2h2SVk2RjRZeU1kZytlTDgwTnhpZ2tsOEJOb0VZdjluY0xnVDE2CmpRUUF0N0Q2M2VlZm9NakQ5SGswR284bm9DODZ0em5CL0ppTFBJbjdMQ0ZISGRSZE9KM0VxYmI2MUIrWDVrSmIKejh4b3h0UEYrRi9QUkI1WTNXVjFTNngxWGlRTjhhR0ozeGFZcFlXcWVIV1lXMDVnR05DZzRLMWdRNWpibkc3WgpWczNWK1V4L0VZNDd2TVM5QWdNQkFBR2dBREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBb1g5QUdoYnU4Sm1yCnp3U3BMS0pkSmlyMW1ZY3FpYzc1L0liaE1KbWlTT1FMRzNWLzBBbTdkQXRBU3hIemVaanhwbVJSeHBuVE4yU0wKUzBvaEZ1SjNmNi9BT2J1SzZ0dGxNalROUDFCSnJTbGhsd2FCREF5aWQ1WjlOa1Ixak9UU2JyL1NHSzJYaFdNTwowTEM2cjBvOEpyRWptVkhDTkR5czlLdFFQM1RNMXgyNDU3bU00VGJ0WEpSR1dNdm5xRjZMdCs4dmRQWHpEeDV2CldkVGV5WUs3RUxHd2tnZlZURW9xV25ockhjcE5yMjRCZ3hXcC8wR2NwMEVsRG95L3lWTEx2eW9aTlRIRkNzUzYKbHg3Q3gyRE9vdkJZemdmOEVoSHpYRVQrbzFib1VsNHJLd2Uxb1huUkRPUXBlZ1ZEV2twa1VFYkpkbnZ4SXlkegp5TVljRmpJRVBBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+~~~~
+
+
+
+
+~~~~bash
+ kubectl create -f jane.yaml 
+
+To list the csr's
+
+$ kubectl get csr
+
+Approve the request
+
+$ kubectl certificate approve jane
+
+To view the certificate
+
+$ kubectl get csr jane -o yaml
+
+To decode it
+
+$ echo "<certificate>" |base64 --decode
+~~~~
+
+
+
+- Tentando criar o CSR via YAML:
+
+kubectl create -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/155-x-admin-csr-.yaml.yaml
+
+- ERRO
+
+~~~~bash
+root@debian10x64:/home/fernando# kubectl create -f /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/155-x-admin-csr-.yaml.yaml
+Error from server (Forbidden): error when creating "/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/155-x-admin-csr-.yaml.yaml": certificatesigningrequests.certificates.k8s.io "admin-csr" is forbidden: use of kubernetes.io/kube-apiserver-client signer with system:masters group is not allowed
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+
+
+
+https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/#request-signing-process
+<https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/#request-signing-process>
+Kubernetes signers
+
+Kubernetes provides built-in signers that each have a well-known signerName:
+
+    kubernetes.io/kube-apiserver-client: signs certificates that will be honored as client certificates by the API server. Never auto-approved by kube-controller-manager.
+        Trust distribution: signed certificates must be honored as client certificates by the API server. The CA bundle is not distributed by any other means.
+        Permitted subjects - no subject restrictions, but approvers and signers may choose not to approve or sign. Certain subjects like cluster-admin level users or groups vary between distributions and installations, but deserve additional scrutiny before approval and signing. The CertificateSubjectRestriction admission plugin is enabled by default to restrict system:masters, but it is often not the only cluster-admin subject in a cluster.
+
+
+"by default to restrict system:masters, but it is often not the only cluster-admin subject in a cluster."
+
+
+
+
+
+
+
+
+
+
+- Testando curl com certificado:
+
+~~~~bash
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key admin.key \
+    --cert admin.crt \
+    --cacert /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+- OK, funcionando:
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ curl https://192.168.92.129:6443/api/v1/pods \
+>     --key admin.key \
+>     --cert admin.crt \
+>     --cacert /etc/kubernetes/pki/ca.crt
+{
+  "kind": "PodList",
+  "apiVersion": "v1",
+  "metadata": {
+    "resourceVersion": "21740"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "cilium-krwv4",
+        "generateName": "cilium-",
+        "namespace": "kube-system",
+        "uid": "712231b3-afd9-48a1-9f4a-eff9b5f87a84",
+        "resourceVersion": "2671",
+        "creationTimestamp": "2023-09-22T23:58:05Z",
+        "labels": {
+          "app.kubernetes.io/name": "cilium-agent",
+          "app.kubernetes.io/part-of": "cilium",
+          "controller-revision-hash": "86467b5c9c",
+          "k8s-app": "cilium",
+          "pod-template-generation": "1"
+        },
+        "annotations": {
+          "container.apparmor.security.beta.kubernetes.io/apply-sysctl-overwrites": "unconfined",
+          "container.apparmor.security.beta.kubernetes.io/cilium-agent": "unconfined",
+          "container.apparmor.security.beta.kubernetes.io/clean-cilium-state": "unconfined",
+          "container.apparmor.security.beta.kubernetes.io/mount-cgroup": "unconfined"
+[...............................................................................................................................]
+        "startTime": "2023-09-22T23:33:05Z",
+        "containerStatuses": [
+          {
+            "name": "kube-scheduler",
+            "state": {
+              "running": {
+                "startedAt": "2023-09-22T23:32:56Z"
+              }
+            },
+            "lastState": {},
+            "ready": true,
+            "restartCount": 2,
+            "image": "registry.k8s.io/kube-scheduler:v1.28.2",
+            "imageID": "registry.k8s.io/kube-scheduler@sha256:6511193f8114a2f011790619698efe12a8119ed9a17e2e36f4c1c759ccf173ab",
+            "containerID": "containerd://5e8550c3fbe280c12bfe471ad8eeed655d806626a7bbb156fd6e8feaff35f2e5",
+            "started": true
+          }
+        ],
+        "qosClass": "Burstable"
+      }
+    }
+  ]
+}fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+- Como o 
+
+
+
+
+
+
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+# ########################################################################################################################################## 
+## PENDENTE
+
+- Documentar diferenças entre os procedimentos de requisição de certificado
+        1. Usando o openssl para gerar o certificado de client e o próprio csr, além de assinar(sign) o certificado:
+        https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md
+
+        2. Usar o openssl para criar a Chave e o CSR, mas a assinatura(sign) é feita via CertificateSigningRequest na api do Kubernetes:
+        https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/11-Certificate-API.md
+
+- Retomar aula 155.
+
+
+
+
+
+
+
+
+- Documentar diferenças entre os procedimentos de requisição de certificado
+
+
+        1. Usando o openssl para gerar o certificado de client e o próprio csr, além de assinar(sign) o certificado:
+        https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md
+
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/07-TLS-in-Kubernetes-Certificate-Creation.md
+Generating Client Certificates
+Admin User Certificates
+
+Generate Keys
+
+$ openssl genrsa -out admin.key 2048
+
+Generate CSR
+
+$ openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+
+Sign certificates
+
+$ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+
+- Comando editado:
+sudo openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -out admin.crt
+
+ca2
+
+Certificate with admin privilages
+
+$ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+
+## OBS
+- Se pedir a csl ou srl, ocorrer algum erro tipo "/etc/kubernetes/pki/ca.srl: No such file or directory", criar uma ca.srl usando o comando abaixo, na pasta "/etc/kubernetes/pki"
+echo 1000 > ca.srl
+
+
+
+
+
+
+
+
+
+
+
+        2. Usar o openssl para criar a Chave e o CSR, mas a assinatura(sign) é feita via CertificateSigningRequest na api do Kubernetes:
+        https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/11-Certificate-API.md
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/11-Certificate-API.md
+
+This certificate can then be extracted and shared with the user.
+A user first creates a key
+
+$ openssl genrsa -out jane.key 2048
+
+Generates a CSR
+
+$ openssl req -new -key jane.key -subj "/CN=jane" -out jane.csr 
+
+Sends the request to the administrator and the adminsitrator takes the key and creates a CSR object, with kind as "CertificateSigningRequest" and a encoded "jane.csr"
+
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: jane
+spec:
+  groups:
+  - system:authenticated
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  request:
+    <certificate-goes-here>
+
+$ cat jane.csr |base64 
+
+$ kubectl create -f jane.yaml
+
+csr1
+
+    To list the csr's
+
+    $ kubectl get csr
+
+Approve the request
+
+$ kubectl certificate approve jane
+
+To view the certificate
+
+$ kubectl get csr jane -o yaml
+
+To decode it
+
+$ echo "<certificate>" |base64 --decode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- Retomar aula 155.
