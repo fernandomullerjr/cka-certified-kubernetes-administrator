@@ -18,6 +18,29 @@ git status
 
 
 
+
+# ############################################################################
+# ############################################################################
+# ############################################################################
+# RESUMO - Comandos
+
+- Comando curl com certificado:
+
+~~~~bash
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key admin.key \
+    --cert admin.crt \
+    --cacert /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+
+
+
+
 # ############################################################################
 # ############################################################################
 # ############################################################################
@@ -359,7 +382,7 @@ lines 3004-3049/3049 (END)
 
 
 
-
+~~~~bash
 
 root@debian10x64:/home/fernando# free -h
               total        used        free      shared  buff/cache   available
@@ -426,7 +449,7 @@ tmpfs                             983M     0  983M   0% /run/user/1000
 /dev/loop7                        273M  273M     0 100% /snap/kontena-lens/246
 root@debian10x64:/home/fernando#
 
-
+~~~~
 
 
 
@@ -472,7 +495,7 @@ vi /etc/fstab
 
 - DEPOIS
 
-
+~~~~bash
 root@debian10x64:/home/fernando#
 root@debian10x64:/home/fernando# free -h
               total        used        free      shared  buff/cache   available
@@ -553,7 +576,7 @@ root@debian10x64:/home/fernando# date
 Fri 22 Sep 2023 08:23:18 PM -03
 root@debian10x64:/home/fernando#
 
-
+~~~~
 
 
 
@@ -820,7 +843,7 @@ root@debian10x64:/home/fernando#
 
 
 
-
+~~~~bash
 
 root@debian10x64:/home/fernando#
 root@debian10x64:/home/fernando# helm install cilium cilium/cilium --version 1.14.1 --namespace kube-system
@@ -837,6 +860,7 @@ Your release version is 1.14.1.
 
 For any further help, visit https://docs.cilium.io/en/v1.14/gettinghelp
 root@debian10x64:/home/fernando#
+~~~~
 
 
 
@@ -855,8 +879,7 @@ root@debian10x64:/home/fernando#
 
 
 
-
-
+~~~~bash
 root@debian10x64:/home/fernando#
 root@debian10x64:/home/fernando# kubectl get pods -A
 NAMESPACE     NAME                                  READY   STATUS              RESTARTS   AGE
@@ -1090,7 +1113,7 @@ Events:
 root@debian10x64:/home/fernando#
 
 
-
+~~~~
 
 
 
@@ -2290,7 +2313,7 @@ Generating Client Certificates
 Admin User Certificates
 
 Generate Keys
-
+~~~~bash
 $ openssl genrsa -out admin.key 2048
 
 Generate CSR
@@ -2313,7 +2336,7 @@ $ openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out a
 ## OBS
 - Se pedir a csl ou srl, ocorrer algum erro tipo "/etc/kubernetes/pki/ca.srl: No such file or directory", criar uma ca.srl usando o comando abaixo, na pasta "/etc/kubernetes/pki"
 echo 1000 > ca.srl
-
+~~~~
 
 
 
@@ -2330,7 +2353,7 @@ https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/m
 
 This certificate can then be extracted and shared with the user.
 A user first creates a key
-
+~~~~bash
 $ openssl genrsa -out jane.key 2048
 
 Generates a CSR
@@ -2374,7 +2397,7 @@ $ kubectl get csr jane -o yaml
 To decode it
 
 $ echo "<certificate>" |base64 --decode
-
+~~~~
 
 
 
@@ -2390,3 +2413,344 @@ $ echo "<certificate>" |base64 --decode
 
 
 - Retomar aula 155.
+
+
+
+- Comando curl com certificado:
+
+~~~~bash
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+curl https://192.168.92.129:6443/api/v1/pods \
+    --key admin.key \
+    --cert admin.crt \
+    --cacert /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+
+
+
+
+
+
+- Comando via kubectl get pods, com certificado:
+
+~~~~bash
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+kubectl get pods --server 192.168.92.129:6443 --client-key admin.key --client-certificate admin.crt --certificate-authority /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+- ERRO
+
+~~~~BASH
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ pwd
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ kubectl get pods --server 192.168.92.129:6443 --client-key admin.key --client-certificate admin.crt --certificate-authority /etc/kubernetes/pki/ca.crt
+Error in configuration:
+* client-cert-data and client-cert are both specified for kubernetes-admin. client-cert-data will override.
+* client-key-data and client-key are both specified for kubernetes-admin; client-key-data will override
+
+~~~~
+
+
+
+
+
+- Comando via kubectl get pods, com certificado:
+
+~~~~bash
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin
+
+kubectl get pods --server https://192.168.92.129:6443 --certificate-authority /etc/kubernetes/pki/ca.crt
+~~~~
+
+
+- OK, assim funcionou:
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ kubectl get pods --server https://192.168.92.129:6443 --certificate-authority /etc/kubernetes/pki/ca.crt -A
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE
+kube-system   cilium-krwv4                          1/1     Running   0          42h
+kube-system   cilium-operator-788c4f69bc-6n8pg      1/1     Running   0          42h
+kube-system   coredns-5dd5756b68-4c6sw              1/1     Running   0          42h
+kube-system   coredns-5dd5756b68-8jr6c              1/1     Running   0          42h
+kube-system   etcd-debian10x64                      1/1     Running   3          42h
+kube-system   kube-apiserver-debian10x64            1/1     Running   2          42h
+kube-system   kube-controller-manager-debian10x64   1/1     Running   2          42h
+kube-system   kube-proxy-fcbjq                      1/1     Running   0          42h
+kube-system   kube-scheduler-debian10x64            1/1     Running   2          42h
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+
+
+
+https://docs.oracle.com/en/learn/ocne-kubectl-intro/index.html#view-context-and-configuration-information
+<https://docs.oracle.com/en/learn/ocne-kubectl-intro/index.html#view-context-and-configuration-information>
+This presents the same information shown in the previous step. However, these fields are not presented in full:
+
+    certificate-authority-data
+    client-certificate-data
+    client-key-data
+
+Instead, the certificate information itself is obfuscated and replaced with these placeholders:
+
+    DATA+OMITTED
+    REDACTED
+
+Why the difference between DATA+OMITTED and REDACTED? This is because the client-certificate-data and client-key-data information is sensitive and therefore needs to be kept secret (REDACTED). However, because the certificate-authority-data is a public certificate it is not a secret. So, to differentiate between them this data is listed as DATA+OMITTED instead (see this GitHub Issue for more information).
+
+    NOTE: The non-redacted information can be displayed using kubectl and appending either of these flags:
+
+        --raw - Displays all raw byte and sensitive data
+        --flatten - Flattens the resulting kubeconfig file into self-contained output that can be used for creating portable kubeconfig files (which are not covered here)
+
+
+
+
+
+
+
+
+
+We can move these information to a configuration file called kubeconfig. And the specify this file as the kubeconfig option in the command.
+
+kubectl get pods --kubeconfig config
+
+
+
+
+
+
+https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#config
+config
+
+Modify kubeconfig files using subcommands like "kubectl config set current-context my-context"
+
+The loading order follows these rules:
+
+    If the --kubeconfig flag is set, then only that file is loaded. The flag may only be set once and no merging takes place.
+    If $KUBECONFIG environment variable is set, then it is used as a list of paths (normal path delimiting rules for your system). These paths are merged. When a value is modified, it is modified in the file that defines the stanza. When a value is created, it is created in the first file that exists. If no files in the chain exist, then it creates the last file in the list.
+    Otherwise, ${HOME}/.kube/config is used and no merging takes place.
+
+
+
+
+
+Kubeconfig File
+
+The kubeconfig file has 3 sections
+
+    Clusters
+    Contexts
+    USers
+
+
+
+
+To view the current file being used
+
+    kubectl config view
+
+You can specify the kubeconfig file with kubectl config view with "--kubeconfig" flag
+
+    kubectl config veiw --kubeconfig=my-custom-config
+
+
+
+- Kube config de base, exemplo:
+
+~~~~yaml
+apiVersion: v1
+kind: Config
+preferences: {}
+
+clusters:
+- cluster:
+  name: development
+- cluster:
+  name: test
+
+users:
+- name: developer
+- name: experimenter
+
+contexts:
+- context:
+  name: dev-frontend
+- context:
+  name: dev-storage
+- context:
+  name: exp-test
+
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+- Exemplo de Kube Config com usuários e contextos:
+
+~~~~yaml
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://1.2.3.4
+  name: development
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://5.6.7.8
+  name: test
+contexts:
+- context:
+    cluster: development
+    namespace: frontend
+    user: developer
+  name: dev-frontend
+- context:
+    cluster: development
+    namespace: storage
+    user: developer
+  name: dev-storage
+- context:
+    cluster: test
+    namespace: default
+    user: experimenter
+  name: exp-test
+current-context: ""
+kind: Config
+preferences: {}
+users:
+- name: developer
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-file
+- name: experimenter
+  user:
+    # Documentation note (this comment is NOT part of the command output).
+    # Storing passwords in Kubernetes client config is risky.
+    # A better alternative would be to use a credential plugin
+    # and store the credentials separately.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins
+    password: some-password
+    username: exp
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+kubectl config --kubeconfig=config-demo view --minify
+
+The output shows configuration information associated with the dev-frontend context:
+
+~~~~YAML
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://1.2.3.4
+  name: development
+contexts:
+- context:
+    cluster: development
+    namespace: frontend
+    user: developer
+  name: dev-frontend
+current-context: dev-frontend
+kind: Config
+preferences: {}
+users:
+- name: developer
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-file
+~~~~
+
+
+
+
+
+
+
+- Ambiente local:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao7-Security/155-kube-config-view.yaml.yml
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$ kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://192.168.92.129:6443
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-admin@kubernetes
+current-context: kubernetes-admin@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Outros/certificado-admin$
+
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+- O contexto que é carregado por padrão é definido via "current-context":
+    current-context: kubernetes-admin@kubernetes
+
+
+
+- Para verificar por um Kubeconfig personalizado:
+      kubectl config veiw --kubeconfig=my-custom-config
+
+
+
+
+
