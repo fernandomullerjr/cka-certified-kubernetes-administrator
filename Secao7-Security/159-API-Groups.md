@@ -540,6 +540,111 @@ Lembre-se de que os endpoints acima são exemplos gerais e podem variar com base
 
 
 
+O Kubernetes API também oferece endpoints sob o caminho /apis. Esses endpoints são usados para acessar recursos personalizados (Custom Resources) definidos por operadores e desenvolvedores. Aqui estão alguns exemplos de paths da API do Kubernetes sob o caminho /apis:
+
+    Listar todos os recursos personalizados (Custom Resources) em um grupo:
+
+    sql
+
+GET /apis/{group}/{version}/{resourcePlural}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com/v1alpha1/mycustomresources
+
+Obter informações sobre um recurso personalizado específico em um grupo:
+
+sql
+
+GET /apis/{group}/{version}/{resourcePlural}/{resourceName}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com/v1alpha1/mycustomresources/myresource-1
+
+Listar todos os recursos personalizados (Custom Resources) em um namespace:
+
+vbnet
+
+GET /apis/{group}/{version}/namespaces/{namespace}/{resourcePlural}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com/v1alpha1/namespaces/default/mycustomresources
+
+Obter informações sobre um recurso personalizado específico em um namespace:
+
+vbnet
+
+GET /apis/{group}/{version}/namespaces/{namespace}/{resourcePlural}/{resourceName}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com/v1alpha1/namespaces/default/mycustomresources/myresource-1
+
+Listar todos os grupos de recursos personalizados disponíveis:
+
+bash
+
+GET /apis/
+
+Listar todas as versões de um grupo de recursos personalizados específico:
+
+sql
+
+GET /apis/{group}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com
+
+Listar todas as versões de um recurso personalizado em um grupo:
+
+sql
+
+GET /apis/{group}/{version}
+
+Por exemplo:
+
+bash
+
+GET /apis/mygroup.example.com/v1alpha1
+
+Obter informações sobre um recurso personalizado específico em uma versão específica de um grupo:
+
+sql
+
+GET /apis/{group}/{version}/{resourcePlural}/{resourceName}
+
+Por exemplo:
+
+bash
+
+    GET /apis/mygroup.example.com/v1alpha1/mycustomresources/myresource-1
+
+Lembre-se de que os exemplos acima são genéricos e os nomes dos grupos, versões e recursos personalizados variarão com base na configuração do seu cluster Kubernetes e nas definições específicas do operador ou desenvolvedor. Certifique-se de consultar a documentação relevante ou a especificação do recurso personalizado para obter informações precisas sobre os endpoints da API sob o caminho /apis.
+
+
+
+
+
+
+
+
+curl https://192.168.92.129:6443/api/v1/nodes --key /root/admin.key --cert /root/admin.crt --cacert /root/ca.crt
+
+
+
 
 
 
@@ -562,8 +667,283 @@ pods
 PVC
 secrets
 services
-
-
 /api/v1/namespaces
 /api/v1/pods
 /api/v1/namespaces/my-namespace/pods
+
+
+The Named group - More organized and going forward all the newer features are going to be made available to these named groups.
+
+named
+/apps
+/extensions
+/certificates.k8s.io
+/networking.k8s.io
+/storage.k8s.io
+/authentication.k8s.io
+/v1
+/deployments
+/
+replicasets
+/
+statefulsets
+/v1
+/
+networkpolicies
+/v1
+/
+certificatesigningrequests
+API Groups
+Resources
+create
+delete
+get
+list
+update
+watch
+Verbs
+
+
+
+
+To list all the api groups
+
+curl https://192.168.92.129:6443 --key /root/admin.key --cert /root/admin.crt --cacert /root/ca.crt
+
+~~~~bash
+
+root@debian10x64:~# curl https://192.168.92.129:6443 --key /root/admin.key --cert /root/admin.crt --cacert /root/ca.crt
+{
+  "paths": [
+    "/.well-known/openid-configuration",
+    "/api",
+    "/api/v1",
+    "/apis",
+    "/apis/",
+    "/apis/admissionregistration.k8s.io",
+    "/apis/admissionregistration.k8s.io/v1",
+    "/apis/apiextensions.k8s.io",
+    "/apis/apiextensions.k8s.io/v1",
+    "/apis/apiregistration.k8s.io",
+    "/apis/apiregistration.k8s.io/v1",
+    "/apis/apps",
+    "/apis/apps/v1",
+    "/apis/authentication.k8s.io",
+    "/apis/authentication.k8s.io/v1",
+    "/apis/authorization.k8s.io",
+    "/apis/authorization.k8s.io/v1",
+    "/apis/autoscaling",
+    "/apis/autoscaling/v1",
+    "/apis/autoscaling/v2",
+    "/apis/batch",
+    "/apis/batch/v1",
+    "/apis/certificates.k8s.io",
+    "/apis/certificates.k8s.io/v1",
+    "/apis/cilium.io",
+    "/apis/cilium.io/v2",
+    "/apis/cilium.io/v2alpha1",
+    "/apis/coordination.k8s.io",
+    "/apis/coordination.k8s.io/v1",
+    "/apis/discovery.k8s.io",
+    "/apis/discovery.k8s.io/v1",
+    "/apis/events.k8s.io",
+    "/apis/events.k8s.io/v1",
+    "/apis/flowcontrol.apiserver.k8s.io",
+    "/apis/flowcontrol.apiserver.k8s.io/v1beta2",
+    "/apis/flowcontrol.apiserver.k8s.io/v1beta3",
+    "/apis/networking.k8s.io",
+    "/apis/networking.k8s.io/v1",
+    "/apis/node.k8s.io",
+    "/apis/node.k8s.io/v1",
+    "/apis/policy",
+    "/apis/policy/v1",
+    "/apis/rbac.authorization.k8s.io",
+    "/apis/rbac.authorization.k8s.io/v1",
+    "/apis/scheduling.k8s.io",
+    "/apis/scheduling.k8s.io/v1",
+    "/apis/storage.k8s.io",
+    "/apis/storage.k8s.io/v1",
+    "/healthz",
+    "/healthz/autoregister-completion",
+    "/healthz/etcd",
+    "/healthz/log",
+    "/healthz/ping",
+    "/healthz/poststarthook/aggregator-reload-proxy-client-cert",
+    "/healthz/poststarthook/apiservice-discovery-controller",
+    "/healthz/poststarthook/apiservice-openapi-controller",
+    "/healthz/poststarthook/apiservice-openapiv3-controller",
+    "/healthz/poststarthook/apiservice-registration-controller",
+    "/healthz/poststarthook/apiservice-status-available-controller",
+    "/healthz/poststarthook/bootstrap-controller",
+    "/healthz/poststarthook/crd-informer-synced",
+    "/healthz/poststarthook/generic-apiserver-start-informers",
+    "/healthz/poststarthook/kube-apiserver-autoregistration",
+    "/healthz/poststarthook/priority-and-fairness-config-consumer",
+    "/healthz/poststarthook/priority-and-fairness-config-producer",
+    "/healthz/poststarthook/priority-and-fairness-filter",
+    "/healthz/poststarthook/rbac/bootstrap-roles",
+    "/healthz/poststarthook/scheduling/bootstrap-system-priority-classes",
+    "/healthz/poststarthook/start-apiextensions-controllers",
+    "/healthz/poststarthook/start-apiextensions-informers",
+    "/healthz/poststarthook/start-cluster-authentication-info-controller",
+    "/healthz/poststarthook/start-deprecated-kube-apiserver-identity-lease-garbage-collector",
+    "/healthz/poststarthook/start-kube-aggregator-informers",
+    "/healthz/poststarthook/start-kube-apiserver-admission-initializer",
+    "/healthz/poststarthook/start-kube-apiserver-identity-lease-controller",
+    "/healthz/poststarthook/start-kube-apiserver-identity-lease-garbage-collector",
+    "/healthz/poststarthook/start-legacy-token-tracking-controller",
+    "/healthz/poststarthook/start-service-ip-repair-controllers",
+    "/healthz/poststarthook/start-system-namespaces-controller",
+    "/healthz/poststarthook/storage-object-count-tracker-hook",
+    "/livez",
+    "/livez/autoregister-completion",
+    "/livez/etcd",
+    "/livez/log",
+    "/livez/ping",
+    "/livez/poststarthook/aggregator-reload-proxy-client-cert",
+    "/livez/poststarthook/apiservice-discovery-controller",
+    "/livez/poststarthook/apiservice-openapi-controller",
+    "/livez/poststarthook/apiservice-openapiv3-controller",
+    "/livez/poststarthook/apiservice-registration-controller",
+    "/livez/poststarthook/apiservice-status-available-controller",
+    "/livez/poststarthook/bootstrap-controller",
+    "/livez/poststarthook/crd-informer-synced",
+    "/livez/poststarthook/generic-apiserver-start-informers",
+    "/livez/poststarthook/kube-apiserver-autoregistration",
+    "/livez/poststarthook/priority-and-fairness-config-consumer",
+    "/livez/poststarthook/priority-and-fairness-config-producer",
+    "/livez/poststarthook/priority-and-fairness-filter",
+    "/livez/poststarthook/rbac/bootstrap-roles",
+    "/livez/poststarthook/scheduling/bootstrap-system-priority-classes",
+    "/livez/poststarthook/start-apiextensions-controllers",
+    "/livez/poststarthook/start-apiextensions-informers",
+    "/livez/poststarthook/start-cluster-authentication-info-controller",
+    "/livez/poststarthook/start-deprecated-kube-apiserver-identity-lease-garbage-collector",
+    "/livez/poststarthook/start-kube-aggregator-informers",
+    "/livez/poststarthook/start-kube-apiserver-admission-initializer",
+    "/livez/poststarthook/start-kube-apiserver-identity-lease-controller",
+    "/livez/poststarthook/start-kube-apiserver-identity-lease-garbage-collector",
+    "/livez/poststarthook/start-legacy-token-tracking-controller",
+    "/livez/poststarthook/start-service-ip-repair-controllers",
+    "/livez/poststarthook/start-system-namespaces-controller",
+    "/livez/poststarthook/storage-object-count-tracker-hook",
+    "/logs",
+    "/metrics",
+    "/metrics/slis",
+    "/openapi/v2",
+    "/openapi/v3",
+    "/openapi/v3/",
+    "/openid/v1/jwks",
+    "/readyz",
+    "/readyz/autoregister-completion",
+    "/readyz/etcd",
+    "/readyz/etcd-readiness",
+    "/readyz/informer-sync",
+    "/readyz/log",
+    "/readyz/ping",
+    "/readyz/poststarthook/aggregator-reload-proxy-client-cert",
+    "/readyz/poststarthook/apiservice-discovery-controller",
+    "/readyz/poststarthook/apiservice-openapi-controller",
+    "/readyz/poststarthook/apiservice-openapiv3-controller",
+    "/readyz/poststarthook/apiservice-registration-controller",
+    "/readyz/poststarthook/apiservice-status-available-controller",
+    "/readyz/poststarthook/bootstrap-controller",
+    "/readyz/poststarthook/crd-informer-synced",
+    "/readyz/poststarthook/generic-apiserver-start-informers",
+    "/readyz/poststarthook/kube-apiserver-autoregistration",
+    "/readyz/poststarthook/priority-and-fairness-config-consumer",
+    "/readyz/poststarthook/priority-and-fairness-config-producer",
+    "/readyz/poststarthook/priority-and-fairness-filter",
+    "/readyz/poststarthook/rbac/bootstrap-roles",
+    "/readyz/poststarthook/scheduling/bootstrap-system-priority-classes",
+    "/readyz/poststarthook/start-apiextensions-controllers",
+    "/readyz/poststarthook/start-apiextensions-informers",
+    "/readyz/poststarthook/start-cluster-authentication-info-controller",
+    "/readyz/poststarthook/start-deprecated-kube-apiserver-identity-lease-garbage-collector",
+    "/readyz/poststarthook/start-kube-aggregator-informers",
+    "/readyz/poststarthook/start-kube-apiserver-admission-initializer",
+    "/readyz/poststarthook/start-kube-apiserver-identity-lease-controller",
+    "/readyz/poststarthook/start-kube-apiserver-identity-lease-garbage-collector",
+    "/readyz/poststarthook/start-legacy-token-tracking-controller",
+    "/readyz/poststarthook/start-service-ip-repair-controllers",
+    "/readyz/poststarthook/start-system-namespaces-controller",
+    "/readyz/poststarthook/storage-object-count-tracker-hook",
+    "/readyz/shutdown",
+    "/version"
+  ]
+}root@debian10x64:~#
+
+~~~~
+
+
+
+
+
+
+
+- Listando a named:
+
+curl https://192.168.92.129:6443/apis --key /root/admin.key --cert /root/admin.crt --cacert /root/ca.crt | grep "name"
+
+~~~~bash
+
+root@debian10x64:~# curl https://192.168.92.129:6443/apis --key /root/admin.key --cert /root/admin.crt --cacert /root/ca.crt | grep "name"
+      "name": "apps",
+      "name": "events.k8s.io",
+      "name": "authentication.k8s.io",
+      "name": "authorization.k8s.io",
+      "name": "autoscaling",
+      "name": "batch",
+      "name": "certificates.k8s.io",
+      "name": "networking.k8s.io",
+      "name": "policy",
+      "name": "rbac.authorization.k8s.io",
+      "name": "storage.k8s.io",
+      "name": "admissionregistration.k8s.io",
+      "name": "apiextensions.k8s.io",
+      "name": "scheduling.k8s.io",
+      "name": "coordination.k8s.io",
+      "name": "node.k8s.io",
+      "name": "discovery.k8s.io",
+      "name": "flowcontrol.apiserver.k8s.io",
+      "name": "cilium.io",
+root@debian10x64:~#
+
+~~~~
+
+
+
+
+## API Groups
+
+/apps
+/extensions
+/certificates.k8s.io
+/networking.k8s.io
+/storage.k8s.io
+/authentication.k8s.io
+
+## Resources
+
+/v1
+/deployments
+/
+replicasets
+/
+statefulsets
+/v1
+/
+networkpolicies
+/v1
+/
+certificatesigningrequests
+
+## Verbs
+
+create
+delete
+get
+list
+update
+watch
+Verbs
