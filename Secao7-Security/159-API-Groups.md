@@ -947,3 +947,61 @@ list
 update
 watch
 Verbs
+
+
+
+
+
+https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/
+<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/>
+
+
+
+
+- An alternate is to start a kubeproxy client
+
+root@debian10x64:~# kubectl proxy
+Starting to serve on 127.0.0.1:8001
+
+- OBSERVAÇÃO
+É necessário utilizar http ao invés de https, ao utilizar o kubeproxy
+
+curl -k http://localhost:8001
+
+
+~~~~bash
+
+root@debian10x64:/home/fernando# curl -k http://localhost:8001/version
+{
+  "major": "1",
+  "minor": "28",
+  "gitVersion": "v1.28.2",
+  "gitCommit": "89a4ea3e1e4ddd7f7572286090359983e0387b2f",
+  "gitTreeState": "clean",
+  "buildDate": "2023-09-13T09:29:07Z",
+  "goVersion": "go1.20.8",
+  "compiler": "gc",
+  "platform": "linux/amd64"
+}root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+curl -k http://localhost:8001
+
+
+root@debian10x64:/home/fernando# curl -k http://localhost:8001
+{
+  "paths": [
+    "/.well-known/openid-configuration",
+    "/api",
+    "/api/v1",
+    "/apis",
+    "/apis/",
+    "/apis/admissionregistration.k8s.io",
+    "/apis/admissionregistration.k8s.io/v1",
+    "/apis/apiextensions.k8s.io",
+    "/apis/apiextensions.k8s.io/v1",
