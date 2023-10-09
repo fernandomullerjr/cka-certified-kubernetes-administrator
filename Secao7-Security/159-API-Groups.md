@@ -457,3 +457,113 @@ root@debian10x64:~# curl https://192.168.92.129:6443/api/v1/pods --key /root/adm
 - Solução funcionou, foi possível consultar a api usando os certificados gerados:
 
 https://stackoverflow.com/questions/66292362/kubernetes-api-access-forbidden
+
+
+
+
+
+
+
+
+
+
+
+
+O Kubernetes API tem uma estrutura de endpoints bem definida para diferentes operações. Em geral, a maioria dos endpoints segue o padrão /api/{version}/{resource}, onde {version} é a versão da API do Kubernetes (por exemplo, v1) e {resource} é o tipo de objeto Kubernetes com o qual você está interagindo (por exemplo, pods, services, deployments, etc.). Abaixo estão alguns exemplos de paths da API do Kubernetes para a versão v1:
+
+    Listar todos os pods:
+
+    bash
+
+GET /api/v1/pods
+
+Obter informações sobre um pod específico:
+
+bash
+
+GET /api/v1/namespaces/{namespace}/pods/{pod-name}
+
+Listar todos os serviços:
+
+bash
+
+GET /api/v1/services
+
+Obter informações sobre um serviço específico em um namespace:
+
+bash
+
+GET /api/v1/namespaces/{namespace}/services/{service-name}
+
+Listar todos os namespaces:
+
+bash
+
+GET /api/v1/namespaces
+
+Obter informações sobre um namespace específico:
+
+bash
+
+GET /api/v1/namespaces/{namespace}
+
+Listar todos os deployments:
+
+bash
+
+GET /api/v1/deployments
+
+Obter informações sobre um deployment específico em um namespace:
+
+bash
+
+GET /api/v1/namespaces/{namespace}/deployments/{deployment-name}
+
+Listar todos os nodes:
+
+bash
+
+GET /api/v1/nodes
+
+Obter informações sobre um node específico:
+
+bash
+
+    GET /api/v1/nodes/{node-name}
+
+Lembre-se de que os endpoints acima são exemplos gerais e podem variar com base na configuração específica do seu cluster Kubernetes. Além disso, a autenticação e autorização adequadas são necessárias para acessar esses endpoints com sucesso. Certifique-se de consultar a documentação oficial do Kubernetes para obter informações detalhadas sobre os endpoints da API para a versão específica que você está usando.
+
+
+
+
+
+
+
+
+
+
+
+# API and APIs
+
+These APIs are catagorized into two.
+
+The core group - Where all the functionality exists
+
+core
+/v1
+bindings
+configmaps
+rc
+events
+namespaces
+nodes
+PV
+pods
+PVC
+secrets
+services
+
+
+/api/v1/namespaces
+/api/v1/pods
+/api/v1/namespaces/my-namespace/pods
