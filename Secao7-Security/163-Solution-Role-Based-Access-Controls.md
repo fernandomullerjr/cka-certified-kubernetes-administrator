@@ -158,3 +158,131 @@ fernando@debian10x64:~$ ps -ef | grep "authorization-mode"
 ```
 $ kubectl describe pod kube-apiserver-controlplane -n kube-system
 ```
+
+
+
+
+
+- Verificar quantidade de roles
+Verificar as roles sem os cabeçalhos usando o "--no-headers"
+
+kubectl get roles -A --no-headers
+
+~~~~bash
+fernando@debian10x64:~$ kubectl get roles -A --no-headers
+kube-public   kubeadm:bootstrap-signer-clusterinfo             2023-09-22T23:33:03Z
+kube-public   system:controller:bootstrap-signer               2023-09-22T23:33:01Z
+kube-system   cilium-config-agent                              2023-09-22T23:58:04Z
+kube-system   extension-apiserver-authentication-reader        2023-09-22T23:33:01Z
+kube-system   kube-proxy                                       2023-09-22T23:33:04Z
+kube-system   kubeadm:kubelet-config                           2023-09-22T23:33:01Z
+kube-system   kubeadm:nodes-kubeadm-config                     2023-09-22T23:33:01Z
+kube-system   system::leader-locking-kube-controller-manager   2023-09-22T23:33:01Z
+kube-system   system::leader-locking-kube-scheduler            2023-09-22T23:33:01Z
+kube-system   system:controller:bootstrap-signer               2023-09-22T23:33:01Z
+kube-system   system:controller:cloud-provider                 2023-09-22T23:33:01Z
+kube-system   system:controller:token-cleaner                  2023-09-22T23:33:01Z
+fernando@debian10x64:~$ kubectl get roles -A --no-headers | wc
+     12      36    1008
+fernando@debian10x64:~$
+
+~~~~
+
+
+
+
+
+
+
+
+- Run the command kubectl describe rolebinding kube-proxy -n kube-system
+  
+  <details>
+  ```
+  $ kubectl describe rolebinding kube-proxy -n kube-system
+  ```
+
+
+~~~~bash
+fernando@debian10x64:~$ kubectl describe rolebinding kube-proxy -n kube-system
+Name:         kube-proxy
+Labels:       <none>
+Annotations:  <none>
+Role:
+  Kind:  Role
+  Name:  kube-proxy
+Subjects:
+  Kind   Name                                             Namespace
+  ----   ----                                             ---------
+  Group  system:bootstrappers:kubeadm:default-node-token
+fernando@debian10x64:~$
+
+~~~~
+
+
+
+
+
+
+
+
+- Na questão "A user dev-user is created. User's details have been added to the kubeconfig file. Inspect the permissions granted to the user. Check if the user can list pods in the default namespace.
+
+Use the --as dev-user option with kubectl to run commands as the dev-user.
+"
+
+
+- Run the command kubectl get pods --as dev-user
+  
+  <details>
+  ```
+  $ kubectl get pods --as dev-user
+  ```
+
+
+
+
+
+
+
+
+
+
+
+
+- Sobre como criar role e rolebinding
+usar o help para pegar o comando imperativo para efetuar criação, como uma forma alternativa
+
+~~~~bash
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ kubectl create role --help
+Create a role with single rule.
+
+Examples:
+  # Create a role named "pod-reader" that allows user to perform "get", "watch" and "list" on pods
+  kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods
+
+  # Create a role named "pod-reader" with ResourceName specified
+  kubectl create role pod-reader --verb=get --resource=pods --resource-name=readablepod --resource-name=anotherpod
+
+  # Create a role named "foo" with API Group specified
+  kubectl create role foo --verb=get,list,watch --resource=rs.extensions
+
+  # Create a role named "foo" with SubResource specified
+  kubectl create role foo --verb=get,list,watch --resource=pods,pods/status
+
+
+fernando@debian10x64:~$ kubectl create rolebinding --help
+Create a role binding for a particular role or cluster role.
+
+Examples:
+  # Create a role binding for user1, user2, and group1 using the admin cluster role
+  kubectl create rolebinding admin --clusterrole=admin --user=user1 --user=user2 --group=group1
+
+
+~~~~
