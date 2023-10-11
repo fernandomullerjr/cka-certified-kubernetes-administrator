@@ -78,5 +78,17 @@ In this section, we will take a look at authorization in kubernetes
 # 160. Authorization
 
 
+Authorization Mechanisms
+
+    There are different authorization mechanisms supported by kubernetes
+        Node Authorization
+        Attribute-based Authorization (ABAC)
+        Role-Based Authorization (RBAC)
+        Webhook
 
 
+Authorization Modes
+
+The mode options can be defined on the kube-apiserver
+mode
+When you specify multiple modes, it will authorize in the order in which it is specified
