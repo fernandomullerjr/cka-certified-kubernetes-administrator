@@ -189,6 +189,77 @@ kubectl create token pipeline --duration=999999h
 
 
 
+fernando@debian10x64:~$ kubectl create token teste
+Error: must specify one of -f and -k
+
+error: unknown command "token teste"
+See 'kubectl create -h' for help and examples
+fernando@debian10x64:~$
+
+
+
+
+
+
+
+
+
+
+comando curl para efetuar consulta na api do kubernetes com opção insecure?
+ChatGPT
+
+Para fazer uma consulta à API do Kubernetes usando o curl e ignorar a verificação do certificado SSL (o que é inseguro e deve ser evitado em ambientes de produção), você pode usar a opção --insecure ou -k. Além disso, você precisa especificar o token de autenticação do ServiceAccount ou credenciais de autenticação apropriadas, juntamente com a URL da API do Kubernetes.
+
+Aqui está um exemplo de um comando curl para fazer uma solicitação à API do Kubernetes com a opção --insecure:
+
+bash
+
+curl --insecure --header "Authorization: Bearer YOUR_TOKEN" "https://YOUR_KUBERNETES_API_SERVER/api/v1/namespaces/default/pods"
+
+Neste comando:
+
+    --insecure: Ignora a verificação do certificado SSL (inseguro, use apenas para testes).
+    --header "Authorization: Bearer YOUR_TOKEN": Substitua YOUR_TOKEN pelo token de autenticação do ServiceAccount ou outro método de autenticação que você esteja usando.
+    "https://YOUR_KUBERNETES_API_SERVER/api/v1/namespaces/default/pods": Substitua YOUR_KUBERNETES_API_SERVER pelo endereço do seu servidor de API do Kubernetes. Este exemplo consulta todos os pods no namespace padrão (default). Você pode ajustar a URL conforme necessário para acessar outras partes da API do Kubernetes.
+
+Tenha cuidado ao usar a opção --insecure, pois ela expõe suas comunicações a possíveis ataques Man-in-the-Middle (MITM). Em ambientes de produção, é altamente recomendável usar certificados SSL válidos e configurar a autenticação adequada em vez de desativar a verificação SSL.
+
+
+
+
+
+curl -k --header "Authorization: Bearer YOUR_TOKEN" https://192.168.92.129:6443/version
+
+
+
+
+
+- A secret é montada dentro do Pod no diretório "/var/run/secrets/kubernetes.io/serviceaccount":
+
+~~~~bash
+
+fernando@debian10x64:~$ kubectl exec -it cilium-krwv4 -n kube-system -- ls -lhasp /var/run/secrets/kubernetes.io/serviceaccount
+Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+total 4.0K
+   0 drwxrwxrwt 3 root root  140 Oct 24 01:32 ./
+4.0K drwxr-xr-x 3 root root 4.0K Oct 18 00:09 ../
+   0 drwxr-xr-x 2 root root  100 Oct 24 01:32 ..2023_10_24_01_32_44.4110393460/
+   0 lrwxrwxrwx 1 root root   32 Oct 24 01:32 ..data -> ..2023_10_24_01_32_44.4110393460
+   0 lrwxrwxrwx 1 root root   13 Oct 18 00:09 ca.crt -> ..data/ca.crt
+   0 lrwxrwxrwx 1 root root   16 Oct 18 00:09 namespace -> ..data/namespace
+   0 lrwxrwxrwx 1 root root   12 Oct 18 00:09 token -> ..data/token
+fernando@debian10x64:~$
+
+~~~~
+
+
+
+## PENDENTE
+
+- Ver porque não é possível criar Token no Kubernetes 1.28
+
+
+
 
 
 # #################################################################################################################################################
