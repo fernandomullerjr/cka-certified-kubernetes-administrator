@@ -236,6 +236,8 @@ curl -k --header "Authorization: Bearer YOUR_TOKEN" https://192.168.92.129:6443/
 
 - A secret é montada dentro do Pod no diretório "/var/run/secrets/kubernetes.io/serviceaccount":
 
+kubectl exec -it cilium-krwv4 -n kube-system -- ls -lhasp /var/run/secrets/kubernetes.io/
+
 ~~~~bash
 
 fernando@debian10x64:~$ kubectl exec -it cilium-krwv4 -n kube-system -- ls -lhasp /var/run/secrets/kubernetes.io/serviceaccount
@@ -254,12 +256,25 @@ fernando@debian10x64:~$
 
 
 
+
+kubectl exec -it cilium-krwv4 -n kube-system -- ls -lhasp /var/run/secrets/kubernetes.io/
+
+kubectl exec -it cilium-krwv4 -n kube-system -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
+
+
+~~~~baSH
+
+fernando@debian10x64:~$ kubectl exec -it cilium-krwv4 -n kube-system -- cat /var/run/secrets/kubernetes.io/serviceaccount/token     Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+eyJhbGciOiJSUzI1NiIsImtpZCI6Ikp3SXpmZHBVMTV4ZTVNdjcyVXhOYWJoWFdXUEpud1NFSDB2Wlk0dGR3d3cifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiXSwiZXhwIjoxNzI5NjQ3MTY0LCJpYXQiOjE2OTgxMTExNjQsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsInBvZCI6eyJuYW1lIjoiY2lsaXVtLWtyd3Y0IiwidWlkIjoiNzEyMjMxYjMtYWZkOS00OGExLTlmNGEtZWZmOWI1Zjg3YTg0In0sInNlcnZpY2VhY2NvdW50Ijp7Im5hbWUiOiJjaWxpdW0iLCJ1aWQiOiI1ZmIyMzBmYS0yM2ZmLTQ4MzItYjAwZS0zMzViMDAwNjUxNzMifSwid2FybmFmdGVyIjoxNjk4MTE0NzcxfSwibmJmIjoxNjk4MTExMTY0LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06Y2lsaXVtIn0.RWOzeJEtkmdZmvrMFqUgHwgde4pslDwhN5BoCJotpX1Y_XBV-NH2GTFK96Oh5ldWYK-RBVTdaCvLmnykm7S0yWBWQdo1a08PfrcrwiHHsA-1k1bjCbmryqHTPLY16ax3_zdGj-Gywey2JNNIQrH8QKRoUYT6rhXjeC1CV16LysTXtPlX538rkwoOyZJCMEwrbbq27xB78LHL_311d4QfjB6HiOiekX01zlszH57hhWMN8uSqg2yQ2ajSVG_twsBPnspIYJ-oNII_zTVgNA3kbZbCO3zzT2mzWs4agp1g4cYl5ad4ZloGH9ikVWj-xGYZBFDpLUpzGMerTvrBdvapmgfernando@debian10x64:~$
+fernando@debian10x64:~$
+
+~~~~
+
+
+
 ## PENDENTE
 
 - Ver porque não é possível criar Token no Kubernetes 1.28
-
-
-
 
 
 # #################################################################################################################################################
