@@ -331,3 +331,23 @@ The connection to the server 192.168.92.129:6443 was refused - did you specify t
 root@debian10x64:/home/fernando#
 
 ~~~~
+
+
+
+
+
+
+
+Please perform below steps on the master node. It works like charm.
+
+1. sudo -i
+
+2. swapoff -a
+
+3. exit
+
+4. strace -eopenat kubectl version
+
+
+
+Efetuado teste, segue com erro.
