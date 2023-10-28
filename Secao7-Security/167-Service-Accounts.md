@@ -513,3 +513,170 @@ FATA[0000] listing containers: rpc error: code = Unavailable desc = connection e
 ## TSHOOT
 - Kube-apiserver ta escutando na porta 6443
 - crictl apresenta erro
+
+
+
+
+
+
+mv /etc/containerd/config.toml /root/config.toml.bak
+systemctl restart containerd
+
+
+
+~~~~bash
+
+root@debian10x64:/home/fernando# mv /etc/containerd/config.toml /root/config.toml.bak
+root@debian10x64:/home/fernando# systemctl restart containerd
+root@debian10x64:/home/fernando# systemctl status containerd
+● containerd.service - containerd container runtime
+   Loaded: loaded (/lib/systemd/system/containerd.service; disabled; vendor preset: enabled)
+   Active: active (running) since Sat 2023-10-28 14:25:49 -03; 4s ago
+     Docs: https://containerd.io
+  Process: 3550 ExecStartPre=/sbin/modprobe overlay (code=exited, status=0/SUCCESS)
+ Main PID: 3551 (containerd)
+    Tasks: 95
+   Memory: 638.4M
+   CGroup: /system.slice/containerd.service
+           ├─1701 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id a1d96cfae1e9301806464c814fb55c0b590c05aaa252d7381aa8f2adf539a8c5 -address /run/containerd/containerd.sock
+           ├─1702 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 1fe7e388479c073517a5f0ddf424f86b1c6e503f99f5f6132327ba2312d5222a -address /run/containerd/containerd.sock
+           ├─1703 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c6940545d9d18b80616b7936 -address /run/containerd/containerd.sock
+           ├─1704 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id b1bd26817ed7daa957797213687373fc2e5e36722d4c38b785ea5fda98e268c5 -address /run/containerd/containerd.sock
+           └─3551 /usr/bin/containerd
+
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046652923-03:00" level=info msg="Start event monitor"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046766576-03:00" level=info msg="Start snapshots syncer"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046962799-03:00" level=info msg="Start cni network conf syncer for default"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046987454-03:00" level=info msg="Start streaming server"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.047249388-03:00" level=info msg="containerd successfully booted in 0.145453s"
+Oct 28 14:25:49 debian10x64 systemd[1]: Started containerd container runtime.
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.286993387-03:00" level=info msg="CreateContainer within sandbox \"01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c694054
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.359957065-03:00" level=info msg="CreateContainer within sandbox \"01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c694054
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.361338507-03:00" level=info msg="StartContainer for \"e0a834df77676cb0958e8f971700d368f2a319f642f727386d548ec0203
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.587277749-03:00" level=info msg="StartContainer for \"e0a834df77676cb0958e8f971700d368f2a319f642f727386d548ec0203
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# systemctl status containerd
+● containerd.service - containerd container runtime
+   Loaded: loaded (/lib/systemd/system/containerd.service; disabled; vendor preset: enabled)
+   Active: active (running) since Sat 2023-10-28 14:25:49 -03; 7s ago
+     Docs: https://containerd.io
+  Process: 3550 ExecStartPre=/sbin/modprobe overlay (code=exited, status=0/SUCCESS)
+ Main PID: 3551 (containerd)
+    Tasks: 97
+   Memory: 639.0M
+   CGroup: /system.slice/containerd.service
+           ├─1701 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id a1d96cfae1e9301806464c814fb55c0b590c05aaa252d7381aa8f2adf539a8c5 -address /run/containerd/containerd.sock
+           ├─1702 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 1fe7e388479c073517a5f0ddf424f86b1c6e503f99f5f6132327ba2312d5222a -address /run/containerd/containerd.sock
+           ├─1703 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c6940545d9d18b80616b7936 -address /run/containerd/containerd.sock
+           ├─1704 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id b1bd26817ed7daa957797213687373fc2e5e36722d4c38b785ea5fda98e268c5 -address /run/containerd/containerd.sock
+           └─3551 /usr/bin/containerd
+
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046652923-03:00" level=info msg="Start event monitor"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046766576-03:00" level=info msg="Start snapshots syncer"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046962799-03:00" level=info msg="Start cni network conf syncer for default"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.046987454-03:00" level=info msg="Start streaming server"
+Oct 28 14:25:49 debian10x64 containerd[3551]: time="2023-10-28T14:25:49.047249388-03:00" level=info msg="containerd successfully booted in 0.145453s"
+Oct 28 14:25:49 debian10x64 systemd[1]: Started containerd container runtime.
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.286993387-03:00" level=info msg="CreateContainer within sandbox \"01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c694054
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.359957065-03:00" level=info msg="CreateContainer within sandbox \"01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c694054
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.361338507-03:00" level=info msg="StartContainer for \"e0a834df77676cb0958e8f971700d368f2a319f642f727386d548ec0203
+Oct 28 14:25:52 debian10x64 containerd[3551]: time="2023-10-28T14:25:52.587277749-03:00" level=info msg="StartContainer for \"e0a834df77676cb0958e8f971700d368f2a319f642f727386d548ec0203
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+
+
+
+
+
+
+jcometti commented May 5, 2023
+
+I resolved my issue with the commands below:
+Configure containerd
+
+mkdir -p /etc/containerd
+containerd config default | tee /etc/containerd/config.toml
+sudo sed -i 's/SystemdCgroup = true/SystemdCgroup = false/g' /etc/containerd/config.toml
+
+
+Restart containerd
+
+systemctl restart containerd
+
+
+
+
+- Segue com erro
+
+
+root@debian10x64:/home/fernando# systemctl restart containerd
+root@debian10x64:/home/fernando# systemctl status containerd
+● containerd.service - containerd container runtime
+   Loaded: loaded (/lib/systemd/system/containerd.service; disabled; vendor preset: enabled)
+   Active: active (running) since Sat 2023-10-28 14:30:56 -03; 5s ago
+     Docs: https://containerd.io
+  Process: 4383 ExecStartPre=/sbin/modprobe overlay (code=exited, status=0/SUCCESS)
+ Main PID: 4384 (containerd)
+    Tasks: 99
+   Memory: 638.9M
+   CGroup: /system.slice/containerd.service
+           ├─1701 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id a1d96cfae1e9301806464c814fb55c0b590c05aaa252d7381aa8f2adf539a8c5 -address /run/containerd/containerd.sock
+           ├─1702 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 1fe7e388479c073517a5f0ddf424f86b1c6e503f99f5f6132327ba2312d5222a -address /run/containerd/containerd.sock
+           ├─1703 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id 01607f0ea8b7cca3794ea4a89c08978e9f68d3c6c6940545d9d18b80616b7936 -address /run/containerd/containerd.sock
+           ├─1704 /usr/bin/containerd-shim-runc-v2 -namespace k8s.io -id b1bd26817ed7daa957797213687373fc2e5e36722d4c38b785ea5fda98e268c5 -address /run/containerd/containerd.sock
+           └─4384 /usr/bin/containerd
+
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.752106135-03:00" level=info msg="Start subscribing containerd event"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.752218569-03:00" level=info msg="Start recovering state"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.755740224-03:00" level=info msg=serving... address=/run/containerd/containerd.sock.ttrpc
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.755959269-03:00" level=info msg=serving... address=/run/containerd/containerd.sock
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.861841310-03:00" level=info msg="Start event monitor"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.861949463-03:00" level=info msg="Start snapshots syncer"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.861975235-03:00" level=info msg="Start cni network conf syncer for default"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.861985687-03:00" level=info msg="Start streaming server"
+Oct 28 14:30:56 debian10x64 containerd[4384]: time="2023-10-28T14:30:56.862139286-03:00" level=info msg="containerd successfully booted in 0.165190s"
+Oct 28 14:30:56 debian10x64 systemd[1]: Started containerd container runtime.
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# crictl ps
+WARN[0000] runtime connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+WARN[0000] image connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+E1028 14:31:06.865981    4414 remote_runtime.go:390] "ListContainers with filter from runtime service failed" err="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory\"" filter="&ContainerFilter{Id:,State:&ContainerStateValue{State:CONTAINER_RUNNING,},PodSandboxId:,LabelSelector:map[string]string{},}"
+FATA[0000] listing containers: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory"
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+- Reinstalado
+
+- Segue com erro
+
+~~~~bash
+
+root@debian10x64:/home/fernando# containerd --version
+containerd containerd.io 1.6.24 61f9fd88f79f081d64d6fa3bb1a0dc71ec870523
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# crictl ps
+WARN[0000] runtime connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+WARN[0000] image connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+E1028 14:50:35.923914   36862 remote_runtime.go:390] "ListContainers with filter from runtime service failed" err="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory\"" filter="&ContainerFilter{Id:,State:&ContainerStateValue{State:CONTAINER_RUNNING,},PodSandboxId:,LabelSelector:map[string]string{},}"
+FATA[0000] listing containers: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory"
+root@debian10x64:/home/fernando# date
+Sat 28 Oct 2023 02:50:41 PM -03
+root@debian10x64:/home/fernando#
