@@ -680,3 +680,149 @@ FATA[0000] listing containers: rpc error: code = Unavailable desc = connection e
 root@debian10x64:/home/fernando# date
 Sat 28 Oct 2023 02:50:41 PM -03
 root@debian10x64:/home/fernando#
+
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ crictl logs
+WARN[0000] runtime connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+FATA[0000] ID cannot be empty
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+~~~~
+
+
+
+
+
+
+
+/etc/docker/daemon.json
+
+
+cat /etc/docker/daemon.json
+
+
+
+root@debian10x64:/home/fernando# cat /etc/docker/daemon.json
+{"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+sudo cat /etc/containerd/config.toml
+
+
+
+reinstalei o docker, mas não é criado o /var/run/dockershim.sock
+ChatGPT
+
+Se o arquivo /var/run/dockershim.sock não está sendo criado após reinstalar o Docker, pode haver um problema com a instalação ou com a configuração do Docker. Aqui estão algumas etapas adicionais que você pode tentar para resolver o problema:
+
+    Verifique o Status do Docker:
+    Primeiro, verifique se o Docker está em execução usando o comando:
+
+    bash
+
+sudo systemctl status docker
+
+Certifique-se de que o Docker está ativo (running) e sem erros. Se estiver inativo, você pode tentar iniciar o Docker novamente com:
+
+bash
+
+sudo systemctl start docker
+
+Verifique Configurações do Docker:
+Certifique-se de que não há problemas nas configurações do Docker. Verifique os arquivos de configuração do Docker para garantir que não haja configurações inválidas ou ausentes.
+
+Reconfigure o Docker:
+Às vezes, reconfigurar o Docker pode ajudar a resolver problemas de configuração. Use o seguinte comando para reconfigurar o Docker:
+
+bash
+
+sudo dpkg-reconfigure docker-ce
+
+Este comando permitirá que você reconfigure as opções do Docker. Siga as instruções na tela para ajustar as configurações conforme necessário.
+
+Verifique o Docker Socket:
+O arquivo de soquete /var/run/dockershim.sock é essencial para a comunicação entre o Docker e outros componentes, como o Containerd. Certifique-se de que o Docker está configurado corretamente para criar esse soquete. Verifique o arquivo de configuração do Docker, geralmente localizado em /etc/docker/daemon.json, e confirme se a configuração socket está correta.
+
+Exemplo de configuração do Docker no daemon.json:
+
+json
+
+    {
+      "socket": "/var/run/docker.sock"
+    }
+
+    Se essa configuração estiver ausente ou incorreta, ajuste-a de acordo.
+
+    Reinstale o Containerd (opcional):
+    Se o problema persistir após tentar as etapas acima, considere reinstalar o Containerd. Remova o Containerd usando sudo apt remove containerd.io e, em seguida, reinstale-o usando sudo apt install containerd.io. Em seguida, reinicie tanto o Docker quanto o Containerd.
+
+    Verifique Logs do Docker:
+    Verifique os logs do Docker para obter informações detalhadas sobre qualquer erro ou problema que esteja ocorrendo. Os logs do Docker geralmente estão localizados em /var/log/docker.log ou podem ser visualizados usando o comando journalctl.
+
+Se após seguir estas etapas o problema persistir, pode ser útil verificar fóruns de suporte específicos do Docker ou do seu sistema operacional para soluções mais específicas. Em alguns casos, problemas como esse podem ser específicos da versão do Docker ou do sistema operacional, e outros usuários podem ter encontrado e resolvido problemas semelhantes.
+User
+como ajustar o containerd, para utilizar o "/var/run/docker.sock" ao invés do "/var/run/dockershim.sock"?
+ChatGPT
+
+Para configurar o Containerd para utilizar o arquivo de soquete /var/run/docker.sock em vez de /var/run/dockershim.sock, você precisará modificar o arquivo de configuração do Containerd.
+
+    Localize o arquivo de configuração do Containerd:
+    O arquivo de configuração do Containerd geralmente está localizado em /etc/containerd/config.toml. Você pode usar um editor de texto como o nano ou o vim para editar o arquivo:
+
+    bash
+
+sudo nano /etc/containerd/config.toml
+
+Se o arquivo não existir, você pode criar um novo.
+
+Atualize o arquivo de configuração:
+Adicione ou atualize a seção plugins."io.containerd.grpc.v1.cri".containerd no arquivo de configuração para especificar o caminho do arquivo de soquete do Docker. O arquivo de configuração do Containerd deve se parecer com algo assim:
+
+toml
+
+[plugins."io.containerd.grpc.v1.cri".containerd]
+  [plugins."io.containerd.grpc.v1.cri".containerd.default_runtime]
+    runtime_type = "io.containerd.runtime.v1.linux"
+    runtime_engine = "/usr/bin/runc"
+    runtime_root = ""
+    privileged_without_host_devices = false
+    runtime_args = []
+    runtime_env = []
+  [plugins."io.containerd.grpc.v1.cri".containerd.untrusted_workload_runtime]
+    runtime_type = "io.containerd.runtime.v1.linux"
+    runtime_engine = ""
+    runtime_root = ""
+    privileged_without_host_devices = false
+    runtime_args = []
+    runtime_env = []
+  [plugins."io.containerd.grpc.v1.cri".containerd.config]
+    sandbox_image = "k8s.gcr.io/pause:3.1"
+    stop_timeout = "0s"
+    systemd_cgroup = false
+    enable_selinux = false
+    enable_apparmor = false
+  [plugins."io.containerd.grpc.v1.cri".containerd.default_runtime.runtime_options]
+    runtime = "runc"
+    runtime_root = ""
+    privileged_without_host_devices = false
+    selinux_label = ""
+
+No exemplo acima, runtime_engine é o caminho para o executável de execução (geralmente runc) e runtime_root é o diretório do sistema de arquivos da execução.
+
+Reinicie o Containerd:
+Após editar o arquivo de configuração, salve as alterações e saia do editor de texto. Em seguida, reinicie o serviço do Containerd para aplicar as configurações:
+
+bash
+
+    sudo systemctl restart containerd
+
+Após essas etapas, o Containerd deverá estar configurado para utilizar o arquivo de soquete /var/run/docker.sock. Certifique-se de que o Docker também esteja em execução e utilizando o mesmo arquivo de soquete para evitar conflitos.
+
+Lembre-se de que é importante ter cuidado ao editar arquivos de configuração do sistema. Faça backup dos arquivos antes de fazer alterações significativas para evitar problemas no sistema.
