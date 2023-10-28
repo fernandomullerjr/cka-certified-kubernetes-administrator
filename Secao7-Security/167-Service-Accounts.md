@@ -351,3 +351,161 @@ Please perform below steps on the master node. It works like charm.
 
 
 Efetuado teste, segue com erro.
+
+
+
+
+
+
+
+
+
+
+
+
+- Kubelet com erros
+
+journalctl -xeu kubelet
+
+~~~~bash
+Oct 28 00:00:54 debian10x64 kubelet[4687]: I1028 00:00:54.359429    4687 reconciler_common.go:258] "operationExecutor.VerifyControllerAttachedVolume started for volume \"usr-local-share
+Oct 28 00:00:54 debian10x64 kubelet[4687]: E1028 00:00:54.460095    4687 controller.go:146] "Failed to ensure lease exists, will retry" err="Get \"https://192.168.92.129:6443/apis/coord
+Oct 28 00:00:54 debian10x64 kubelet[4687]: I1028 00:00:54.555250    4687 scope.go:117] "RemoveContainer" containerID="92f71d8760fdc154a9065c7a18cd1d059bed8e734ffa36498934f1935ce84617"
+Oct 28 00:00:54 debian10x64 kubelet[4687]: I1028 00:00:54.679765    4687 kubelet_node_status.go:70] "Attempting to register node" node="debian10x64"
+Oct 28 00:00:54 debian10x64 kubelet[4687]: E1028 00:00:54.681311    4687 kubelet_node_status.go:92] "Unable to register node with API server" err="Post \"https://192.168.92.129:6443/api
+Oct 28 00:00:54 debian10x64 kubelet[4687]: E1028 00:00:54.862592    4687 controller.go:146] "Failed to ensure lease exists, will retry" err="Get \"https://192.168.92.129:6443/apis/coord
+Oct 28 00:00:55 debian10x64 kubelet[4687]: W1028 00:00:55.384636    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.Service: Get "https://192
+Oct 28 00:00:55 debian10x64 kubelet[4687]: E1028 00:00:55.384876    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.Service: failed to list
+Oct 28 00:00:55 debian10x64 kubelet[4687]: W1028 00:00:55.566704    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.RuntimeClass: Get "https:
+Oct 28 00:00:55 debian10x64 kubelet[4687]: E1028 00:00:55.566908    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.RuntimeClass: failed to
+Oct 28 00:00:55 debian10x64 kubelet[4687]: I1028 00:00:55.578719    4687 scope.go:117] "RemoveContainer" containerID="eb0c4e855dfc3974a3abf3e478c62a62a4b19c32727cac25aa02b23fae7498e2"
+Oct 28 00:00:55 debian10x64 kubelet[4687]: E1028 00:00:55.668555    4687 controller.go:146] "Failed to ensure lease exists, will retry" err="Get \"https://192.168.92.129:6443/apis/coord
+Oct 28 00:00:55 debian10x64 kubelet[4687]: W1028 00:00:55.817311    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.CSIDriver: Get "https://1
+Oct 28 00:00:55 debian10x64 kubelet[4687]: E1028 00:00:55.817748    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.CSIDriver: failed to lis
+Oct 28 00:00:55 debian10x64 kubelet[4687]: W1028 00:00:55.844529    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.Node: Get "https://192.16
+Oct 28 00:00:55 debian10x64 kubelet[4687]: E1028 00:00:55.844750    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.Node: failed to list *v1
+Oct 28 00:00:56 debian10x64 kubelet[4687]: I1028 00:00:56.291050    4687 kubelet_node_status.go:70] "Attempting to register node" node="debian10x64"
+Oct 28 00:00:56 debian10x64 kubelet[4687]: I1028 00:00:56.620084    4687 scope.go:117] "RemoveContainer" containerID="92f71d8760fdc154a9065c7a18cd1d059bed8e734ffa36498934f1935ce84617"
+Oct 28 00:00:56 debian10x64 kubelet[4687]: I1028 00:00:56.628767    4687 scope.go:117] "RemoveContainer" containerID="17759088870d9a7a2edb28b06164170620441044d96b0c01ccce84e25abe7bf3"
+Oct 28 00:00:56 debian10x64 kubelet[4687]: E1028 00:00:56.629724    4687 pod_workers.go:1300] "Error syncing pod, skipping" err="failed to \"StartContainer\" for \"etcd\" with CrashLoop
+Oct 28 00:00:57 debian10x64 kubelet[4687]: I1028 00:00:57.643270    4687 scope.go:117] "RemoveContainer" containerID="17759088870d9a7a2edb28b06164170620441044d96b0c01ccce84e25abe7bf3"
+Oct 28 00:00:57 debian10x64 kubelet[4687]: E1028 00:00:57.644116    4687 pod_workers.go:1300] "Error syncing pod, skipping" err="failed to \"StartContainer\" for \"etcd\" with CrashLoop
+Oct 28 00:01:02 debian10x64 kubelet[4687]: I1028 00:01:02.754339    4687 scope.go:117] "RemoveContainer" containerID="17759088870d9a7a2edb28b06164170620441044d96b0c01ccce84e25abe7bf3"
+Oct 28 00:01:02 debian10x64 kubelet[4687]: E1028 00:01:02.755000    4687 pod_workers.go:1300] "Error syncing pod, skipping" err="failed to \"StartContainer\" for \"etcd\" with CrashLoop
+Oct 28 00:01:02 debian10x64 kubelet[4687]: E1028 00:01:02.777163    4687 eviction_manager.go:258] "Eviction manager: failed to get summary stats" err="failed to get node info: node \"de
+Oct 28 00:01:04 debian10x64 kubelet[4687]: I1028 00:01:04.571885    4687 scope.go:117] "RemoveContainer" containerID="17759088870d9a7a2edb28b06164170620441044d96b0c01ccce84e25abe7bf3"
+Oct 28 00:01:04 debian10x64 kubelet[4687]: E1028 00:01:04.572449    4687 pod_workers.go:1300] "Error syncing pod, skipping" err="failed to \"StartContainer\" for \"etcd\" with CrashLoop
+Oct 28 00:01:06 debian10x64 kubelet[4687]: E1028 00:01:06.295354    4687 kubelet_node_status.go:92] "Unable to register node with API server" err="Post \"https://192.168.92.129:6443/api
+Oct 28 00:01:07 debian10x64 kubelet[4687]: E1028 00:01:07.271411    4687 controller.go:146] "Failed to ensure lease exists, will retry" err="Get \"https://192.168.92.129:6443/apis/coord
+Oct 28 00:01:08 debian10x64 kubelet[4687]: W1028 00:01:08.256171    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.CSIDriver: Get "https://1
+Oct 28 00:01:08 debian10x64 kubelet[4687]: I1028 00:01:08.256403    4687 trace.go:236] Trace[509717370]: "Reflector ListAndWatch" name:vendor/k8s.io/client-go/informers/factory.go:150 (
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[509717370]: ---"Objects listed" error:Get "https://192.168.92.129:6443/apis/storage.k8s.io/v1/csidrivers?limit=500&resourceVersion=0": n
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[509717370]: [10.005025427s] [10.005025427s] END
+Oct 28 00:01:08 debian10x64 kubelet[4687]: E1028 00:01:08.256476    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.CSIDriver: failed to lis
+Oct 28 00:01:08 debian10x64 kubelet[4687]: W1028 00:01:08.366471    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.RuntimeClass: Get "https:
+Oct 28 00:01:08 debian10x64 kubelet[4687]: I1028 00:01:08.366719    4687 trace.go:236] Trace[935093795]: "Reflector ListAndWatch" name:vendor/k8s.io/client-go/informers/factory.go:150 (
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[935093795]: ---"Objects listed" error:Get "https://192.168.92.129:6443/apis/node.k8s.io/v1/runtimeclasses?limit=500&resourceVersion=0":
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[935093795]: [10.003346987s] [10.003346987s] END
+Oct 28 00:01:08 debian10x64 kubelet[4687]: E1028 00:01:08.366805    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.RuntimeClass: failed to
+Oct 28 00:01:08 debian10x64 kubelet[4687]: W1028 00:01:08.369746    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.Service: Get "https://192
+Oct 28 00:01:08 debian10x64 kubelet[4687]: I1028 00:01:08.369919    4687 trace.go:236] Trace[2141674617]: "Reflector ListAndWatch" name:vendor/k8s.io/client-go/informers/factory.go:150
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[2141674617]: ---"Objects listed" error:Get "https://192.168.92.129:6443/api/v1/services?limit=500&resourceVersion=0": net/http: TLS hand
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[2141674617]: [10.002634326s] [10.002634326s] END
+Oct 28 00:01:08 debian10x64 kubelet[4687]: E1028 00:01:08.369992    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.Service: failed to list
+Oct 28 00:01:08 debian10x64 kubelet[4687]: W1028 00:01:08.969697    4687 reflector.go:535] vendor/k8s.io/client-go/informers/factory.go:150: failed to list *v1.Node: Get "https://192.16
+Oct 28 00:01:08 debian10x64 kubelet[4687]: I1028 00:01:08.969941    4687 trace.go:236] Trace[1916504381]: "Reflector ListAndWatch" name:vendor/k8s.io/client-go/informers/factory.go:150
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[1916504381]: ---"Objects listed" error:Get "https://192.168.92.129:6443/api/v1/nodes?fieldSelector=metadata.name%3Ddebian10x64&limit=500
+Oct 28 00:01:08 debian10x64 kubelet[4687]: Trace[1916504381]: [10.002649898s] [10.002649898s] END
+Oct 28 00:01:08 debian10x64 kubelet[4687]: E1028 00:01:08.970025    4687 reflector.go:147] vendor/k8s.io/client-go/informers/factory.go:150: Failed to watch *v1.Node: failed to list *v1
+Oct 28 00:01:09 debian10x64 kubelet[4687]: I1028 00:01:09.504843    4687 kubelet_node_status.go:70] "Attempting to register node" node="debian10x64"
+lines 1004-1053/1053 (END)
+
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@debian10x64:/home/fernando# ufw
+bash: ufw: command not found
+root@debian10x64:/home/fernando# ss -nltp | grep 6443
+LISTEN    5         1024                     *:6443                   *:*        users:(("kube-apiserver",pid=5549,fd=3))
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl get pods
+The connection to the server 192.168.92.129:6443 was refused - did you specify the right host or port?
+root@debian10x64:/home/fernando# echo $KUBECONFIG
+/etc/kubernetes/admin.conf
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+
+root@debian10x64:/home/fernando# ss -nltp | grep 6443
+LISTEN    5         1024                     *:6443                   *:*        users:(("kube-apiserver",pid=5549,fd=3))
+root@debian10x64:/home/fernando#
+
+
+
+
+
+
+
+
+kubeadm init --apiserver-advertise-address=192.168.0.110 --pod-network-cidr=10.123.0.0/16
+
+~~~~bash
+root@debian10x64:/home/fernando# kubeadm init --apiserver-advertise-address=192.168.0.110 --pod-network-cidr=10.123.0.0/16
+[init] Using Kubernetes version: v1.28.3
+[preflight] Running pre-flight checks
+        [WARNING SystemVerification]: missing optional cgroups: hugetlb
+error execution phase preflight: [preflight] Some fatal errors occurred:
+        [ERROR Port-10259]: Port 10259 is in use
+        [ERROR Port-10257]: Port 10257 is in use
+        [ERROR FileAvailable--etc-kubernetes-manifests-kube-apiserver.yaml]: /etc/kubernetes/manifests/kube-apiserver.yaml already exists
+        [ERROR FileAvailable--etc-kubernetes-manifests-kube-controller-manager.yaml]: /etc/kubernetes/manifests/kube-controller-manager.yaml already exists
+        [ERROR FileAvailable--etc-kubernetes-manifests-kube-scheduler.yaml]: /etc/kubernetes/manifests/kube-scheduler.yaml already exists
+        [ERROR FileAvailable--etc-kubernetes-manifests-etcd.yaml]: /etc/kubernetes/manifests/etcd.yaml already exists
+        [ERROR Port-10250]: Port 10250 is in use
+        [ERROR DirAvailable--var-lib-etcd]: /var/lib/etcd is not empty
+[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`
+To see the stack trace of this error execute with --v=5 or higher
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+kubeadm init --apiserver-advertise-address=192.168.0.110 --pod-network-cidr=10.123.0.0/16
+
+
+
+
+- crictl apresenta erro
+
+~~~~bash
+root@debian10x64:/home/fernando# crictl ps
+WARN[0000] runtime connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+WARN[0000] image connect using default endpoints: [unix:///var/run/dockershim.sock unix:///run/containerd/containerd.sock unix:///run/crio/crio.sock unix:///var/run/cri-dockerd.sock]. As the default settings are now deprecated, you should set the endpoint instead.
+E1028 00:07:08.414823    5887 remote_runtime.go:390] "ListContainers with filter from runtime service failed" err="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory\"" filter="&ContainerFilter{Id:,State:&ContainerStateValue{State:CONTAINER_RUNNING,},PodSandboxId:,LabelSelector:map[string]string{},}"
+FATA[0000] listing containers: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory"
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+## TSHOOT
+- Kube-apiserver ta escutando na porta 6443
+- crictl apresenta erro
