@@ -505,6 +505,10 @@ root@debian10x64:/home/fernando#
 
 
 
+FATA[0000] listing containers: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing dial unix /var/run/dockershim.sock: connect: no such file or directory"
+
+
+
 
 ## TSHOOT
 - Kube-apiserver ta escutando na porta 6443
