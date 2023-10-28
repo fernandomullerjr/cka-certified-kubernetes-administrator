@@ -286,3 +286,35 @@ fernando@debian10x64:~$
 
 Na versão K8s anterior à 1.24, sempre que criávamos uma conta de serviço, um token secreto que não expirava (segredos e tokens montáveis) era criado por padrão. 
 Porém, a partir da versão 1.24, ele foi desfeito e nenhum token secreto é criado por padrão quando criamos uma conta de serviço. No entanto, podemos criá-lo quando necessário.
+
+
+
+
+
+
+
+
+
+
+
+
+
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+#  Dia 27/10/2023
+
+- Erro no kubeadm
+
+~~~~bash
+
+root@debian10x64:/home/fernando# kubectl get pods
+The connection to the server 192.168.92.129:6443 was refused - did you specify the right host or port?
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# date
+Fri 27 Oct 2023 11:48:21 PM -03
+root@debian10x64:/home/fernando#
+
+~~~~
