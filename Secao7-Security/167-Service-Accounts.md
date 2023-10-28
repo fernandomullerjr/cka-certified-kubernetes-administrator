@@ -317,4 +317,17 @@ root@debian10x64:/home/fernando# date
 Fri 27 Oct 2023 11:48:21 PM -03
 root@debian10x64:/home/fernando#
 
+The connection to the server 192.168.92.129:6443 was refused - did you specify the right host or port?
+root@debian10x64:/home/fernando# kubectl get nodes
+The connection to the server 192.168.92.129:6443 was refused - did you specify the right host or port?
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando# kubectl cluster-info
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+The connection to the server 192.168.92.129:6443 was refused - did you specify the right host or port?
+root@debian10x64:/home/fernando#
+
 ~~~~
