@@ -30,7 +30,11 @@ git status
 # #################################################################################################################################################
 # 167-Service-Accounts
 
+https://kubernetes.io/docs/concepts/security/service-accounts/
+<https://kubernetes.io/docs/concepts/security/service-accounts/>
 
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+<https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>
 
 ~~~~bash
 fernando@debian10x64:~$ kubectl get sa
@@ -1091,3 +1095,102 @@ root@debian10x64:/home/fernando# date
 Sat 28 Oct 2023 05:48:02 PM -03
 root@debian10x64:/home/fernando#
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Dia 31/10/2023
+
+Um Service Account no Kubernetes é uma entidade que representa a identidade de um conjunto de processos em execução em um cluster que desejam interagir com o API server Kubernetes. A seguir, você encontrará um exemplo de manifesto YAML para criar um Service Account no Kubernetes:
+
+~~~~yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nome-do-service-account
+  namespace: namespace-desejado
+~~~~
+
+Neste exemplo:
+
+    apiVersion: Especifica a versão da API do Kubernetes que estamos usando.
+    kind: Define o tipo do objeto, que neste caso é ServiceAccount.
+    metadata: Contém informações sobre o objeto, como o nome e o namespace do Service Account.
+        name: Especifica o nome do Service Account.
+        namespace: Especifica o namespace onde o Service Account será criado. Se você não especificar um namespace, ele será criado no namespace padrão.
+
+Você pode salvar este manifesto em um arquivo YAML (por exemplo, serviceaccount.yaml) e, em seguida, aplicá-lo ao seu cluster Kubernetes usando o comando kubectl apply:
+
+bash
+
+kubectl apply -f serviceaccount.yaml
+
+Isso criará o Service Account no namespace especificado. Lembre-se de substituir nome-do-service-account pelo nome desejado para o Service Account e namespace-desejado pelo namespace onde você deseja criar o Service Account.
+
+
+
+
+
+
+
+
+
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+
+## Use the default service account to access the API server
+
+When Pods contact the API server, Pods authenticate as a particular ServiceAccount (for example, default). There is always at least one ServiceAccount in each namespace.
+
+Every Kubernetes namespace contains at least one ServiceAccount: the default ServiceAccount for that namespace, named default. If you do not specify a ServiceAccount when you create a Pod, Kubernetes automatically assigns the ServiceAccount named default in that namespace.
+
+You can fetch the details for a Pod you have created. For example:
+
+kubectl get pods/<podname> -o yaml
+
+In the output, you see a field spec.serviceAccountName. Kubernetes automatically sets that value if you don't specify it when you create a Pod.
+
+An application running inside a Pod can access the Kubernetes API using automatically mounted service account credentials. See accessing the Cluster to learn more.
+
+When a Pod authenticates as a ServiceAccount, its level of access depends on the authorization plugin and policy in use.
+
+
+## Opt out of API credential automounting
+
+If you don't want the kubelet to automatically mount a ServiceAccount's API credentials, you can opt out of the default behavior. You can opt out of automounting API credentials on /var/run/secrets/kubernetes.io/serviceaccount/token for a service account by setting automountServiceAccountToken: false on the ServiceAccount:
+
+For example:
+
+~~~~YAML
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-robot
+automountServiceAccountToken: false
+...
+~~~~
+
+You can also opt out of automounting API credentials for a particular Pod:
+
+~~~~YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  serviceAccountName: build-robot
+  automountServiceAccountToken: false
+  ...
+~~~~
+
+If both the ServiceAccount and the Pod's .spec specify a value for automountServiceAccountToken, the Pod spec takes precedence.
+Use more than one
