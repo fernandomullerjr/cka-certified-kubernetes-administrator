@@ -1392,3 +1392,16 @@ kube-system       ttl-controller                       0         24h
 root@debian10x64:/home/fernando#
 
 ~~~~
+
+
+
+
+
+
+
+
+
+
+## PENDENTE
+- Resumir,
+- Pods, caminho montado, diferen~ças entre 1.22 e 1.24.
