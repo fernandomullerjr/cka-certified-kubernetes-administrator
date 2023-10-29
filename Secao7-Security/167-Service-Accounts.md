@@ -1194,3 +1194,201 @@ spec:
 
 If both the ServiceAccount and the Pod's .spec specify a value for automountServiceAccountToken, the Pod spec takes precedence.
 Use more than one
+
+
+
+
+
+
+
+
+- Verificando existencia da "  serviceAccountName: default" no Pod:
+
+kubectl get pods/backstage-7b5dc95679-c7mzs -n backstage -o yaml
+
+~~~~YAML
+
+root@debian10x64:/home/fernando# kubectl get pods/backstage-7b5dc95679-c7mzs -n backstage -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-10-29T17:59:53Z"
+  generateName: backstage-7b5dc95679-
+  labels:
+    app: backstage
+    pod-template-hash: 7b5dc95679
+  name: backstage-7b5dc95679-c7mzs
+  namespace: backstage
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: backstage-7b5dc95679
+    uid: 4c7d4012-5f3c-4050-85f4-12715163313a
+  resourceVersion: "33157"
+  uid: cc243080-b1fa-4a5c-bd3b-8c0876b58db4
+spec:
+  containers:
+  - envFrom:
+    - secretRef:
+        name: postgres-secrets
+    - secretRef:
+        name: backstage-secrets
+    image: fernandomj90/backstage-local:v3
+    imagePullPolicy: IfNotPresent
+    name: backstage
+    ports:
+    - containerPort: 7007
+      name: http
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-rcsbp
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: debian10x64
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-rcsbp
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-29T17:59:53Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-29T17:59:55Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-29T17:59:55Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-29T17:59:53Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://551c86dc967b75aa7dd865854b84f6a61ef598b5d61e561f0747404b5c983e98
+    image: docker.io/fernandomj90/backstage-local:v3
+    imageID: docker.io/fernandomj90/backstage-local@sha256:42cbe9f633d998b8ec6ee0bf0e909dd6f2c1b00db53c9e5be29b08488ecf71c1
+    lastState: {}
+    name: backstage
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-10-29T17:59:55Z"
+  hostIP: 192.168.92.129
+  phase: Running
+  podIP: 10.0.0.205
+  podIPs:
+  - ip: 10.0.0.205
+  qosClass: BestEffort
+  startTime: "2023-10-29T17:59:53Z"
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+
+
+  serviceAccountName: default
+
+
+- Verificando a listagem de SA(ServiceAccounts):
+
+~~~~bash
+
+root@debian10x64:/home/fernando# kubectl get sa
+NAME      SECRETS   AGE
+default   0         24h
+root@debian10x64:/home/fernando# kubectl get sa -A
+NAMESPACE         NAME                                 SECRETS   AGE
+backstage         default                              0         21h
+default           default                              0         24h
+kube-node-lease   default                              0         24h
+kube-public       default                              0         24h
+kube-system       attachdetach-controller              0         24h
+kube-system       bootstrap-signer                     0         24h
+kube-system       certificate-controller               0         24h
+kube-system       cilium                               0         23h
+kube-system       cilium-operator                      0         23h
+kube-system       clusterrole-aggregation-controller   0         24h
+kube-system       coredns                              0         24h
+kube-system       cronjob-controller                   0         24h
+kube-system       daemon-set-controller                0         24h
+kube-system       default                              0         24h
+kube-system       deployment-controller                0         24h
+kube-system       disruption-controller                0         24h
+kube-system       endpoint-controller                  0         24h
+kube-system       endpointslice-controller             0         24h
+kube-system       endpointslicemirroring-controller    0         24h
+kube-system       ephemeral-volume-controller          0         24h
+kube-system       expand-controller                    0         24h
+kube-system       generic-garbage-collector            0         24h
+kube-system       horizontal-pod-autoscaler            0         24h
+kube-system       job-controller                       0         24h
+kube-system       kube-proxy                           0         24h
+kube-system       namespace-controller                 0         24h
+kube-system       node-controller                      0         24h
+kube-system       persistent-volume-binder             0         24h
+kube-system       pod-garbage-collector                0         24h
+kube-system       pv-protection-controller             0         24h
+kube-system       pvc-protection-controller            0         24h
+kube-system       replicaset-controller                0         24h
+kube-system       replication-controller               0         24h
+kube-system       resourcequota-controller             0         24h
+kube-system       root-ca-cert-publisher               0         24h
+kube-system       service-account-controller           0         24h
+kube-system       service-controller                   0         24h
+kube-system       statefulset-controller               0         24h
+kube-system       token-cleaner                        0         24h
+kube-system       ttl-after-finished-controller        0         24h
+kube-system       ttl-controller                       0         24h
+root@debian10x64:/home/fernando#
+
+~~~~
