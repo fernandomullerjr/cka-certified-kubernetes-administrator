@@ -1440,10 +1440,133 @@ Conditions:
 
 kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system -- ls /var/run/secrets/kubernetes.io/serviceaccount
 
+- ERROS:
+
+~~~~BASH
+
+root@debian10x64:/home/fernando# kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system ls /var/run/secrets/kubernetes.io/serviceaccount
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+error: Internal error occurred: error executing command in container: failed to exec in container: failed to start exec "dc9635364f1080bf54eaf540b701bdcea2b0a85a52fa3becb313b3546c1064a7": OCI runtime exec failed: exec failed: unable to start container process: exec: "ls": executable file not found in $PATH: unknown
+root@debian10x64:/home/fernando# kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system -- ls /var/run/secrets/kubernetes.io/serviceaccount
+error: Internal error occurred: error executing command in container: failed to exec in container: failed to start exec "255e36b3ed9806c7540904c244ad7fc8206faed42d214162ae19620904944b95": OCI runtime exec failed: exec failed: unable to start container process: exec: "ls": executable file not found in $PATH: unknown
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+- Verificando no Pod do backstage:
+
+kubectl describe pod backstage-7b5dc95679-c7mzs -n backstage
+
+~~~~bash
+root@debian10x64:/home/fernando# kubectl describe pod backstage-7b5dc95679-c7mzs -n backstage
+Name:         backstage-7b5dc95679-c7mzs
+Namespace:    backstage
+Priority:     0
+[...]
+    Environment Variables from:
+      postgres-secrets   Secret  Optional: false
+      backstage-secrets  Secret  Optional: false
+    Environment:         <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-rcsbp (ro)
+~~~~
+
+
+
+kubectl exec -it backstage-7b5dc95679-c7mzs -n backstage -- ls /var/run/secrets/kubernetes.io/serviceaccount
+
+~~~~bash
+root@debian10x64:/home/fernando# kubectl exec -it backstage-7b5dc95679-c7mzs -n backstage -- ls /var/run/secrets/kubernetes.io/serviceaccount
+ca.crt  namespace  token
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+
+- Verificando o conteúdo do Token:
+
+kubectl exec -it backstage-7b5dc95679-c7mzs -n backstage -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
+
+~~~~bash
+
+CONTEÚDO OMITIDO:
+
+root@debian10x64:/home/fernando# kubectl exec -it backstage-7b5dc95679-c7mzs -n backstage -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkY4TlFkc1o5eXlCWjQ3Q2laVzlMQ3RoUGctQmk5N2ZqTHozTmFhUmpnZXcifQ.
+[...]
+nfcOaF7L27AKAxb2DdVyZ1R-aOfDekLGFG-wy3BzDi_-_rK09MNmKYWqlomPlh0n5ziOYNzP3ZXlQ45mzD9KzVtQHXTnQQnPmWaQM-pOOpyxP8FuNFqPlqcQ
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+- Usar ferramenta para decodar:
+https://jwt.io/
+<https://jwt.io/>
+
+
+- Payload e cabeçalho decodificado:
+
+~~~~JSON
+{
+  "alg": "RS256",
+  "kid": "F8NQdsZ9yyBZ47CiZW9LCthPg-Bi97fjLz3NaaRjgew"
+}
+
+{
+  "aud": [
+    "https://kubernetes.default.svc.cluster.local"
+  ],
+  "exp": 1730513707,
+  "iat": 1698977707,
+  "iss": "https://kubernetes.default.svc.cluster.local",
+  "kubernetes.io": {
+    "namespace": "backstage",
+    "pod": {
+      "name": "backstage-7b5dc95679-c7mzs",
+      "uid": "cc243080-b1fa-4a5c-bd3b-8c0876b58db4"
+    },
+    "serviceaccount": {
+      "name": "default",
+      "uid": "6ea781c5-5ed7-47ed-872b-aeeac13183eb"
+    },
+    "warnafter": 1698981314
+  },
+  "nbf": 1698977707,
+  "sub": "system:serviceaccount:backstage:default"
+}
+~~~~
 
 
 
 
 
 
-kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system -- ls /var/run/secrets/kubernetes.io/serviceaccount
+- Tokens na versão 1.22 do Kubernetes não expiravam.
+
+- A partir da versão 1.24, é necessário criar o token manualmente.
+- É incentivado o uso da "TokenRequest API".
+
+https://www.kubernetes.dev/resources/keps/
+
+
+## 1205	Bound Service Account Tokens
+https://github.com/kubernetes/enhancements/tree/master/keps/sig-auth/1205-bound-service-account-tokens#summary
+
+
+## 2799	Reduction of Secret-based Service Account Tokens
+
+https://github.com/kubernetes/enhancements/tree/master/keps/sig-auth/2799-reduction-of-secret-based-service-account-token#summary
+
+Proposal
+
+    Change the service account control loop in Token Controller to not auto-create secret for service accounts. At the same time, warn usage of auto-created secret-based service account tokens and encourage users to use TokenRequest API or manually-created secret-based service account tokens.
+    Purge unused auto-generated secret-based service account tokens.

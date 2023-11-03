@@ -1,0 +1,27 @@
+{
+    "alg": "RS256",
+    "kid": "F8NQdsZ9yyBZ47CiZW9LCthPg-Bi97fjLz3NaaRjgew"
+}
+
+{
+    "aud": [
+        "https://kubernetes.default.svc.cluster.local"
+    ],
+    "exp": 1730513707,
+    "iat": 1698977707,
+    "iss": "https://kubernetes.default.svc.cluster.local",
+    "kubernetes.io": {
+        "namespace": "backstage",
+        "pod": {
+            "name": "backstage-7b5dc95679-c7mzs",
+            "uid": "cc243080-b1fa-4a5c-bd3b-8c0876b58db4"
+        },
+        "serviceaccount": {
+            "name": "default",
+            "uid": "6ea781c5-5ed7-47ed-872b-aeeac13183eb"
+        },
+        "warnafter": 1698981314
+    },
+    "nbf": 1698977707,
+    "sub": "system:serviceaccount:backstage:default"
+}
