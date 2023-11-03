@@ -1335,8 +1335,11 @@ root@debian10x64:/home/fernando#
 
 
 
+- Consta:
 
   serviceAccountName: default
+
+
 
 
 - Verificando a listagem de SA(ServiceAccounts):
@@ -1405,3 +1408,42 @@ root@debian10x64:/home/fernando#
 ## PENDENTE
 - Resumir,
 - Pods, caminho montado, diferen~ças entre 1.22 e 1.24.
+
+
+
+## RESUMO
+
+- Every Kubernetes namespace contains at least one ServiceAccount: the default ServiceAccount for that namespace, named default. If you do not specify a ServiceAccount when you create a Pod, Kubernetes automatically assigns the ServiceAccount named default in that namespace.
+
+- If both the ServiceAccount and the Pod's .spec specify a value for automountServiceAccountToken, the Pod spec takes precedence.
+
+
+
+
+- Verificando ponto de montagem da SA no Pod:
+
+~~~~yaml
+root@debian10x64:/home/fernando# kubectl describe pod cilium-operator-788c4f69bc-g7mw4 -n kube-system
+Name:                 cilium-operator-788c4f69bc-g7mw4
+Namespace:  
+    Mounts:
+      /tmp/cilium/config-map from cilium-config-path (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-fl5mc (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+~~~~
+
+
+
+
+
+kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system -- ls /var/run/secrets/kubernetes.io/serviceaccount
+
+
+
+
+
+
+
+kubectl exec -it cilium-operator-788c4f69bc-g7mw4 -n kube-system -- ls /var/run/secrets/kubernetes.io/serviceaccount
