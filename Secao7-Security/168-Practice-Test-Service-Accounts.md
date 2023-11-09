@@ -776,3 +776,131 @@ controlplane ~ ➜  kubectl apply -f deployment.yaml
 Error from server (BadRequest): error when creating "deployment.yaml": Deployment in version "v1" cannot be handled as a Deployment: strict decoding error: unknown field "spec.serviceAccount", unknown field "spec.serviceAccountName"
 
 controlplane ~ ✖ 
+
+
+
+controlplane ~ ✖ kubectl delete -f deployment.yaml
+Error from server (NotFound): error when deleting "deployment.yaml": deployments.apps "web-dashboard" not found
+
+controlplane ~ ✖ vi deployment.yaml
+
+controlplane ~ ➜  kubectl apply -f deployment.yaml
+Error from server (BadRequest): error when creating "deployment.yaml": Deployment in version "v1" cannot be handled as a Deployment: strict decoding error: unknown field "spec.template.serviceAccount", unknown field "spec.template.serviceAccountName"
+
+controlplane ~ ✖ 
+
+
+
+
+
+## PENDENTE
+- Ver como editar Deployment para que ele informe o ServiceAccount, ao invés de direto no Pod.
+
+
+
+
+
+controlplane ~ ✖ vi deployment.yaml
+
+controlplane ~ ➜  kubectl apply -f deployment.yaml
+deployment.apps/web-dashboard created
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get deployment
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+web-dashboard   1/1     1            1           24s
+
+controlplane ~ ➜  kubectl get deployment web-dashboard -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"1"},"name":"web-dashboard","namespace":"default"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"name":"web-dashboard"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"name":"web-dashboard"}},"spec":{"containers":[{"env":[{"name":"PYTHONUNBUFFERED","value":"1"}],"image":"gcr.io/kodekloud/customimage/my-kubernetes-dashboard","imagePullPolicy":"Always","name":"web-dashboard","ports":[{"containerPort":8080,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"dashboard-sa","serviceAccountName":"dashboard-sa","terminationGracePeriodSeconds":30}}}}
+  creationTimestamp: "2023-11-09T03:33:05Z"
+  generation: 1
+  name: web-dashboard
+  namespace: default
+  resourceVersion: "1824"
+  uid: a870ddeb-8198-42fe-b539-596d58425437
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: web-dashboard
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: web-dashboard
+    spec:
+      containers:
+      - env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        image: gcr.io/kodekloud/customimage/my-kubernetes-dashboard
+        imagePullPolicy: Always
+        name: web-dashboard
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: dashboard-sa
+      serviceAccountName: dashboard-sa
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2023-11-09T03:33:08Z"
+    lastUpdateTime: "2023-11-09T03:33:08Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-11-09T03:33:05Z"
+    lastUpdateTime: "2023-11-09T03:33:08Z"
+    message: ReplicaSet "web-dashboard-598c6cb6d" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  date
+Thu Nov  9 03:33:35 UTC 2023
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+Refresh the Dashboard application UI and you should now see the PODs listed automatically.
+
+This time you shouldn't have to put in the token manually.
+
+https://30080-port-61616da2991745a5.labs.kodekloud.com/#!/view1
+<https://30080-port-61616da2991745a5.labs.kodekloud.com/#!/view1>

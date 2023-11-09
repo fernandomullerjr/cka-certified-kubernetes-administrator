@@ -6,9 +6,6 @@ metadata:
   name: web-dashboard
   namespace: default
 spec:
-
-  serviceAccount: dashboard-sa
-  serviceAccountName: dashboard-sa
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
@@ -26,6 +23,8 @@ spec:
       labels:
         name: web-dashboard
     spec:
+      serviceAccount: dashboard-sa
+      serviceAccountName: dashboard-sa
       containers:
       - env:
         - name: PYTHONUNBUFFERED
@@ -39,8 +38,6 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-
-
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
