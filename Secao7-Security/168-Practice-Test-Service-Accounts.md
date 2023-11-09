@@ -892,6 +892,58 @@ controlplane ~ ➜
 
 
 
+- Problema ocorria devido a posição dos parametros "serviceAccount" e "serviceAccountName".
+- Foi necessário colocar embaixo da "spec" do template, no nível Pod mesmo.
+- Conforme:
+
+~~~~YAML
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: web-dashboard
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: web-dashboard
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: web-dashboard
+    spec:
+      serviceAccount: dashboard-sa
+      serviceAccountName: dashboard-sa
+      containers:
+      - env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        image: gcr.io/kodekloud/customimage/my-kubernetes-dashboard
+        imagePullPolicy: Always
+        name: web-dashboard
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+~~~~
+
 
 
 
