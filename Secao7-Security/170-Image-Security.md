@@ -135,26 +135,33 @@ docker.io/library/nginx
 # Private Registry
 
 - To login to the registry
-  ```
-  $ docker login private-registry.io
-  ```
-- Run the application using the image available at the private registry
-  ```
-  $ docker run private-registry.io/apps/internal-app
 
+~~~~bash
+$ docker login private-registry.io
+~~~~
+
+
+- Run the application using the image available at the private registry
+
+~~~~bash
+$ docker run private-registry.io/apps/internal-app
+~~~~
 
 
   
 - To pass the credentials to the docker untaged on the worker node for that we first create a secret object with credentials in it.
-  ```
+
+~~~~bash
   $ kubectl create secret docker-registry regcred \
     --docker-server=private-registry.io \ 
     --docker-username=registry-user \
     --docker-password=registry-password \
     --docker-email=registry-user@org.com
-  ```
+~~~~
+
 - We then specify the secret inside our pod definition file under the imagePullSecret section 
-  ```
+
+~~~~bash
   apiVersion: v1
   kind: Pod
   metadata:
@@ -165,8 +172,9 @@ docker.io/library/nginx
       image: private-registry.io/apps/internal-app
     imagePullSecrets:
     - name: regcred
-  ```
-  
+~~~~
+
+
 
 
 
@@ -191,3 +199,20 @@ Use "kubectl options" for a list of global command-line options (applies to all 
 root@debian10x64:/home/fernando#
 
 ~~~~
+
+
+
+
+
+
+
+
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# RESUMO
+
+- É possível autenticar com um registry via manifesto do Pod, utilizando o campo [imagePullSecrets].
+- Existe um tipo de Secret no Kubernetes, que é a "docker-registry", que cria uma Secret para autenticar com um Docker registry.
