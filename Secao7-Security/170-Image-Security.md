@@ -76,3 +76,40 @@ In this section we will take a look at image security
   
   #### K8s Reference Docs
   - https://kubernetes.io/docs/concepts/containers/images/
+
+
+
+
+
+
+
+
+
+
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# #################################################################################################################################################
+# 170. Image Security
+
+image:
+Image/
+Repository
+nginx
+nginx
+User/
+Account
+docker.io/
+Registry
+gcr.io/
+kubernetes
+e2e test images/ dnsutils
+
+
+
+Image updates:
+official-images repo's library/nginx label
+official-images repo's library/nginx file (history)
+
+<https://github.com/docker-library/official-images/issues?q=label%3Alibrary%2Fnginx>
