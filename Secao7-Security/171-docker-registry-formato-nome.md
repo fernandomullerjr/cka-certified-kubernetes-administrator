@@ -59,3 +59,13 @@ spec:
         - containerPort: 80
 
 No exemplo acima, a linha image: gcr.io/meu-projeto/repositorio/imagem:tag especifica a imagem a ser usada para o contêiner na implantação do Kubernetes. Certifique-se de substituir os valores reais pelos correspondentes à sua configuração específica.
+
+
+
+
+
+
+
+- Exemplo onde o Registry também tem os 2 pontos(para informar a porta dele), além do nome da imagem ter 2 pontos também:
+
+myprivateregistry.com:5000/nginx:alpine  
