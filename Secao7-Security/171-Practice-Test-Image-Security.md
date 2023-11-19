@@ -197,3 +197,160 @@ root@controlplane ~ ➜
   ```
   
   </details>
+
+
+
+
+
+## NOVA TENTATIVA
+
+What secret type must we choose for docker registry?
+
+
+
+
+
+We have an application running on our cluster. Let us explore it first. What image is the application using?
+
+
+
+
+
+
+We decided to use a modified version of the application from an internal private registry. Update the image of the deployment to use a new image from myprivateregistry.com:5000
+
+The registry is located at myprivateregistry.com:5000. Don't worry about the credentials for now. We will configure them in the upcoming steps.
+
+    Use Image from private registry
+
+kubectl edit deployment web
+
+
+myprivateregistry.com:5000/nginx:alpine                                
+
+root@controlplane ~ ➜  kubectl edit deployment web
+deployment.apps/web edited
+
+root@controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+Are the new PODs created with the new images successfully running?
+
+root@controlplane ~ ➜  kubectl get pods
+NAME                   READY   STATUS         RESTARTS   AGE
+web-694fcfd956-slh8b   1/1     Running        0          3m24s
+web-694fcfd956-z4nr7   1/1     Running        0          3m24s
+web-776bccfbcf-kt5h9   0/1     ErrImagePull   0          26s
+
+root@controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+Create a secret object with the credentials required to access the registry.
+
+Name: private-reg-cred
+Username: dock_user
+Password: dock_password
+Server: myprivateregistry.com:5000
+Email: dock_user@myprivateregistry.com
+
+    Secret: private-reg-cred
+
+    Secret Type: docker-registry
+
+    Secret Data
+
+
+root@controlplane ~ ➜  kubectl create secret -h
+Create a secret using specified subcommand.
+
+Available Commands:
+  docker-registry   Create a secret for use with a Docker registry
+  generic           Create a secret from a local file, directory, or literal value
+  tls               Create a TLS secret
+
+Usage:
+  kubectl create secret [flags] [options]
+
+Use "kubectl <command> --help" for more information about a given command.
+Use "kubectl options" for a list of global command-line options (applies to all commands).
+
+root@controlplane ~ ➜  
+
+
+https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+
+Create a Secret by providing credentials on the command line
+
+Create this Secret, naming it regcred:
+
+kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+
+where:
+
+    <your-registry-server> is your Private Docker Registry FQDN. Use https://index.docker.io/v1/ for DockerHub.
+    <your-name> is your Docker username.
+    <your-pword> is your Docker password.
+    <your-email> is your Docker email.
+
+- Editando o comando:
+
+kubectl create secret docker-registry private-reg-cred --docker-server=myprivateregistry.com:5000 --docker-username=dock_user --docker-password=dock_password --docker-email=dock_user@myprivateregistry.com
+
+root@controlplane ~ ➜  kubectl create secret docker-registry private-reg-cred --docker-server=myprivateregistry.com:5000 --docker-username=dock_user --docker-password=dock_password --docker-email=dock_user@myprivateregistry.com
+secret/private-reg-cred created
+
+root@controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+Configure the deployment to use credentials from the new secret to pull images from the private registry
+
+    Image Pull Secret: private-reg-cred
+
+https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+Create a Pod that uses your Secret
+
+Here is a manifest for an example Pod that needs access to your Docker credentials in regcred:
+pods/private-reg-pod.yaml [Copy pods/private-reg-pod.yaml to clipboard]
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: private-reg
+spec:
+  containers:
+  - name: private-reg-container
+    image: <your-private-image>
+  imagePullSecrets:
+  - name: regcred
+
+
+kubectl edit deployment web
