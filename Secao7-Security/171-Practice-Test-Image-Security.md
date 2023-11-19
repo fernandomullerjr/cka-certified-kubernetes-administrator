@@ -181,3 +181,19 @@ root@controlplane ~ ➜
 
 ## PENDENTE
 - Questão do registry privado nao ficou OK
+
+
+
+- Testar solução:
+
+<https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/07-Security/24-Practice-Test-Image-Security.md>
+
+- Use the kubectl edit deployment command to edit the image name to myprivateregistry.com:5000/nginx:alpine
+
+  <details>
+  
+  ```
+  $ kubectl edit deployment web
+  ```
+  
+  </details>
