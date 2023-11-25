@@ -29,6 +29,8 @@ https://madhuakula.com/content/attacking-and-auditing-docker-containers-using-op
 
 - Testando
 
+no host local, na VM
+
 ~~~~bash
 
 fernando@debian10x64:~$
@@ -54,9 +56,39 @@ fernando@debian10x64:~$
 
 ~~~~
 
+- Acessando o Container
+
+podemos ver o processo com o pid 1
+
+~~~~bash
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND        CREATED         STATUS         PORTS     NAMES
+68b4f64625aa   alpine    "sleep 1111"   6 minutes ago   Up 6 minutes             confident_rubin
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ docker exec -ti 68b4f64625aa sh
+/ #
+/ #
+/ #
+/ #
+/ # ps -ef
+PID   USER     TIME  COMMAND
+    1 root      0:00 sleep 1111
+    8 root      0:00 sh
+   14 root      0:00 ps -ef
+/ #
+
+~~~~
 
 
+- Estes pid diferentes, é porque o processo pode ter diferentes pid em diferentes Namespaces.
+- Este é o isolamento de processos que o Docker faz.
 
+- Podemos ver que o container está utilizando o usuário root.
+- Por padrão o Docker utiliza o usuário root dentro dos Containers.
 
 
 
