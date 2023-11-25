@@ -24,6 +24,9 @@ git status
 # 173. Pre-requisite - Security in Docker
 
 
+https://madhuakula.com/content/attacking-and-auditing-docker-containers-using-opensource/attacking-docker-containers/namespaces.html
+<https://madhuakula.com/content/attacking-and-auditing-docker-containers-using-opensource/attacking-docker-containers/namespaces.html>
+
 - Testando
 
 ~~~~bash
@@ -50,3 +53,55 @@ cgroup  ipc  mnt  net  pid  pid_for_children  user  uts
 fernando@debian10x64:~$
 
 ~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+<https://www.baeldung.com/linux/docker-container-process-host-pid>
+
+## 5. Docker Example
+
+Now, let’s see how PID namespaces work in Docker. We’ll create and start a new detached Alpine Linux container:
+
+~~~~bash
+$ sudo docker run -d alpine:latest sleep 1000
+f0901c0b43329f6f997ec946597c3ab159c58a885cd081a8d0f855ae19c8188f
+~~~~
+
+Next, let’s run the lsns command again to output the accessible PID namespaces:
+
+~~~~bash
+$ sudo lsns -t pid
+        NS TYPE NPROCS   PID USER COMMAND
+4026531836 pid     115     1 root /sbin/init
+4026532153 pid       1  2083 root sleep 1000
+~~~~
+
+As expected, Docker created a new PID namespace with the identifier 4026532153. Now, let’s run ps:
+
+~~~~bash
+$ ps aux | grep sleep
+ 2083 root     sleep 1000
+~~~~
+
+Indeed, we can see a process that’s running the sleep command with PID 2083 in the parent namespace.
+
+To find out the process ID of this process in its namespace we’ll execute the ps command in the container:
+
+~~~~bash
+$ sudo docker container exec f0901 ps ax
+PID   USER     TIME  COMMAND
+    1 root      0:00 sleep 1000
+    6 root      0:00 ps ax
+~~~~
+
+As can be seen, the process ID of the process running the sleep command in the child namespace is 1. 
