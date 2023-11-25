@@ -22,3 +22,31 @@ git status
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 # 173. Pre-requisite - Security in Docker
+
+
+- Testando
+
+~~~~bash
+
+fernando@debian10x64:~$
+fernando@debian10x64:~$ docker run --rm -d alpine sleep 1111
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+96526aa774ef: Pull complete
+Digest: sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
+Status: Downloaded newer image for alpine:latest
+68b4f64625aae6c2ffeacd2260d9088d7de9def3c18441c812244f448a38cea3
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ ps auxx | grep 'sleep 1111'
+root      73776  4.0  0.0   1584     4 ?        Ss   15:34   0:00 sleep 1111
+fernando  73809  0.0  0.0   6072   816 pts/1    S+   15:35   0:00 grep sleep 1111
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ sudo ls /proc/73776/ns/
+[sudo] password for fernando:
+cgroup  ipc  mnt  net  pid  pid_for_children  user  uts
+fernando@debian10x64:~$
+
+~~~~
