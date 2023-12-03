@@ -137,3 +137,55 @@ PID   USER     TIME  COMMAND
 ~~~~
 
 As can be seen, the process ID of the process running the sleep command in the child namespace is 1. 
+
+
+
+
+
+
+
+
+
+
+
+## USUARIO
+
+To run our asset build, we could use a command something like this:
+
+~~~~BASH
+docker container run --rm -it \
+  -v $(app):/app \                          # Mount the source code
+  --workdir /app \                          # Set the working dir
+  --user 1000:1000 \                        # Run as the given user
+  my-docker/my-build-environment:latest \   # Our build env image
+  make assets                               # ... and the command!
+~~~~
+
+This will tell Docker to run its processes with user ID 1000 and group ID 1000. That will mean that any files created by that process also belong to the user with ID 1000.
+
+
+
+Um Dockerfile é um script que contém uma série de instruções para a construção de uma imagem Docker. Para definir um usuário específico no Dockerfile, você pode usar a instrução USER. Aqui está um exemplo de um Dockerfile que define o usuário 1000:
+
+~~~~Dockerfile
+
+# Use uma imagem base, como o Alpine Linux
+FROM alpine:latest
+
+# Define o usuário para o ID 1000
+USER 1000
+
+# Adicione outras instruções do Dockerfile abaixo
+# ...
+
+# Especifica o comando padrão a ser executado quando o contêiner é iniciado
+CMD ["echo", "Hello, Docker!"]
+~~~~
+
+A instrução USER é usada para definir o usuário ou UID (User ID) que será utilizado quando o contêiner estiver sendo executado. No exemplo acima, o usuário é definido como 1000.
+
+A razão para definir um usuário específico está relacionada à segurança. Por padrão, ao executar um contêiner Docker, ele é executado como o usuário root (UID 0). Isso pode representar um risco de segurança, pois um contêiner comprometido como root pode ter acesso irrestrito ao sistema hospedeiro.
+
+Ao definir um usuário não privilegiado, como o usuário 1000, você limita os danos que um contêiner comprometido pode causar. Isso ajuda a seguir o princípio do "privilégio mínimo necessário", onde você restringe os privilégios do contêiner para reduzir o impacto de possíveis violações de segurança.
+
+Lembre-se de que o UID 1000 é apenas um exemplo e pode variar dependendo do contexto do seu sistema. Ao usar imagens base, como Alpine Linux ou outras, o UID 1000 geralmente é um UID não privilegiado padrão. Certifique-se de ajustar conforme necessário para atender aos requisitos específicos do seu aplicativo e ambiente.
