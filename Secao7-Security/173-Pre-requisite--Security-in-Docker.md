@@ -189,3 +189,152 @@ A razão para definir um usuário específico está relacionada à segurança. P
 Ao definir um usuário não privilegiado, como o usuário 1000, você limita os danos que um contêiner comprometido pode causar. Isso ajuda a seguir o princípio do "privilégio mínimo necessário", onde você restringe os privilégios do contêiner para reduzir o impacto de possíveis violações de segurança.
 
 Lembre-se de que o UID 1000 é apenas um exemplo e pode variar dependendo do contexto do seu sistema. Ao usar imagens base, como Alpine Linux ou outras, o UID 1000 geralmente é um UID não privilegiado padrão. Certifique-se de ajustar conforme necessário para atender aos requisitos específicos do seu aplicativo e ambiente.
+
+
+
+
+
+
+
+
+
+
+
+
+https://cloudyuga.guru/hands_on_lab/docker-as-non-root-user
+<https://cloudyuga.guru/hands_on_lab/docker-as-non-root-user>
+
+## Running Programs as non-root user, inside the Container
+
+Generally, if you run a container and check the user id or group id, it is set to 0; which means that we are running the program as the admin user, in the context of the container. 
+
+docker run --rm alpine id
+
+    uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+
+This is not a good practice.  One way is to fix it by providing the uid/gid, while running the containers like following :-
+
+docker run --rm -u 1001:1001 alpine id
+
+    uid=1001 gid=1001 groups=1001
+
+But this may cause problems to the programs which we are not configured to run as non-root users, inside the containers; unless we do so. So a better approach is to configure the default user/group and the program accordingly inside the Dockerfile. Let's see an example of the same. 
+
+### Step 1: Create a Dockerfile.
+
+    To write a Dockerfile
+
+vim Dockerfile
+
+
+~~~~DOCKERFILE
+FROM centos:7
+
+RUN useradd -u 1001 testuser
+
+USER testuser
+
+CMD ["/bin/sleep", "200"]
+~~~~
+​
+
+### Step 2: Build an Image.
+
+    To build an image from the Dockerfile
+
+docker build -t cloudyuga/test:learn .
+
+docker image ls
+
+Step 3: Create and run a container from the previous step image 
+
+    To create and run container and retrive user detail
+
+docker run --rm -d --name testc cloudyuga/test:learn
+
+Step 4: Verify the user and ownership of the program running inside the container
+
+docker exec testc id 
+
+docker exec testc ps aux 
+
+We can see the uid and gid are set to 1001 and the sleep program runs with the user testuser.  Also if we inspect the container we'll see the user is set to testuser. 
+
+docker inspect testc --format '{{.Config.User}} {{.Name}}'
+
+Note: container name is added with username.
+
+
+
+
+
+
+## Capabilities in Docker Containers
+
+By default Docker assigns a few capabilities to the containers. It's very easy to check which capabilities are these by running:
+docker run --rm -it  r.j3ss.co/amicontained 
+
+~~~~BASH
+Capabilities:
+	BOUNDING -> chown dac_override fowner fsetid kill setgid setuid setpcap net_bind_service net_raw sys_chroot mknod audit_write setfcap
+​
+# Add a capabilities
+docker run --rm -it --cap-add=SYS_ADMIN r.j3ss.co/amicontained bash
+​
+# Add all capabilities
+docker run --rm -it --cap-add=ALL r.j3ss.co/amicontained bash
+​
+# Remove all and add only one
+docker run --rm -it  --cap-drop=ALL --cap-add=SYS_PTRACE r.j3ss.co/amicontained bash
+​~~~~
+~~~~
+
+
+
+- Arquivo onde podem ser ajustados os
+
+~~~~bash
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ cat /usr/include/linux/capability.h  | head
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+/*
+ * This is <linux/capability.h>
+ *
+ * Andrew G. Morgan <morgan@kernel.org>
+ * Alexander Kjeldaas <astor@guardian.no>
+ * with help from Aleph1, Roland Buresund and Andrew Main.
+ *
+ * See here for the libcap library ("POSIX draft" compliance):
+ *
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ cat /usr/include/linux/capability.h  | tail
+
+/*
+ * Bit location of each capability (used by user-space library and kernel)
+ */
+
+#define CAP_TO_INDEX(x)     ((x) >> 5)        /* 1 << 5 == bits in __u32 */
+#define CAP_TO_MASK(x)      (1U << ((x) & 31)) /* mask for indexed __u32 */
+
+
+#endif /* _LINUX_CAPABILITY_H */
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+
+~~~~
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# RESUMO
+
+- Por padrão, o root é usuario 0 num container.
+- O usuário root tem acesso a varios "Linux Capabilities".
+
+- Adicionando uma Linux Capability:
+    docker run --rm -it --cap-add=SYS_ADMIN r.j3ss.co/amicontained bash
+
