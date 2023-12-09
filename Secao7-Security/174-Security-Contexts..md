@@ -111,3 +111,61 @@ In this section, we will take a look at security context
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 #  174. Security Contexts
+
+
+
+Security Context
+
+    To add security context on the container and a field called securityContext under the spec section.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-pod
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep", "3600"]
+
+
+
+
+
+
+
+To set the same context at the container level, then move the whole section under container section.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-pod
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep", "3600"]
+    securityContext:
+      runAsUser: 1000
+
+
+
+
+
+To add capabilities use the capabilities option
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-pod
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep", "3600"]
+    securityContext:
+      runAsUser: 1000
+      capabilities: 
+        add: ["MAC_ADMIN"]
