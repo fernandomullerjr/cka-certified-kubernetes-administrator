@@ -138,6 +138,7 @@ spec:
 
 To set the same context at the container level, then move the whole section under container section.
 
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -149,13 +150,15 @@ spec:
     command: ["sleep", "3600"]
     securityContext:
       runAsUser: 1000
+~~~~
 
 
 
-
+## capabilities
 
 To add capabilities use the capabilities option
 
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -169,7 +172,7 @@ spec:
       runAsUser: 1000
       capabilities: 
         add: ["MAC_ADMIN"]
-
+~~~~
 
 
 
@@ -181,5 +184,6 @@ spec:
 # ###################################################################################################################### 
 # RESUMO
 
-- Assim como temos como 
+- Podemos configurar o securityContext a nível Pod e Container.
+- Configuração do securityContext realizada ao nível do Container sobrepõe o que foi configurado a nível Pod.
 - Capabilities são suportadas apenas no nível de Container, não é possível definir ao nível do Pod.
