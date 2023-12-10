@@ -113,11 +113,11 @@ In this section, we will take a look at security context
 #  174. Security Contexts
 
 
-
-Security Context
+## Security Context
 
     To add security context on the container and a field called securityContext under the spec section.
 
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -129,7 +129,7 @@ spec:
   - name: ubuntu
     image: ubuntu
     command: ["sleep", "3600"]
-
+~~~~
 
 
 
@@ -169,3 +169,17 @@ spec:
       runAsUser: 1000
       capabilities: 
         add: ["MAC_ADMIN"]
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# RESUMO
+
+- Assim como temos como 
+- Capabilities são suportadas apenas no nível de Container, não é possível definir ao nível do Pod.
