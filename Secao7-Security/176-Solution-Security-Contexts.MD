@@ -8,7 +8,7 @@
 
 git status
 git add .
-git commit -m "175. Practice Test - Security Contexts."
+git commit -m "176. Solution Security Contexts."
 eval $(ssh-agent -s)
 ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
@@ -36,3 +36,9 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ whoami
 fernando
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 ~~~~
+
+
+
+
+- Para agilizar a deleção de um Pod, usar o --force
+kubectl delete -f pod-editado.yaml --force
