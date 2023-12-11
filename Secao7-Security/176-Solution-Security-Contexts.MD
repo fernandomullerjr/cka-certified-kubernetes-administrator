@@ -31,6 +31,8 @@ kubectl exec ubuntu-sleeper -- whoami
 
 - Testando local
 
+~~~~bash
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ whoami
 fernando
 fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+~~~~
