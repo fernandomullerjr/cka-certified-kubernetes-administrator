@@ -42,3 +42,8 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 - Para agilizar a deleção de um Pod, usar o --force
 kubectl delete -f pod-editado.yaml --force
+
+
+
+- Para adicionar mais outra capability, é possível utilizar o kubectl edit
+kubectl edit pod
