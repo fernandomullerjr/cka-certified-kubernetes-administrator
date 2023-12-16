@@ -156,3 +156,4 @@ Como a policy fala somente de ingress policyTypes, o tráfego de egress não é 
 # RESUMO
 
 - Por padrão o Kubernetes tem uma regra "All Allow".
+- Quando a policy fala somente de ingress policyTypes, o tráfego de egress não é influenciado por esta policy.
