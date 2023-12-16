@@ -182,6 +182,77 @@ spec:
 
 
 
+
+
+## Condição "AND"
+
+Se você quiser que tanto a condição do namespace quanto a condição da etiqueta sejam atendidas (ou seja, uma condição "AND"), você pode colocar ambas as condições dentro do mesmo bloco from. Aqui está como seria a configuração:
+
+~~~~yaml
+ingress:
+- from:
+  - podSelector:
+      matchLabels:
+        role: api-pod
+    namespaceSelector:
+      matchLabels:
+        name: prod
+- ipBlock:
+    cidr: 172.17.0.0/16
+    except:
+      - 172.17.1.0/24
+ports:
+- protocol: TCP
+  port: 3306
+~~~~
+
+Neste exemplo:
+
+    O tráfego de entrada será permitido apenas se vier de pods com a etiqueta "role: api-pod" e pertencer ao namespace com a etiqueta "name: prod".
+    Além disso, o tráfego também será permitido do intervalo de IP especificado (CIDR 172.17.0.0/16), excluindo o subintervalo 172.17.1.0/24.
+
+Portanto, essa configuração exige que ambas as condições sejam atendidas para permitir o tráfego de entrada.
+
+- Ajustando, fica assim:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: api-pod
+      namespaceSelector:
+        matchLabels:
+          name: prod
+    - ipBlock:
+        cidr: 172.17.0.0/16
+        except:
+          - 172.17.1.0/24
+  ports:
+  - protocol: TCP
+    port: 3306
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 192.168.5.10/32
+      ports:
+        - protocol: TCP
+          port: 80
+~~~~
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
