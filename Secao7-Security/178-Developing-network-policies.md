@@ -261,3 +261,4 @@ spec:
 # RESUMO
 
 - Quando liberamos um tráfego de entrada(ingress), não precisamos liberar o tráfego da resposta desta comunicação. A resposta é liberada automaticamente.
+- Sobre condicionais no from/to, cuidar o traço no YAML, pois ao remover o traço, o Kubernetes entende que é 1 unica condição, como se fosse AND. Para ser OR, cada condição precisa de um traço.
