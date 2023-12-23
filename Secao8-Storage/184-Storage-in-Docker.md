@@ -303,6 +303,15 @@ Vejo você na próxima palestra.
 # ###################################################################################################################### 
 #
 
+
+Container size on disk
+
+To view the approximate size of a running container, you can use the docker ps -s command. Two different columns relate to size.
+
+    size: the amount of data (on disk) that's used for the writable layer of each container.
+    virtual size: the amount of data used for the read-only image data used by the container plus the container's writable layer size. Multiple containers may share some or all read-only image data. Two containers started from the same image share 100% of the read-only data, while two containers with different images which have layers in common share those common layers. Therefore, you can't just total the virtual sizes. This over-estimates the total disk usage by a potentially non-trivial amount.
+
+
 docker run -d --name meu_container -it ubuntu
 
 ~~~~bash
@@ -322,6 +331,27 @@ fernando@debian10x64:~$
 
 
 
+## Volumes
+
+https://docs.docker.com/storage/volumes/
+<https://docs.docker.com/storage/volumes/>
+
+
+## Bind Mount
+
+<https://docs.docker.com/storage/bind-mounts/>
+
+~~~~bash
+docker run -d \
+  -it \
+  --name devtest \
+  --mount type=bind,source="$(pwd)"/target,target=/app \
+  nginx:latest
+~~~~
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
@@ -332,3 +362,5 @@ fernando@debian10x64:~$
 - O Docker reaproveita layers, quando vai criar nova imagem Docker, criando apenas as Layers que sofreram alguma alteração.
 - As Layers da Docker Image são Read-Only.
 - Ao efetuar o "docker run", o Docker cria uma Layer adicional chamada "Container Layer". Esta Layer é Read/Write. Esta Layer armazena logs e outras coisas do Container.
+- Caso um container seja criado passando o parametro -v, para criar o volume, o Docker cria o volume automaticamente, caso ele não exista.
+- Para os "Mount Bind", antes era usado o -v, porém atualmente é utilizado o --mount preferencialmente.
