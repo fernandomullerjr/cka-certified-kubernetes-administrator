@@ -292,6 +292,36 @@ Vejo você na próxima palestra.
 
 
 
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+#
+
+docker run -d --name meu_container -it ubuntu
+
+~~~~bash
+
+fernando@debian10x64:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS         PORTS     NAMES
+3e147a5ba6f7   ubuntu    "/bin/bash"   14 minutes ago   Up 3 seconds             meu_container
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$
+fernando@debian10x64:~$ docker ps -s
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS         PORTS     NAMES           SIZE
+3e147a5ba6f7   ubuntu    "/bin/bash"   14 minutes ago   Up 6 seconds             meu_container   0B (virtual 77.9MB)
+fernando@debian10x64:~$
+
+~~~~
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
@@ -300,3 +330,5 @@ Vejo você na próxima palestra.
 # RESUMO
 
 - O Docker reaproveita layers, quando vai criar nova imagem Docker, criando apenas as Layers que sofreram alguma alteração.
+- As Layers da Docker Image são Read-Only.
+- Ao efetuar o "docker run", o Docker cria uma Layer adicional chamada "Container Layer". Esta Layer é Read/Write. Esta Layer armazena logs e outras coisas do Container.
