@@ -150,3 +150,21 @@ No contexto do CSI, as RPCs são usadas para que o orquestrador de contêineres 
 Ao longo do ciclo de vida de um pod em execução em um nó, o orquestrador pode chamar métodos CSI para criar, montar e desmontar volumes conforme necessário.
 
 É importante observar que os detalhes específicos das RPCs podem variar entre os diferentes drivers CSI, uma vez que esses drivers são implementados por fornecedores de armazenamento externo. A documentação específica do driver CSI que você está usando deve ser consultada para entender detalhes precisos sobre as RPCs disponíveis e como configurar a interação entre o orquestrador e o driver.
+
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# RESUMO
+
+    CSI Controller Service: O serviço de controlador CSI geralmente lida com operações de administração, como a criação e exclusão de volumes. As chamadas de RPC associadas podem incluir métodos como CreateVolume, DeleteVolume, ControllerPublishVolume, entre outros.
+
+    CSI Node Service: O serviço de nó CSI está envolvido nas operações de montagem e desmontagem de volumes em nós específicos. As chamadas de RPC associadas podem incluir métodos como NodePublishVolume e NodeUnpublishVolume.
