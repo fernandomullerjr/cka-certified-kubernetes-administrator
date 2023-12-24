@@ -411,3 +411,4 @@ RHEL	overlay2	devicemapper¹, vfs
 - Ao efetuar o "docker run", o Docker cria uma Layer adicional chamada "Container Layer". Esta Layer é Read/Write. Esta Layer armazena logs e outras coisas do Container.
 - Caso um container seja criado passando o parametro -v, para criar o volume, o Docker cria o volume automaticamente, caso ele não exista.
 - Para os "Mount Bind", antes era usado o -v, porém atualmente é utilizado o --mount preferencialmente.
+-  AuFS storage driver has been deprecated
