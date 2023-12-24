@@ -351,6 +351,53 @@ docker run -d \
 
 
 
+preciso de exemplo de comando docker que sobe container com volume mount bind
+ChatGPT
+
+Claro, vou fornecer um exemplo de comando Docker que cria um container com um volume montado usando a opção --mount para fazer um "bind mount". Este tipo de montagem permite mapear um diretório no host para um diretório no container, proporcionando persistência aos dados.
+
+Suponha que você tenha um diretório chamado /caminho/do/host no seu host e deseja montá-lo no diretório /caminho/no/container dentro do container. O comando seria semelhante ao seguinte:
+
+~~~~bash
+docker run -d --name meu_container --mount type=bind,source=/caminho/do/host,target=/caminho/no/container -it ubuntu
+~~~~
+
+Neste exemplo:
+
+    -d: Executa o container em segundo plano.
+    --name meu_container: Define o nome do container como "meu_container".
+    --mount type=bind,source=/caminho/do/host,target=/caminho/no/container: Especifica o tipo de montagem como "bind" e mapeia o diretório do host /caminho/do/host para o diretório no container /caminho/no/container.
+    -it ubuntu: Associa o terminal do host ao terminal dentro do container, usando a imagem do Ubuntu.
+
+Lembre-se de substituir /caminho/do/host e /caminho/no/container pelos caminhos e diretórios desejados no seu sistema.
+
+Com esse comando, qualquer alteração feita dentro do diretório /caminho/no/container no container será refletida no diretório /caminho/do/host no host e vice-versa. Isso é útil para persistência de dados, pois os dados são armazenados no sistema de arquivos do host e persistem mesmo quando o container é removido.
+
+
+
+
+
+## Storage Drivers
+
+<https://docs.docker.com/storage/storagedriver/select-storage-driver/>
+
+The Docker Engine provides the following storage drivers on Linux:
+Driver	Description
+overlay2	overlay2 is the preferred storage driver for all currently supported Linux distributions, and requires no extra configuration.
+fuse-overlayfs	fuse-overlayfsis preferred only for running Rootless Docker on a host that does not provide support for rootless overlay2. On Ubuntu and Debian 10, the fuse-overlayfs driver does not need to be used, and overlay2 works even in rootless mode. Refer to the rootless mode documentation for details.
+btrfs and zfs	The btrfs and zfs storage drivers allow for advanced options, such as creating "snapshots", but require more maintenance and setup. Each of these relies on the backing filesystem being configured correctly.
+vfs	The vfs storage driver is intended for testing purposes, and for situations where no copy-on-write filesystem can be used. Performance of this storage driver is poor, and is not generally recommended for production use.
+devicemapper ( deprecated)	The devicemapper storage driver requires direct-lvm for production environments, because loopback-lvm, while zero-configuration, has very poor performance. devicemapper was the recommended storage driver for CentOS and RHEL, as their kernel version did not support overlay2. However, current versions of CentOS and RHEL now have support for overlay2, which is now the recommended driver.
+
+Linux distribution	Recommended storage drivers	Alternative drivers
+Ubuntu	overlay2	devicemapper¹, zfs, vfs
+Debian	overlay2	devicemapper¹, vfs
+CentOS	overlay2	devicemapper¹, zfs, vfs
+Fedora	overlay2	devicemapper¹, zfs, vfs
+SLES 15	overlay2	devicemapper¹, vfs
+RHEL	overlay2	devicemapper¹, vfs
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
