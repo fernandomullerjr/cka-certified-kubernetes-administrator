@@ -123,8 +123,6 @@ Docker Volume Driver for vSphere enables customers to address persistent storage
 
 
 
-
-
 ## Volume Drivers - EBS
 
     When you run a Docker container, you can choose to use a specific volume driver, such as the RexRay EBS to provision a volume from the Amazon EBS. This will create a container and attach a volume from the AWS cloud. When the container exits, your data is safe in the cloud.
