@@ -174,6 +174,35 @@ Portanto, no seu manifesto, o caminho /data especificado em hostPath se refere a
 
 
 
+## AWS EBS
+
+
+Aqui está um exemplo atualizado do manifesto de Pod com a inclusão do fsType:
+
+~~~~yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exemplo-pod
+spec:
+  volumes:
+    - name: volume-ebs
+      awsElasticBlockStore:
+        volumeID: <ID_DO_VOLUME_EBS>
+        fsType: ext4  # ou o sistema de arquivos desejado
+  containers:
+    - name: container
+      image: nome-da-imagem
+      volumeMounts:
+        - mountPath: "/caminho/no/container"
+          name: volume-ebs
+~~~~
+
+No exemplo acima, fsType foi definido como ext4. Certifique-se de ajustar isso conforme necessário, dependendo do sistema de arquivos desejado para o seu volume EBS.
+
+Note que a escolha do sistema de arquivos depende do sistema operacional que está sendo executado dentro do seu contêiner. Além disso, certifique-se de que o sistema de arquivos especificado seja suportado pelo sistema operacional do contêiner.
+
 
 <https://kubernetes.io/docs/concepts/storage/volumes/>
 awsElasticBlockStore (removed)
@@ -183,6 +212,8 @@ Kubernetes 1.29 does not include a awsElasticBlockStore volume type.
 The AWSElasticBlockStore in-tree storage driver was deprecated in the Kubernetes v1.19 release and then removed entirely in the v1.27 release.
 
 The Kubernetes project suggests that you use the AWS EBS third party storage driver instead.
+<https://github.com/kubernetes-sigs/aws-ebs-csi-driver>
+
 
 
 
