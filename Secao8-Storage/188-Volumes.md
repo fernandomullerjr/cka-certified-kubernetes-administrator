@@ -161,6 +161,8 @@ spec:
 Em resumo, o contêiner tem acesso ao diretório /opt e pode escrever um número gerado aleatoriamente no arquivo /opt/number.out. Esse diretório /opt está montado a partir de um volume chamado data-volume. Por sua vez, esse volume data-volume é um hostPath montado no diretório /data no host.
 
 Portanto, qualquer coisa escrita no caminho /opt dentro do contêiner será refletida no diretório /data no host. Este exemplo em particular cria um número aleatório entre 0 e 100 e o anexa ao arquivo /opt/number.out dentro do contêiner, que é, na verdade, o diretório /data no host devido ao volume hostPath.
+
+
 User
 o host é o node do Kubernetes neste caso?
 ChatGPT
@@ -168,3 +170,28 @@ ChatGPT
 Sim, no contexto do Kubernetes, o termo "host" refere-se ao nó (node) onde os pods são executados. Cada nó em um cluster Kubernetes é responsável por executar os containers que compõem os pods. Quando você usa um hostPath em um volume, você está especificando um caminho no sistema de arquivos do nó hospedeiro (host node) para ser montado no pod.
 
 Portanto, no seu manifesto, o caminho /data especificado em hostPath se refere a um diretório no nó do Kubernetes onde o pod está sendo executado. O conteúdo desse diretório no host é acessível para o contêiner no pod através do ponto de montagem em /opt no contêiner.
+
+
+
+
+
+<https://kubernetes.io/docs/concepts/storage/volumes/>
+awsElasticBlockStore (removed)
+
+Kubernetes 1.29 does not include a awsElasticBlockStore volume type.
+
+The AWSElasticBlockStore in-tree storage driver was deprecated in the Kubernetes v1.19 release and then removed entirely in the v1.27 release.
+
+The Kubernetes project suggests that you use the AWS EBS third party storage driver instead.
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# RESUMO
+
+- Não é interessante utilizar o "hostPath" num Cluster com vários nodes, pois o Container vai montar o volume em vários nodes com a mesma informação, esperando que todos eles tenham o mesmo diretório e a mesma informação.
+- awsElasticBlockStore depreciado.
