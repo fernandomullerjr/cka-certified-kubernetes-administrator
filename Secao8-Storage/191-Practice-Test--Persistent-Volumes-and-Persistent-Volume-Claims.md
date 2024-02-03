@@ -864,3 +864,99 @@ What would happen to the PV if the PVC was destroyed?
 
 - RESPOSTA
 NOT DELETED, BUT NOT AVAILABLE.
+
+
+
+
+
+
+
+
+
+Try deleting the PVC and notice what happens.
+
+If the command hangs, you can use CTRL + C to get back to the bash prompt OR check the status of the pvc from another terminal
+
+controlplane ~ ➜  kubectl delete pvc claim-log-1
+persistentvolumeclaim "claim-log-1" deleted
+
+
+
+- RESPOSTA
+STUCK ON TERMINATE
+
+
+
+
+
+
+
+Why is the PVC stuck in Terminating state?
+
+- RESPOSTA
+USING BY A POD
+
+
+
+
+
+
+
+
+Let us now delete the webapp Pod.
+
+Once deleted, wait for the pod to fully terminate.
+
+Name: webapp
+
+controlplane ~ ✖ kubectl delete pod webapp
+pod "webapp" deleted
+
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods
+No resources found in default namespace.
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+What is the state of the PVC now?
+controlplane ~ ➜  kubectl get pvc
+NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+webapp   Bound    webapp   10Gi       RWO            manual         44m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 01:08:39 PM EST
+
+controlplane ~ ➜  
+
+-resposta
+deleted
+
+
+
+
+
+What is the state of the Persistent Volume now?
+
+
+controlplane ~ ➜  kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM                 STORAGECLASS   REASON   AGE
+pv-log   100Mi      RWX            Retain           Released   default/claim-log-1   manual                  24m
+webapp   10Gi       RWO            Retain           Bound      default/webapp        manual                  46m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 01:09:06 PM EST
+
+controlplane ~ ➜  
+
+
