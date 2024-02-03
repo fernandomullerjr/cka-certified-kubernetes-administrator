@@ -567,3 +567,300 @@ controlplane ~ ➜  date
 Sat 03 Feb 2024 12:45:10 PM EST
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+Let us claim some of that storage for our application. Create a Persistent Volume Claim with the given specification.
+
+Volume Name: claim-log-1
+
+Storage Request: 50Mi
+
+Access Modes: ReadWriteOnce
+
+- Criando pvc:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao8-Storage/191-pvc-questao6.yaml
+
+~~~~bash
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+~~~~
+controlplane ~ ➜  vi pvc-questao6.yaml
+
+controlplane ~ ➜  kubectl apply -f pvc-questao6.yaml
+persistentvolumeclaim/claim-log-1 created
+
+controlplane ~ ➜  
+
+
+
+
+
+
+What is the state of the Persistent Volume Claim?
+controlplane ~ ➜  kubectl get pvc
+NAME          STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+claim-log-1   Pending                                      manual         8m1s
+webapp        Bound     webapp   10Gi       RWO            manual         31m
+
+controlplane ~ ➜  
+
+
+
+
+What is the state of the Persistent Volume?
+
+controlplane ~ ✖ kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM            STORAGECLASS   REASON   AGE
+pv-log   100Mi      RWX            Retain           Available                    manual                  10m
+webapp   10Gi       RWO            Retain           Bound       default/webapp   manual                  32m
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+Why is the claim not bound to the available Persistent Volume?
+
+Access mode mismatch
+
+
+
+
+
+
+
+
+Update the Access Mode on the claim to bind it to the PV.
+
+Delete and recreate the claim-log-1.
+
+Volume Name: claim-log-1
+
+Storage Request: 50Mi
+
+PVol: pv-log
+
+Status: Bound
+
+
+controlplane ~ ➜  vi pvc-questao10.yaml 
+
+controlplane ~ ➜  kubectl apply -f pvc-questao10.yaml 
+The PersistentVolumeClaim "claim-log-1" is invalid: spec: Forbidden: spec is immutable after creation except resources.requests for bound claims
+  core.PersistentVolumeClaimSpec{
+-       AccessModes: []core.PersistentVolumeAccessMode{"ReadWriteOnce"},
++       AccessModes: []core.PersistentVolumeAccessMode{"ReadWriteMany"},
+        Selector:    nil,
+        Resources:   {Requests: {s"storage": {i: {...}, s: "50Mi", Format: "BinarySI"}}},
+        ... // 5 identical fields
+  }
+
+
+controlplane ~ ✖ kubectl delete -f pvc-questao10.yaml 
+persistentvolumeclaim "claim-log-1" deleted
+
+controlplane ~ ➜  kubectl apply -f pvc-questao10.yaml 
+persistentvolumeclaim/claim-log-1 created
+
+controlplane ~ ➜  kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                 STORAGECLASS   REASON   AGE
+pv-log   100Mi      RWX            Retain           Bound    default/claim-log-1   manual                  13m
+webapp   10Gi       RWO            Retain           Bound    default/webapp        manual                  35m
+
+controlplane ~ ➜  kubectl get pvc
+NAME          STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+claim-log-1   Bound    pv-log   100Mi      RWX            manual         5s
+webapp        Bound    webapp   10Gi       RWO            manual         34m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 12:58:19 PM EST
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+You requested for 50Mi, how much capacity is now available to the PVC?
+
+
+controlplane ~ ➜  kubectl describe pv pv-log
+Name:            pv-log
+Labels:          type=local
+Annotations:     pv.kubernetes.io/bound-by-controller: yes
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    manual
+Status:          Bound
+Claim:           default/claim-log-1
+Reclaim Policy:  Retain
+Access Modes:    RWX
+VolumeMode:      Filesystem
+Capacity:        100Mi
+Node Affinity:   <none>
+Message:         
+Source:
+    Type:          HostPath (bare host directory volume)
+    Path:          /pv/log
+    HostPathType:  
+Events:            <none>
+
+controlplane ~ ➜  kubectl describe pvc claim-log-1
+Name:          claim-log-1
+Namespace:     default
+StorageClass:  manual
+Status:        Bound
+Volume:        pv-log
+Labels:        <none>
+Annotations:   pv.kubernetes.io/bind-completed: yes
+               pv.kubernetes.io/bound-by-controller: yes
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      100Mi
+Access Modes:  RWX
+VolumeMode:    Filesystem
+Used By:       <none>
+Events:        <none>
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 12:59:30 PM EST
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+Update the webapp pod to use the persistent volume claim as its storage.
+
+Replace hostPath configured earlier with the newly created PersistentVolumeClaim.
+
+Name: webapp
+
+Image Name: kodekloud/event-simulator
+
+Volume: PersistentVolumeClaim=claim-log-1
+
+Volume Mount: /log
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  volumes:
+    - name: log-volume
+      persistentVolumeClaim:
+        claimName: claim-log-1
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: "/log"
+          name: log-volume
+
+
+controlplane ~ ➜  vi pod-v3.yaml
+
+controlplane ~ ➜  kubectl delete -f pod-v3.yaml
+pod "webapp" deleted
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f pod-v3.yaml
+pod/webapp created
+
+controlplane ~ ➜  kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+webapp   1/1     Running   0          3s
+
+controlplane ~ ➜  kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                 STORAGECLASS   REASON   AGE
+pv-log   100Mi      RWX            Retain           Bound    default/claim-log-1   manual                  17m
+webapp   10Gi       RWO            Retain           Bound    default/webapp        manual                  39m
+
+controlplane ~ ➜  kubectl get pvc
+NAME          STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+claim-log-1   Bound    pv-log   100Mi      RWX            manual         3m57s
+webapp        Bound    webapp   10Gi       RWO            manual         38m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 01:02:10 PM EST
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+What is the Reclaim Policy set on the Persistent Volume pv-log?
+
+
+controlplane ~ ➜  kubectl describe pv pv-log
+Name:            pv-log
+Labels:          type=local
+Annotations:     pv.kubernetes.io/bound-by-controller: yes
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    manual
+Status:          Bound
+Claim:           default/claim-log-1
+Reclaim Policy:  Retain
+Access Modes:    RWX
+VolumeMode:      Filesystem
+Capacity:        100Mi
+Node Affinity:   <none>
+Message:         
+Source:
+    Type:          HostPath (bare host directory volume)
+    Path:          /pv/log
+    HostPathType:  
+Events:            <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+What would happen to the PV if the PVC was destroyed?
+
+- RESPOSTA
+NOT DELETED, BUT NOT AVAILABLE.
