@@ -159,3 +159,4 @@ For Kubernetes 1.29, only nfs and hostPath volume types support recycling.
 
 - Se o PVC der match com vários PV, é possível utilizar Labels para especificar um Volume desejado.
 - O padrão ao deletar um PVC é o "Retain", que mantem o Volume, que precisa ser deletado manualmente.
+- O reclaim policy do tipo "Recycle" só faz uma limpeza no Volume.
