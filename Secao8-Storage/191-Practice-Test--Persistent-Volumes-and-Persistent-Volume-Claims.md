@@ -349,3 +349,221 @@ Warning: resource pods/webapp is missing the kubectl.kubernetes.io/last-applied-
 The Pod "webapp" is invalid: spec.containers: Forbidden: pod updates may not add or remove containers
 
 controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+webapp   1/1     Running   0          12m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 12:27:18 PM EST
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl delete pod webapp
+pod "webapp" deleted
+
+controlplane ~ ➜  kubectl apply -f pod.yaml
+pod/webapp created
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+webapp   1/1     Running   0          11s
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   REASON   AGE
+webapp   10Gi       RWO            Retain           Bound    default/webapp   manual                  5m35s
+
+controlplane ~ ➜  kubectl get pvc
+NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+webapp   Bound    webapp   10Gi       RWO            manual         4m48s
+
+controlplane ~ ➜  
+
+
+Questão acusa que a parte "Volume HostPath: /var/log/webapp" não está ok.
+Verificando.
+
+- Ajustando o pod:
+nova versão
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao8-Storage/191-pod-v2.yaml
+
+~~~~bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  volumes:
+    - name: log-volume
+      hostPath:
+        path: "/var/log/webapp"
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: "/log"
+          name: webapp
+~~~~
+
+
+controlplane ~ ✖ kubectl delete -f pod.yaml 
+pod "webapp" deleted
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f pod.yaml 
+The Pod "webapp" is invalid: spec.containers[0].volumeMounts[0].name: Not found: "webapp"
+
+controlplane ~ ✖ 
+
+- Ajustando
+
+~~~~bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  volumes:
+    - name: log-volume
+      hostPath:
+        path: "/var/log/webapp"
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: "/log"
+          name: log-volume
+~~~~
+
+
+controlplane ~ ➜  kubectl apply -f pod.yaml 
+pod/webapp created
+
+controlplane ~ ➜  kubectl get pods
+NAME     READY   STATUS    RESTARTS   AGE
+webapp   1/1     Running   0          4s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe pod webapp
+Name:             webapp
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             controlplane/192.27.216.6
+Start Time:       Sat, 03 Feb 2024 12:41:41 -0500
+Labels:           <none>
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.6
+IPs:
+  IP:  10.244.0.6
+Containers:
+  webapp:
+    Container ID:   containerd://d09b02c50e16e16c548b3e6c3675f729373e895e55712d44df38ad35eb5f80a5
+    Image:          kodekloud/event-simulator
+    Image ID:       docker.io/kodekloud/event-simulator@sha256:1e3e9c72136bbc76c96dd98f29c04f298c3ae241c7d44e2bf70bcc209b030bf9
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Sat, 03 Feb 2024 12:41:43 -0500
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /log from log-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-shjjv (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  log-volume:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/log/webapp
+    HostPathType:  
+  kube-api-access-shjjv:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  19s   default-scheduler  Successfully assigned default/webapp to controlplane
+  Normal  Pulling    18s   kubelet            Pulling image "kodekloud/event-simulator"
+  Normal  Pulled     18s   kubelet            Successfully pulled image "kodekloud/event-simulator" in 327.938553ms (327.953747ms including waiting)
+  Normal  Created    17s   kubelet            Created container webapp
+  Normal  Started    17s   kubelet            Started container webapp
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+Create a Persistent Volume with the given specification.
+
+Volume Name: pv-log
+
+Storage: 100Mi
+
+Access Modes: ReadWriteMany
+
+Host Path: /pv/log
+
+Reclaim Policy: Retain
+
+- Criando pv:
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao8-Storage/191-pv-questo5.yaml
+
+~~~~bash
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/pv/log"
+~~~~
+
+controlplane ~ ➜  vi pv-questao5.yaml
+
+controlplane ~ ➜  kubectl apply -f pv-questao5.yaml
+persistentvolume/pv-log created
+
+controlplane ~ ➜  kubectl get pv
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM            STORAGECLASS   REASON   AGE
+pv-log   100Mi      RWX            Retain           Available                    manual                  3s
+webapp   10Gi       RWO            Retain           Bound       default/webapp   manual                  22m
+
+controlplane ~ ➜  date
+Sat 03 Feb 2024 12:45:10 PM EST
+
+controlplane ~ ➜  
