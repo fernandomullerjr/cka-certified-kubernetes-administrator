@@ -324,3 +324,8 @@ spec:
         - mountPath: "/log"
           name: log-volume
 ~~~~
+
+- OBSERVAÇÃO
+Edições foram via:
+kubectl edit
+kubectl replace (utilizando o YAML temporário do /tmp)
