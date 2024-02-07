@@ -271,3 +271,56 @@ git status
 
 
 
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+#  192. Solution - Persistent Volumes and Persistent Volume Claims
+
+
+
+If the POD was to get deleted now, would you be able to view these logs.
+
+- ORIGINAL
+Foi verificado se existia algum PV ou PVC.
+
+- ALTERNATIVA
+Verificar via describe no Pod se ele tem outros volumes configurados.
+
+
+
+
+
+
+
+
+
+
+Configure a volume to store these logs at /var/log/webapp on the host.
+
+- ORIGINAL
+Criei pv, pvc e pod usando referencias a cada item.
+
+- ALTERNATIVA
+Criar o volume apenas passando "hostPath" na especificação do Pod:
+
+~~~~bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  volumes:
+    - name: log-volume
+      hostPath:
+        path: "/var/log/webapp"
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: "/log"
+          name: log-volume
+~~~~
