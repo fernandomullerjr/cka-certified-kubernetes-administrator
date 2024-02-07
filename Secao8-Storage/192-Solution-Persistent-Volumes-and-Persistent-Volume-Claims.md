@@ -329,3 +329,25 @@ spec:
 Edições foram via:
 kubectl edit
 kubectl replace (utilizando o YAML temporário do /tmp)
+
+Validar se os logs estão disponiveis no host no devido diretório "/var/log/webapp"
+
+
+
+
+
+
+Why is the claim not bound to the available Persistent Volume?
+
+- RESPOSTA
+Access mode mismatch
+
+
+
+
+
+
+## pendente
+- Ver melhor sobre "Access mode mismatch" entre pv e pvc.
+- Entender porque o capacity do pvc ficou 100Mi na questão "You requested for 50Mi, how much capacity is now available to the PVC?"
+ 

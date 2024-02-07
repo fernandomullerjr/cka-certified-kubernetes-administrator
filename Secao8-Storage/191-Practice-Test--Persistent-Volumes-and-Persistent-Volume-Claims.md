@@ -642,6 +642,7 @@ controlplane ~ ➜
 
 Why is the claim not bound to the available Persistent Volume?
 
+- RESPOSTA
 Access mode mismatch
 
 
