@@ -209,3 +209,14 @@ spec:
 ~~~~
 
 This claim results in an SSD-like Persistent Disk being automatically provisioned. When the claim is deleted, the volume is destroyed.
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Quando é utilizado o "Storage Class" não é necessário utilizar um PV.
+- O PV é criado automaticamente por debaixo dos panos, pelo Storage Class.
