@@ -172,3 +172,30 @@ git status
 ## 197. Solution - Storage Class
 
 https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/
+
+
+What is the name of the Storage Class that does not support dynamic volume provisioning?
+
+- RESPOSTA
+local-storage
+
+controlplane ~ ➜  kubectl get sc -A
+NAME                        PROVISIONER                     RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+local-path (default)        rancher.io/local-path           Delete          WaitForFirstConsumer   false                  27m
+local-storage               kubernetes.io/no-provisioner    Delete          WaitForFirstConsumer   false                  12s
+portworx-io-priority-high   kubernetes.io/portworx-volume   Delete          Immediate              false                  12s
+
+controlplane ~ ➜  date
+Fri Feb 23 23:43:12 UTC 2024
+
+
+- A resposta é "local-storage" devido o PROVISIONER.
+No caso ele utiliza o "kubernetes.io/no-provisioner"
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- O Provisioner define se o Storage Class suporta Dynamic Provisioning.
