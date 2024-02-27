@@ -6,8 +6,6 @@
 git status
 git add .
 git commit -m " 203. Prerequisite - Network Namespaces"
-eval $(ssh-agent -s)
-ssh-add /home/fernando/.ssh/chave-debian10-github
 git push
 git status
 
@@ -295,3 +293,59 @@ $ iptables -nvL -t nat
 ## 203. Prerequisite - Network Namespaces
 
 
+```
+root@debian10x64:/tmp#
+root@debian10x64:/tmp# ip net
+450676e4-d672-4e95-8197-19c7d2a04d0e
+39015aa4-c93f-4e96-8d2f-583af1d35259
+efdc8422-6624-40df-b00b-53815767d266
+350bc60c-d701-4d1c-a13e-efbdd4f1a7ee
+1080aea5-bd51-475e-90de-54e5c3629366
+root@debian10x64:/tmp# ip netns add red
+root@debian10x64:/tmp#
+root@debian10x64:/tmp#
+root@debian10x64:/tmp# ip net
+red
+450676e4-d672-4e95-8197-19c7d2a04d0e
+39015aa4-c93f-4e96-8d2f-583af1d35259
+efdc8422-6624-40df-b00b-53815767d266
+350bc60c-d701-4d1c-a13e-efbdd4f1a7ee
+1080aea5-bd51-475e-90de-54e5c3629366
+root@debian10x64:/tmp# ip netns add blue
+root@debian10x64:/tmp#
+root@debian10x64:/tmp#
+root@debian10x64:/tmp#
+root@debian10x64:/tmp# ip netns
+blue
+red
+450676e4-d672-4e95-8197-19c7d2a04d0e
+39015aa4-c93f-4e96-8d2f-583af1d35259
+efdc8422-6624-40df-b00b-53815767d266
+350bc60c-d701-4d1c-a13e-efbdd4f1a7ee
+1080aea5-bd51-475e-90de-54e5c3629366
+root@debian10x64:/tmp#
+```
+
+
+```
+root@debian10x64:/tmp# ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=128 time=16.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=128 time=16.4 ms
+^C
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 3ms
+rtt min/avg/max/mdev = 16.373/16.396/16.420/0.130 ms
+root@debian10x64:/tmp#
+```
+
+
+FAQ
+
+While testing the Network Namespaces, if you come across issues where you can't ping one namespace from the other, make sure you set the NETMASK while setting IP Address. ie: 192.168.1.10/24
+
+
+ip -n red addr add 192.168.1.10/24 dev veth-red
+
+
+Another thing to check is FirewallD/IP Table rules. Either add rules to IP Tables to allow traffic from one namespace to another. Or disable IP Tables all together (Only in a learning environment).
