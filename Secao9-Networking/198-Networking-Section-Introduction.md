@@ -39,4 +39,6 @@ In this section, we will take a look at **Networking Section**
 - CNI in Kubernetes
 - CoreDNS
 - Ingress
- 
+
+
+- Baixar deck de apresentação
