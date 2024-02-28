@@ -340,7 +340,9 @@ root@debian10x64:/tmp#
 ```
 
 
-FAQ
+
+
+## FAQ
 
 While testing the Network Namespaces, if you come across issues where you can't ping one namespace from the other, make sure you set the NETMASK while setting IP Address. ie: 192.168.1.10/24
 
