@@ -40,3 +40,13 @@ bridge  dhcp  flannel  host-device  host-local  ipvlan  loopback  macvlan  portm
 
 - https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
 
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  206. Prerequisite - CNI
+
+
+Em Kubernetes, CNI significa Container Network Interface. É uma especificação e uma API que define como contêineres em um cluster Kubernetes se comunicam entre si e com o mundo exterior através da rede. O CNI permite que diferentes plugins de rede sejam usados para fornecer funcionalidades de rede, como roteamento, isolamento, balanceamento de carga, etc. Esses plugins podem ser escolhidos com base nas necessidades específicas do ambiente Kubernetes, permitindo uma flexibilidade significativa na configuração da rede.
