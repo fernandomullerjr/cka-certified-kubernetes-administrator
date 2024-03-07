@@ -61,3 +61,21 @@ ls /etc/cni/net.d
 
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
 - https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##   212. CNI in kubernetes
+
+Container Runtime must create network namespace
+
+Identify network the container must attach to
+
+Container Runtime to invoke Network Plugin (bridge) when container is ADDed
+
+Container Runtime to invoke Network Plugin (bridge) when container is DELeted
+
+JSON format of the Network Configuration
