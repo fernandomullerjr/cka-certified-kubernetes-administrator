@@ -128,3 +128,13 @@ $ ip route add 10.244.2.2 via 192.168.1.12
 #### References Docs
 
 - https://kubernetes.io/docs/concepts/workloads/pods/
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Todos Pods devem ter um endereço ip, serem capazes de comunicar com outros Pods no mesmo Node e Pods dos outros Nodes sem a necessidade de um NAT.
+- CNI automatiza a questão toda de linkar os endereços ip, criar rotas, etc.
