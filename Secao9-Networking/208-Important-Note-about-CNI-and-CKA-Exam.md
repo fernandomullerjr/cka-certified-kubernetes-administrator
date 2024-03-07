@@ -34,3 +34,13 @@ The links above redirect to third-party/vendor sites or GitHub repositories, whi
 
 
 NOTE: In the official exam, all essential CNI deployment details will be provided.
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- É usado como exemplo o "weave-net", mas no exame CKA pode ser usado qualquer um dos addons contidos na documentação. Somente se houver alguma especificação, que precisa ser algum especifico.
+- No exame oficial serão fornecidos os detalhes necessários para efetuar o deploy de uma CNI.
