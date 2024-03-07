@@ -267,3 +267,242 @@ controlplane ~ ➜  date
 Thu Mar  7 01:11:20 AM UTC 2024
 
 controlplane ~ ➜  
+
+
+controlplane ~ ➜  crictl info
+{
+  "status": {
+    "conditions": [
+      {
+[..RESTANTE OMITIDO...]
+
+        },
+        "IFName": "eth0"
+
+Resposta não é "eth0"!
+Resposta não é "eth0"!
+Resposta não é "eth0"!
+Resposta não é "eth0"!
+
+controlplane ~ ➜  crictl info | grep -i cni
+  "cniconfig": {
+      "/opt/cni/bin"
+    "PluginConfDir": "/etc/cni/net.d",
+          "Name": "cni-loopback",
+          "CNIVersion": "0.3.1",
+          "Source": "{\n\"cniVersion\": \"0.3.1\",\n\"name\": \"cni-loopback\",\n\"plugins\": [{\n  \"type\": \"loopback\"\n}]\n}"
+          "CNIVersion": "0.3.1",
+          "Source": "{\n  \"name\": \"cbr0\",\n  \"cniVersion\": \"0.3.1\",\n  \"plugins\": [\n    {\n      \"type\": \"flannel\",\n      \"delegate\": {\n        \"hairpinMode\": true,\n        \"isDefaultGateway\": true\n      }\n    },\n    {\n      \"type\": \"portmap\",\n      \"capabilities\": {\n        \"portMappings\": true\n      }\n    }\n  ]\n}\n"
+        "cniConfDir": "",
+        "cniMaxConfNum": 0
+        "cniConfDir": "",
+        "cniMaxConfNum": 0
+          "cniConfDir": "",
+          "cniMaxConfNum": 0
+    "cni": {
+      "binDir": "/opt/cni/bin",
+      "confDir": "/etc/cni/net.d",
+  "lastCNILoadStatus": "OK",
+  "lastCNILoadStatus.default": "OK"
+
+controlplane ~ ➜  ls /opt/cni/
+bin
+
+controlplane ~ ➜  ls /opt/cni/bin/
+bandwidth  bridge  dhcp  dummy  firewall  flannel  host-device  host-local  ipvlan  loopback  macvlan  portmap  ptp  sbr  static  tap  tuning  vlan  vrf
+
+controlplane ~ ➜  ls /opt/cni/bin/f
+firewall  flannel   
+
+controlplane ~ ➜  ls /opt/cni/bin/flannel 
+/opt/cni/bin/flannel
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  cat /etc/crictl.yaml 
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+timeout: 2
+debug: false
+pull-image-on-create: false
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: flannel.1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN group default 
+    link/ether ea:54:16:5f:b7:f2 brd ff:ff:ff:ff:ff:ff
+    inet 10.244.0.0/32 scope global flannel.1
+       valid_lft forever preferred_lft forever
+3: cni0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether da:6b:8f:9a:d4:f2 brd ff:ff:ff:ff:ff:ff
+    inet 10.244.0.1/24 brd 10.244.0.255 scope global cni0
+       valid_lft forever preferred_lft forever
+4: veth7005ee2b@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master cni0 state UP group default 
+    link/ether ca:68:ba:ec:56:04 brd ff:ff:ff:ff:ff:ff link-netns cni-41534cd2-caf4-6dba-353f-921554488813
+5: veth5e6cd51c@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master cni0 state UP group default 
+    link/ether e6:b2:05:3c:20:86 brd ff:ff:ff:ff:ff:ff link-netns cni-2f330487-e3e4-654f-e710-ffe84227a864
+55: eth0@if56: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default 
+    link/ether 02:42:c0:02:b1:0a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.2.177.10/24 brd 192.2.177.255 scope global eth0
+       valid_lft forever preferred_lft forever
+75: eth1@if76: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:ac:19:00:0d brd ff:ff:ff:ff:ff:ff link-netnsid 1
+    inet 172.25.0.13/24 brd 172.25.0.255 scope global eth1
+       valid_lft forever preferred_lft forever
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+What is the state of the interface cni0?
+
+
+
+
+
+If you were to ping google from the controlplane node, which route does it take?
+
+What is the IP address of the Default Gateway?
+
+
+
+controlplane ~ ➜  ping google.com
+PING google.com (64.233.183.100) 56(84) bytes of data.
+64 bytes from it-in-f100.1e100.net (64.233.183.100): icmp_seq=1 ttl=114 time=1.50 ms
+64 bytes from it-in-f100.1e100.net (64.233.183.100): icmp_seq=2 ttl=114 time=1.07 ms
+^C
+--- google.com ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 1.070/1.285/1.500/0.215 ms
+
+controlplane ~ ➜  
+controlplane ~ ✖ ip route
+default via 172.25.0.1 dev eth1 
+10.244.0.0/24 dev cni0 proto kernel scope link src 10.244.0.1 
+10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink 
+172.25.0.0/24 dev eth1 proto kernel scope link src 172.25.0.13 
+192.2.177.0/24 dev eth0 proto kernel scope link src 192.2.177.10 
+
+controlplane ~ ➜  
+
+172.25.0.1
+
+
+
+
+
+
+
+What is the port the kube-scheduler is listening on in the controlplane node?
+
+
+controlplane ~ ➜  ps -ef | grep -i scheduler
+root        3543    3209  0 00:40 ?        00:00:06 kube-scheduler --authentication-kubeconfig=/etc/kubernetes/scheduler.conf --authorization-kubeconfig=/etc/kubernetes/scheduler.conf --bind-address=127.0.0.1 --kubeconfig=/etc/kubernetes/scheduler.conf --leader-elect=true
+root       21123   13154  0 01:19 pts/0    00:00:00 grep --color=auto -i scheduler
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ ss -tulp
+Netid        State         Recv-Q        Send-Q                 Local Address:Port                     Peer Address:Port        Process                                           
+udp          UNCONN        0             0                         127.0.0.11:53866                         0.0.0.0:*                                                             
+udp          UNCONN        0             0                      127.0.0.53%lo:domain                        0.0.0.0:*            users:(("systemd-resolve",pid=625,fd=13))        
+udp          UNCONN        0             0                            0.0.0.0:8472                          0.0.0.0:*                                                             
+tcp          LISTEN        0             4096                       127.0.0.1:46853                         0.0.0.0:*            users:(("containerd",pid=1272,fd=15))            
+tcp          LISTEN        0             4096                       127.0.0.1:10248                         0.0.0.0:*            users:(("kubelet",pid=4283,fd=16))               
+tcp          LISTEN        0             4096                       127.0.0.1:10249                         0.0.0.0:*            users:(("kube-proxy",pid=4924,fd=10))            
+tcp          LISTEN        0             4096                    192.2.177.10:2379                          0.0.0.0:*            users:(("etcd",pid=3823,fd=9))                   
+tcp          LISTEN        0             4096                       127.0.0.1:2379                          0.0.0.0:*            users:(("etcd",pid=3823,fd=8))                   
+tcp          LISTEN        0             4096                    192.2.177.10:2380                          0.0.0.0:*            users:(("etcd",pid=3823,fd=7))                   
+tcp          LISTEN        0             4096                       127.0.0.1:2381                          0.0.0.0:*            users:(("etcd",pid=3823,fd=15))                  
+tcp          LISTEN        0             128                          0.0.0.0:http-alt                      0.0.0.0:*            users:(("ttyd",pid=1271,fd=12))                  
+tcp          LISTEN        0             4096                       127.0.0.1:10257                         0.0.0.0:*            users:(("kube-controller",pid=3783,fd=3))        
+tcp          LISTEN        0             4096                      127.0.0.11:40657                         0.0.0.0:*                                                             
+tcp          LISTEN        0             4096                       127.0.0.1:10259                         0.0.0.0:*            users:(("kube-scheduler",pid=3543,fd=3))         
+tcp          LISTEN        0             4096                   127.0.0.53%lo:domain                        0.0.0.0:*            users:(("systemd-resolve",pid=625,fd=14))        
+tcp          LISTEN        0             128                          0.0.0.0:ssh                           0.0.0.0:*            users:(("sshd",pid=1274,fd=3))                   
+tcp          LISTEN        0             4096                               *:10250                               *:*            users:(("kubelet",pid=4283,fd=26))               
+tcp          LISTEN        0             4096                               *:6443                                *:*            users:(("kube-apiserver",pid=3799,fd=3))         
+tcp          LISTEN        0             4096                               *:10256                               *:*            users:(("kube-proxy",pid=4924,fd=18))            
+tcp          LISTEN        0             128                             [::]:ssh                              [::]:*            users:(("sshd",pid=1274,fd=4))                   
+tcp          LISTEN        0             4096                               *:8888                                *:*            users:(("kubectl",pid=4471,fd=3))                
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+Notice that ETCD is listening on two ports. Which of these have more client connections established?
+
+
+controlplane ~ ➜  ss -tulpes --packet
+Total: 314
+TCP:   3705 (estab 140, closed 3547, orphaned 7, timewait 14)
+
+Transport Total     IP        IPv6
+RAW       0         0         0        
+UDP       3         3         0        
+TCP       158       140       18       
+INET      161       143       18       
+FRAG      0         0         0        
+
+Netid     State      Recv-Q     Send-Q         Local Address:Port               Peer Address:Port     Process                                                                     
+udp       UNCONN     0          0                 127.0.0.11:53866                   0.0.0.0:*         uid:65534 ino:109922 sk:1 <->                                              
+udp       UNCONN     0          0              127.0.0.53%lo:domain                  0.0.0.0:*         users:(("systemd-resolve",pid=625,fd=13)) uid:102 ino:135598 sk:2 <->      
+udp       UNCONN     0          0                    0.0.0.0:8472                    0.0.0.0:*         ino:319815 sk:3 <->                                                        
+tcp       LISTEN     0          4096               127.0.0.1:46853                   0.0.0.0:*         users:(("containerd",pid=1272,fd=15)) ino:129703 sk:4 <->                  
+tcp       LISTEN     0          4096               127.0.0.1:10248                   0.0.0.0:*         users:(("kubelet",pid=4283,fd=16)) ino:231866 sk:5 <->                     
+tcp       LISTEN     0          4096               127.0.0.1:10249                   0.0.0.0:*         users:(("kube-proxy",pid=4924,fd=10)) ino:287006 sk:6 <->                  
+tcp       LISTEN     0          4096            192.2.177.10:2379                    0.0.0.0:*         users:(("etcd",pid=3823,fd=9)) ino:213336 sk:7 <->                         
+tcp       LISTEN     0          4096               127.0.0.1:2379                    0.0.0.0:*         users:(("etcd",pid=3823,fd=8)) ino:213335 sk:8 <->                         
+tcp       LISTEN     0          4096            192.2.177.10:2380                    0.0.0.0:*         users:(("etcd",pid=3823,fd=7)) ino:202590 sk:9 <->                         
+tcp       LISTEN     0          4096               127.0.0.1:2381                    0.0.0.0:*         users:(("etcd",pid=3823,fd=15)) ino:224304 sk:a <->                        
+tcp       LISTEN     0          128                  0.0.0.0:http-alt                0.0.0.0:*         users:(("ttyd",pid=1271,fd=12)) ino:137401 sk:b <->                        
+tcp       LISTEN     0          4096               127.0.0.1:10257                   0.0.0.0:*         users:(("kube-controller",pid=3783,fd=3)) ino:205590 sk:c <->              
+tcp       LISTEN     0          4096              127.0.0.11:40657                   0.0.0.0:*         uid:65534 ino:109923 sk:d <->                                              
+tcp       LISTEN     0          4096               127.0.0.1:10259                   0.0.0.0:*         users:(("kube-scheduler",pid=3543,fd=3)) ino:201184 sk:e <->               
+tcp       LISTEN     0          4096           127.0.0.53%lo:domain                  0.0.0.0:*         users:(("systemd-resolve",pid=625,fd=14)) uid:102 ino:135599 sk:f <->      
+tcp       LISTEN     0          128                  0.0.0.0:ssh                     0.0.0.0:*         users:(("sshd",pid=1274,fd=3)) ino:132431 sk:10 <->                        
+tcp       LISTEN     0          4096                       *:10250                         *:*         users:(("kubelet",pid=4283,fd=26)) ino:212839 sk:11 v6only:0 <->           
+tcp       LISTEN     0          4096                       *:6443                          *:*         users:(("kube-apiserver",pid=3799,fd=3)) ino:218361 sk:12 v6only:0 <->     
+tcp       LISTEN     0          4096                       *:10256                         *:*         users:(("kube-proxy",pid=4924,fd=18)) ino:296984 sk:13 v6only:0 <->        
+tcp       LISTEN     0          128                     [::]:ssh                        [::]:*         users:(("sshd",pid=1274,fd=4)) ino:132433 sk:14 v6only:1 <->               
+tcp       LISTEN     0          4096                       *:8888                          *:*         users:(("kubectl",pid=4471,fd=3)) ino:236984 sk:15 v6only:0 <->            
+
+
+resposta é 2379
+
+
+
+
+
+
+
+
+
+Correct! That's because 2379 is the port of ETCD to which all control plane components connect to. 2380 is only for etcd peer-to-peer connectivity. When you have multiple controlplane nodes. In this case we don't.
+
+
+
+
