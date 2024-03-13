@@ -19,8 +19,6 @@ git status
 
 # Practice Test - CNI weave
 
-  - Take me to [Practice Test](https://kodekloud.com/topic/practice-test-cni-weave/)
-
 #### Solution
 
   1. <details>
@@ -164,3 +162,5 @@ root@debian10x64:/etc/cni/net.d# pwd
 root@debian10x64:/etc/cni/net.d#
 
 ~~~~
+
+
