@@ -44,3 +44,29 @@ What is the IP Range configured for the services within the cluster?
 ## ALTERNATIVA
 - Verificar a conf do api-server.
 - Na pasta manifests, conf do api-server, ver sobre service-cluster-ip-range.
+
+
+
+
+
+How many kube-proxy pods are deployed in this cluster?
+## ALTERNATIVA
+- Respondeu 2 também, mesmo a questão dizendo cluster, daí seriam 3, pq tem 3 pods contando o node01 também.
+
+
+
+
+
+What type of proxy is the kube-proxy configured to use?
+## ALTERNATIVA
+- Ver os logs do Pod kube-proxy.
+- Nele consta se é iptables.
+
+
+
+
+
+
+How does this Kubernetes cluster ensure that a kube-proxy pod runs on all nodes in the cluster?
+## ALTERNATIVA
+- kubectl get all -A

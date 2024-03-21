@@ -729,3 +729,24 @@ metadata:
   uid: 58ed69c1-d4e4-46a6-98de-6ba1d50a2746
 
 controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+How does this Kubernetes cluster ensure that a kube-proxy pod runs on all nodes in the cluster?
+
+Inspect the kube-proxy pods and try to identify how they are deployed.
