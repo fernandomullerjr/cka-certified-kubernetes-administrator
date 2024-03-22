@@ -119,6 +119,13 @@ Server: nginx/1.19.2
 ##  225. DNS in kubernetes
 
 
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  RESUMO
+
 - Qualquer Pod no Cluster consegue alcançar o Service pelo nome.
 - O nome do Service só é alcançado pelo nome simples, somente quando estão no mesmo Namespace.
 
@@ -130,3 +137,5 @@ nginx-service.apps.svc.cluster.local
 
 - Por padrão, os registros DNS não são criados para os Pods em especifico.
 - Quando ativado, o Kubernetes nomeia os Pods com seu endereço ip, trocando os pontos por traços.
+exemplo:
+10-244-1-3.apps.pod.cluster.local
