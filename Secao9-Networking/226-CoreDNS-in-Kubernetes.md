@@ -209,3 +209,5 @@ Corefile:
 ## RESUMO
 
 - Antes era usado o kube-dns, agora é usado o CoreDNS.
+
+- Configuração do coredns fica num ConfigMap.
