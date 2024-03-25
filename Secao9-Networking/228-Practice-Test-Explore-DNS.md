@@ -229,3 +229,271 @@ controlplane ~ ➜
 
 
 
+
+
+
+
+How is the Corefile passed into the CoreDNS POD?
+
+
+
+What is the name of the ConfigMap object created for Corefile?
+
+
+
+
+What is the root domain/zone configured for this kubernetes cluster?
+
+cluster.local
+
+
+
+
+
+
+
+
+
+We have deployed a set of PODs and Services in the default and payroll namespaces. Inspect them and go to the next question.
+
+
+
+
+
+What name can be used to access the hr web server from the test Application?
+
+You can execute a curl command on the test pod to test. Alternatively, the test Application also has a UI. Access it using the tab at the top of your terminal named test-app.
+
+
+controlplane ~ ✖ kubectl describe pod hr
+Name:             hr
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             controlplane/192.0.44.9
+Start Time:       Mon, 25 Mar 2024 22:46:16 +0000
+Labels:           name=hr
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.5
+IPs:
+  IP:  10.244.0.5
+Containers:
+  web:
+    Container ID:  containerd://180ddc8eb5464a5ba495e2cd12accd8571a5e3082071405cc6c4730d9a94997d
+    Image:         nicolaka/netshoot:v0.11
+    Image ID:      docker.io/nicolaka/netshoot@sha256:a7c92e1a2fb9287576a16e107166fee7f9925e15d2c1a683dbb1f4370ba9bfe8
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+    Args:
+      -c
+      while true; do echo -e "HTTP/1.1 200 OK\n\n This is the HR server!" | nc -l -p 80 -q 1; done
+    State:          Running
+      Started:      Mon, 25 Mar 2024 22:46:28 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-whj5m (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-whj5m:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  9m33s  default-scheduler  Successfully assigned default/hr to controlplane
+  Normal  Pulling    9m32s  kubelet            Pulling image "nicolaka/netshoot:v0.11"
+  Normal  Pulled     9m21s  kubelet            Successfully pulled image "nicolaka/netshoot:v0.11" in 318ms (10.887s including waiting)
+  Normal  Created    9m21s  kubelet            Created container web
+  Normal  Started    9m21s  kubelet            Started container web
+
+controlplane ~ ➜  kubectl describe pod test
+Name:             test
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             controlplane/192.0.44.9
+Start Time:       Mon, 25 Mar 2024 22:46:16 +0000
+Labels:           name=test
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.6
+IPs:
+  IP:  10.244.0.6
+Containers:
+  test:
+    Container ID:   containerd://89de54e4f127d3f953fd4bbc98bdf6ee04d55821ef50c9f2c752ba2df5c71048
+    Image:          kodekloud/webapp-conntest:web
+    Image ID:       docker.io/kodekloud/webapp-conntest@sha256:9deb1325274bcdf0256629133c693ed9fb4899cff147c9169f905d7b273d0a99
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Mon, 25 Mar 2024 22:46:34 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      APP_NAME:  Test Application
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-mkvl9 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-mkvl9:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  9m36s  default-scheduler  Successfully assigned default/test to controlplane
+  Normal  Pulling    9m35s  kubelet            Pulling image "kodekloud/webapp-conntest:web"
+  Normal  Pulled     9m18s  kubelet            Successfully pulled image "kodekloud/webapp-conntest:web" in 5.9s (16.693s including waiting)
+  Normal  Created    9m18s  kubelet            Created container test
+  Normal  Started    9m18s  kubelet            Started container test
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get svc -A
+NAMESPACE     NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE
+default       kubernetes     ClusterIP   10.96.0.1        <none>        443/TCP                  15m
+default       test-service   NodePort    10.107.76.20     <none>        80:30080/TCP             10m
+default       web-service    ClusterIP   10.101.222.14    <none>        80/TCP                   10m
+kube-system   kube-dns       ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   15m
+payroll       web-service    ClusterIP   10.103.240.216   <none>        80/TCP                   10m
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pod hr
+NAME   READY   STATUS    RESTARTS   AGE
+hr     1/1     Running   0          11m
+
+controlplane ~ ➜  kubectl get pod hr -o wide
+NAME   READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
+hr     1/1     Running   0          11m   10.244.0.5   controlplane   <none>           <none>
+
+controlplane ~ ➜  kubectl describe pod hr
+Name:             hr
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             controlplane/192.0.44.9
+Start Time:       Mon, 25 Mar 2024 22:46:16 +0000
+Labels:           name=hr
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.5
+IPs:
+  IP:  10.244.0.5
+Containers:
+  web:
+    Container ID:  containerd://180ddc8eb5464a5ba495e2cd12accd8571a5e3082071405cc6c4730d9a94997d
+    Image:         nicolaka/netshoot:v0.11
+    Image ID:      docker.io/nicolaka/netshoot@sha256:a7c92e1a2fb9287576a16e107166fee7f9925e15d2c1a683dbb1f4370ba9bfe8
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+    Args:
+      -c
+      while true; do echo -e "HTTP/1.1 200 OK\n\n This is the HR server!" | nc -l -p 80 -q 1; done
+    State:          Running
+      Started:      Mon, 25 Mar 2024 22:46:28 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-whj5m (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-whj5m:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  11m   default-scheduler  Successfully assigned default/hr to controlplane
+  Normal  Pulling    11m   kubelet            Pulling image "nicolaka/netshoot:v0.11"
+  Normal  Pulled     11m   kubelet            Successfully pulled image "nicolaka/netshoot:v0.11" in 318ms (10.887s including waiting)
+  Normal  Created    11m   kubelet            Created container web
+  Normal  Started    11m   kubelet            Started container web
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl describe service web-service
+Name:              web-service
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          name=hr
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.101.222.14
+IPs:               10.101.222.14
+Port:              <unset>  80/TCP
+TargetPort:        80/TCP
+Endpoints:         10.244.0.5:80
+Session Affinity:  None
+Events:            <none>
+
+controlplane ~ ➜  
+
+
+- Pela UI nao funcionou
+https://30080-port-1d4e1c8c80224d61.labs.kodekloud.com/#!/view1
+sem comunicacao com "web-service"
+
+- Via terminal foi:
+
+controlplane ~ ➜  kubectl exec -ti test sh
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+/opt/webapp-conntest # 
+/opt/webapp-conntest # 
+/opt/webapp-conntest # 
+/opt/webapp-conntest # curl web-service
+ This is the HR server!
+/opt/webapp-conntest # 
