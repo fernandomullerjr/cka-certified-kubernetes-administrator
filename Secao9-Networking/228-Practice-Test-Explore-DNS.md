@@ -536,7 +536,7 @@ controlplane ~ ➜
 
 Which of the below name CANNOT be used to access the payroll service from the test application?
 
-
+cluster apenas não rola
 
 
 
@@ -1089,10 +1089,20 @@ deployment.apps/webapp edited
 
 controlplane ~ ➜  
 
-- OK após ajuste da variavel no Deployment:
+- OK após ajuste da variavel no Deployment, para "mysql.payroll":
 Environment Variables: DB_Host=mysql.payroll; DB_Database=Not Set; DB_User=root; DB_Password=paswrd;
 
 From webapp-744595c5c5-825r2!
+
+
+
+
+
+
+
+
+
+
 
 
 

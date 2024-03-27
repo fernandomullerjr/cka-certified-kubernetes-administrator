@@ -5,7 +5,7 @@
 
 git status
 git add .
-git commit -m "229. Solution - Explore DNS."
+git commit -m "230. Ingress."
 git push
 git status
 
@@ -13,14 +13,4 @@ git status
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
-##  229. Solution - Explore DNS
-
-cluster apenas não rola
-é necessário utilizar cluster.local ou sacar fora
-
-exemplo:
-[OK] mysql.payroll.svc.cluster.local
-[OK] mysql.payroll.svc
-[OK] mysql.payroll
-[OK] mysql
-[NÃO-OK] mysql.payroll.svc.cluster
+##  230. Ingress
