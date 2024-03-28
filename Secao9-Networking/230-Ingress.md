@@ -238,6 +238,35 @@ Kubernetes as a project supports and maintains AWS, GCE, and nginx ingress contr
 Additional controllers
 
 
+- Estrutura necessária para o Ingress controller:
+Deployment
+Service
+ConfigMap
+Auth
+
+
+- Quando não é especificado o host, o ingress entende que a regra é um asterisco *, ou seja, qualquer requisição entrando é processada pelas rules existentes:
+- 1 Rule and 2 Paths.
+
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        backend:
+          serviceName: wear-service
+          servicePort: 80
+      - path: /watch
+        backend:
+          serviceName: watch-service
+          servicePort: 80
+```
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
