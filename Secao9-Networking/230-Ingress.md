@@ -228,3 +228,24 @@ spec:
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##  230. Ingress
+
+- Exemplos de "Ingress Controller" 
+GCE, Istio, HaProxy, Contour, Traefik, NGINX
+
+
+- Mantidos pela Kubernetes:
+Kubernetes as a project supports and maintains AWS, GCE, and nginx ingress controllers.
+Additional controllers
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- "Ingress Controller" é a solução, exemplo:
+NGINX, HaProxy, Traefik
+
+- "Ingress Resources" são as configurações de ingress.
+
+- Por padrão, o Kubernetes não vem com um Ingress Controller provisionado.
