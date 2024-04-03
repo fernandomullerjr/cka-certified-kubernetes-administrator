@@ -93,4 +93,5 @@ spec:
 
 - Com o "rewrite-target", o que vem após a barra antes de ser processado pelo ingress é removido depois de ser processado, para evitar erros 404.
 exemplo:
-http://<ingress-service>:<ingress-port>/watch --> http://<watch-service>:<port>/watch
+http://<ingress-service>:<ingress-port>/watch --> http://<watch-service>:<port>/
+http://<ingress-service>:<ingress-port>/wear --> http://<wear-service>:<port>/
