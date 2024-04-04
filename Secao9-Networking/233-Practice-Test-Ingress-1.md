@@ -805,7 +805,224 @@ Events:
 
 controlplane ~ ➜  
 
+controlplane ~ ➜  kubectl get svc -A
+NAMESPACE        NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+app-space        default-backend-service              ClusterIP   10.105.45.3      <none>        80/TCP                       19m
+app-space        food-service                         ClusterIP   10.96.161.60     <none>        8080/TCP                     9m12s
+app-space        video-service                        ClusterIP   10.101.122.101   <none>        8080/TCP                     19m
+app-space        wear-service                         ClusterIP   10.109.68.126    <none>        8080/TCP                     19m
+critical-space   pay-service                          ClusterIP   10.109.140.27    <none>        8282/TCP                     5m42s
+default          kubernetes                           ClusterIP   10.96.0.1        <none>        443/TCP                      29m
+ingress-nginx    ingress-nginx-controller             NodePort    10.96.197.136    <none>        80:30080/TCP,443:32103/TCP   19m
+ingress-nginx    ingress-nginx-controller-admission   ClusterIP   10.106.19.171    <none>        443/TCP                      19m
+kube-system      kube-dns                             ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP       29m
 
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe svc pay-service -n critical-space
+Name:              pay-service
+Namespace:         critical-space
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=webapp-pay
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.109.140.27
+IPs:               10.109.140.27
+Port:              <unset>  8282/TCP
+TargetPort:        8080/TCP
+Endpoints:         10.244.0.11:8080
+Session Affinity:  None
+Events:            <none>
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl logs webapp-pay-657d677c99-2hnq4 -n critical-space
+ * Serving Flask app 'app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on http://10.244.0.11:8080/ (Press CTRL+C to quit)
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe pod webapp-pay-657d677c99-2hnq4 -n critical-space
+Name:             webapp-pay-657d677c99-2hnq4
+Namespace:        critical-space
+Priority:         0
+Service Account:  default
+Node:             controlplane/192.1.235.9
+Start Time:       Thu, 04 Apr 2024 00:18:44 +0000
+Labels:           app=webapp-pay
+                  pod-template-hash=657d677c99
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.11
+IPs:
+  IP:           10.244.0.11
+Controlled By:  ReplicaSet/webapp-pay-657d677c99
+Containers:
+  webapp-pay:
+    Container ID:   containerd://47afe04618a4af16b25855624dea1e582e9e3765b772323b96243395cea510c2
+    Image:          kodekloud/ecommerce:pay
+    Image ID:       docker.io/kodekloud/ecommerce@sha256:aca16f2d5f2305ae5d14016037f6ed17fcb8cb2da0a5c7e6a6d24435196bb5b3
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 04 Apr 2024 00:18:46 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-cr2tg (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-cr2tg:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  9m57s  default-scheduler  Successfully assigned critical-space/webapp-pay-657d677c99-2hnq4 to controlplane
+  Normal  Pulling    9m56s  kubelet            Pulling image "kodekloud/ecommerce:pay"
+  Normal  Pulled     9m55s  kubelet            Successfully pulled image "kodekloud/ecommerce:pay" in 840ms (840ms including waiting)
+  Normal  Created    9m55s  kubelet            Created container webapp-pay
+  Normal  Started    9m55s  kubelet            Started container webapp-pay
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get endpoints -A
+NAMESPACE        NAME                                 ENDPOINTS                                               AGE
+app-space        default-backend-service              10.244.0.6:8080                                         26m
+app-space        food-service                         10.244.0.10:8080                                        16m
+app-space        video-service                        10.244.0.5:8080                                         26m
+app-space        wear-service                         10.244.0.4:8080                                         26m
+critical-space   pay-service                          10.244.0.11:8080                                        12m
+default          kubernetes                           192.1.235.9:6443                                        37m
+ingress-nginx    ingress-nginx-controller             10.244.0.9:443,10.244.0.9:80                            26m
+ingress-nginx    ingress-nginx-controller-admission   10.244.0.9:8443                                         26m
+kube-system      kube-dns                             10.244.0.2:53,10.244.0.3:53,10.244.0.2:53 + 3 more...   36m
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl describe deploy webapp-pay -n critical-space
+Name:                   webapp-pay
+Namespace:              critical-space
+CreationTimestamp:      Thu, 04 Apr 2024 00:18:44 +0000
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=webapp-pay
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=webapp-pay
+  Containers:
+   webapp-pay:
+    Image:        kodekloud/ecommerce:pay
+    Port:         8080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   webapp-pay-657d677c99 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  14m   deployment-controller  Scaled up replica set webapp-pay-657d677c99 to 1
+
+controlplane ~ ➜  kubectl get deploy webapp-pay -n critical-space -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2024-04-04T00:18:44Z"
+  generation: 1
+  name: webapp-pay
+  namespace: critical-space
+  resourceVersion: "2681"
+  uid: 0c90a429-d2fd-45aa-870f-56904f359e69
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: webapp-pay
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webapp-pay
+    spec:
+      containers:
+      - image: kodekloud/ecommerce:pay
+        imagePullPolicy: Always
+        name: webapp-pay
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-04-04T00:18:47Z"
+    lastUpdateTime: "2024-04-04T00:18:47Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-04-04T00:18:44Z"
+    lastUpdateTime: "2024-04-04T00:18:47Z"
+    message: ReplicaSet "webapp-pay-657d677c99" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
+
+TSHOOT ainda
 
 
 
