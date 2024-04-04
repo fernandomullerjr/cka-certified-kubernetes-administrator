@@ -648,6 +648,8 @@ What is the name of the deployment of the new application?
 
 
 
+
+
 You are requested to make the new application available at /pay.
 
 Identify and implement the best approach to making this application available on the ingress controller and test to make sure its working. Look into annotations: rewrite-target as well.
@@ -818,6 +820,11 @@ ingress-nginx    ingress-nginx-controller-admission   ClusterIP   10.106.19.171 
 kube-system      kube-dns                             ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP       29m
 
 controlplane ~ ➜  
+
+
+ERRO no ingress:
+              /pay      pay-service:8282 (<error: endpoints "pay-service" not found>)
+
 
 controlplane ~ ➜  kubectl describe svc pay-service -n critical-space
 Name:              pay-service
@@ -1023,7 +1030,535 @@ controlplane ~ ➜
 
 
 TSHOOT ainda
+endpoints OK
+erro 502 segue no ingress
 
+              /pay      pay-service:8282 (<error: endpoints "pay-service" not found>)
+
+controlplane ~ ➜  kubectl describe svc pay-service -n critical-space
+Name:              pay-service
+Namespace:         critical-space
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=webapp-pay
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.109.140.27
+IPs:               10.109.140.27
+Port:              <unset>  8282/TCP
+TargetPort:        8080/TCP
+Endpoints:         10.244.0.11:8080
+Session Affinity:  None
+Events:            <none>
+
+controlplane ~ ➜  
+
+
+kubectl get service pay-service -n critical-space -o json
+
+
+controlplane ~ ➜  kubectl get service pay-service -n critical-space -o json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": "2024-04-04T00:18:44Z",
+        "name": "pay-service",
+        "namespace": "critical-space",
+        "resourceVersion": "2666",
+        "uid": "a8151d1e-7876-476c-b41b-188be779a6a4"
+    },
+    "spec": {
+        "clusterIP": "10.109.140.27",
+        "clusterIPs": [
+            "10.109.140.27"
+        ],
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "port": 8282,
+                "protocol": "TCP",
+                "targetPort": 8080
+            }
+        ],
+        "selector": {
+            "app": "webapp-pay"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe ingress ingress-wear-watch -n app-space
+Name:             ingress-wear-watch
+Labels:           <none>
+Namespace:        app-space
+Address:          10.96.197.136
+Ingress Class:    <none>
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /wear     wear-service:8080 (10.244.0.4:8080)
+              /stream   video-service:8080 (10.244.0.5:8080)
+              /eat      food-service:8080 (10.244.0.10:8080)
+              /pay      pay-service:8282 (<error: endpoints "pay-service" not found>)
+Annotations:  nginx.ingress.kubernetes.io/rewrite-target: /
+              nginx.ingress.kubernetes.io/ssl-redirect: false
+Events:
+  Type    Reason  Age                From                      Message
+  ----    ------  ----               ----                      -------
+  Normal  Sync    18m (x5 over 35m)  nginx-ingress-controller  Scheduled for sync
+
+controlplane ~ ➜  
+
+
+Pode ser porque o pay-service está em outro namespace
+Pode ser porque o pay-service está em outro namespace
+Pode ser porque o pay-service está em outro namespace
+Pode ser porque o pay-service está em outro namespace
+
+https://kubernetes.io/docs/concepts/services-networking/service/#dns
+DNS
+
+You can (and almost always should) set up a DNS service for your Kubernetes cluster using an add-on.
+
+A cluster-aware DNS server, such as CoreDNS, watches the Kubernetes API for new Services and creates a set of DNS records for each one. If DNS has been enabled throughout your cluster then all Pods should automatically be able to resolve Services by their DNS name.
+
+For example, if you have a Service called my-service in a Kubernetes namespace my-ns, the control plane and the DNS Service acting together create a DNS record for my-service.my-ns. Pods in the my-ns namespace should be able to find the service by doing a name lookup for my-service (my-service.my-ns would also work).
+
+Pods in other namespaces must qualify the name as my-service.my-ns. These names will resolve to the cluster IP assigned for the Service.
+
+Kubernetes also supports DNS SRV (Service) records for named ports. If the my-service.my-ns Service has a port named http with the protocol set to TCP, you can do a DNS SRV query for _http._tcp.my-service.my-ns to discover the port number for http, as well as the IP address.
+
+The Kubernetes DNS server is the only way to access ExternalName Services. You can find more information about ExternalName resolution in DNS for Services and Pods.
+Virtual IP addressing 
+
+ANTES
+
+controlplane ~ ➜  kubectl get ingress ingress-wear-watch -n app-space -o yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-04-04T00:04:47Z"
+  generation: 4
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2980"
+  uid: dbd6ffc3-931d-499f-a9b4-8ca98f4fc17d
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+      - backend:
+          service:
+            name: pay-service
+            port:
+              number: 8282
+        path: /pay
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.96.197.136
+
+controlplane ~ ➜  date
+Thu Apr  4 12:45:27 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+pay-service.critical-space
+
+ajustando
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-04-04T00:04:47Z"
+  generation: 4
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2980"
+  uid: dbd6ffc3-931d-499f-a9b4-8ca98f4fc17d
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+      - backend:
+          service:
+            name: pay-service.critical-space
+            port:
+              number: 8282
+        path: /pay
+        pathType: Prefix
+
+
+- ERRO
+
+~~~~BASH
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+# ingresses.networking.k8s.io "ingress-wear-watch" was not valid:
+# * spec.rules[0].http.paths[3].backend.service.name: Invalid value: "pay-service.critical-space": a DNS-1035 label must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',  or 'abc-123', regex used for validation is '[a-z]([-a-z0-9]*[a-z0-9])?')
+#
+~~~~
+
+
+controlplane ~ ➜  kubectl get all -n critical-space
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/webapp-pay-657d677c99-2hnq4   1/1     Running   0          30m
+
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/pay-service   ClusterIP   10.109.140.27   <none>        8282/TCP   30m
+
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-pay   1/1     1            1           30m
+
+NAME                                    DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-pay-657d677c99   1         1         1       30m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ kubectl get service/pay-service -n critical-space -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-04-04T00:18:44Z"
+  name: pay-service
+  namespace: critical-space
+  resourceVersion: "2666"
+  uid: a8151d1e-7876-476c-b41b-188be779a6a4
+spec:
+  clusterIP: 10.109.140.27
+  clusterIPs:
+  - 10.109.140.27
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8282
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: webapp-pay
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get deployment.apps/webapp-pay -n critical-space -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2024-04-04T00:18:44Z"
+  generation: 1
+  name: webapp-pay
+  namespace: critical-space
+  resourceVersion: "2681"
+  uid: 0c90a429-d2fd-45aa-870f-56904f359e69
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: webapp-pay
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webapp-pay
+    spec:
+      containers:
+      - image: kodekloud/ecommerce:pay
+        imagePullPolicy: Always
+        name: webapp-pay
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-04-04T00:18:47Z"
+    lastUpdateTime: "2024-04-04T00:18:47Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-04-04T00:18:44Z"
+    lastUpdateTime: "2024-04-04T00:18:47Z"
+    message: ReplicaSet "webapp-pay-657d677c99" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
+   47  kubectl get service/pay-service -n critical-space -o yaml
+   48  kubectl get deployment.apps/webapp-pay -n critical-space -o yaml
+
+
+kubectl delete service/pay-service -n critical-space
+kubectl delete deployment.apps/webapp-pay -n critical-space
+
+controlplane ~ ➜  
+kubectl delete service/pay-service -n critical-space
+kubectl delete deployment.apps/webapp-pay -n critical-space
+service "pay-service" deleted
+deployment.apps "webapp-pay" deleted
+
+controlplane ~ ➜  
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-pay
+  namespace: app-space
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: webapp-pay
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webapp-pay
+    spec:
+      containers:
+      - image: kodekloud/ecommerce:pay
+        imagePullPolicy: Always
+        name: webapp-pay
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pay-service
+  namespace: app-space
+spec:
+  clusterIP: 10.109.140.27
+  clusterIPs:
+  - 10.109.140.27
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8282
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: webapp-pay
+  sessionAffinity: None
+  type: ClusterIPcontrolplane ~ ➜  vi deploy.yaml
+
+
+  
+
+controlplane ~ ➜  vi service.yaml
+
+controlplane ~ ➜  kubectl apply -f deploy.yaml
+deployment.apps/webapp-pay created
+
+controlplane ~ ➜  kubectl apply -f service.yaml
+service/pay-service created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get ingress ingress-wear-watch -n app-space -o yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-04-04T00:04:47Z"
+  generation: 4
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2980"
+  uid: dbd6ffc3-931d-499f-a9b4-8ca98f4fc17d
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+      - backend:
+          service:
+            name: pay-service
+            port:
+              number: 8282
+        path: /pay
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.96.197.136
+
+controlplane ~ ➜  kubectl describe ingress ingress-wear-watch -n app-space
+Name:             ingress-wear-watch
+Labels:           <none>
+Namespace:        app-space
+Address:          10.96.197.136
+Ingress Class:    <none>
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /wear     wear-service:8080 (10.244.0.4:8080)
+              /stream   video-service:8080 (10.244.0.5:8080)
+              /eat      food-service:8080 (10.244.0.10:8080)
+              /pay      pay-service:8282 (10.244.0.12:8080)
+Annotations:  nginx.ingress.kubernetes.io/rewrite-target: /
+              nginx.ingress.kubernetes.io/ssl-redirect: false
+Events:
+  Type    Reason  Age                From                      Message
+  ----    ------  ----               ----                      -------
+  Normal  Sync    33m (x5 over 50m)  nginx-ingress-controller  Scheduled for sync
+
+controlplane ~ ➜  
+
+
+Resolvido!
+https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
+abrindo normalmente
+Resolvido!
+https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
+abrindo normalmente
+Resolvido!
+https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
+abrindo normalmente
+Resolvido!
+https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
+abrindo normalmente
 
 
 ## PENDENTE
