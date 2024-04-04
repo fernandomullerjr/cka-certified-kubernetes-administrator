@@ -1,4 +1,5 @@
 
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 #  push
@@ -1559,6 +1560,87 @@ abrindo normalmente
 Resolvido!
 https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
 abrindo normalmente
+
+
+questão NÃO OK
+
+
+
+controlplane ~ ➜  vi deploy2.yaml
+
+controlplane ~ ➜  vi service2.yaml
+
+controlplane ~ ➜  kubectl apply -f deploy2.yaml
+deployment.apps/webapp-pay created
+
+controlplane ~ ➜  kubectl apply -f service2.yaml
+The Service "pay-service" is invalid: spec.clusterIPs: Invalid value: []string{"10.109.140.27"}: failed to allocate IP 10.109.140.27: provided IP is already allocated
+
+controlplane ~ ✖ kubectl delete -f service.yaml 
+service "pay-service" deleted
+
+controlplane ~ ➜  kubectl delete -f deploy.yaml 
+deployment.apps "webapp-pay" deleted
+
+controlplane ~ ➜  kubectl apply -f service2.yaml
+service/pay-service created
+
+controlplane ~ ➜  
+
+kubectl get ingress ingress-wear-watch -n app-space -o yaml
+
+kubectl get ingress ingress-wear-watch -n app-space -o yaml
+
+
+controlplane ~ ➜  kubectl apply -f ingress.yaml
+Error from server (BadRequest): error when creating "ingress.yaml": admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: host "_" and path "/pay" is already defined in ingress app-space/ingress-wear-watch
+
+controlplane ~ ✖ kubectl edit ingress ingress-wear-watch -n app-space 
+Edit cancelled, no changes made.
+
+controlplane ~ ➜  kubectl edit ingress ingress-wear-watch -n app-space 
+ingress.networking.k8s.io/ingress-wear-watch edited
+
+controlplane ~ ➜  
+
+^[[A^[[A^[[A
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f service2.yaml
+service/pay-service unchanged
+
+controlplane ~ ➜  kubectl apply -f ingress.yaml
+ingress.networking.k8s.io/ingress-pay created
+
+controlplane ~ ➜  
+
+
+Solução
+foi necessário deletar o deployment e service criados no ns do app original
+recriar o deployment e service no ns critical-space
+criar 1 ingress neste ns critical-space
+
+
+
+
+
+
+
+
+
+
+
+View the Payment application using the /pay URL in your browser.
+
+Click on the Ingress tab above your terminal, if its not open already, and append /pay to the URL in the browser.
+
+https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/pay
+abriu
+
+
+
+
+
 
 
 ## PENDENTE
