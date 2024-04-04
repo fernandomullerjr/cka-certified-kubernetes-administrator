@@ -590,6 +590,225 @@ https://30080-port-6c189bbec1f04c4e.labs.kodekloud.com/eat
 
 
 
+
+
+
+
+
+
+A new payment service has been introduced. Since it is critical, the new application is deployed in its own namespace.
+
+Identify the namespace in which the new application is deployed.
+
+
+
+controlplane ~ ➜  kubectl get ns
+NAME              STATUS   AGE
+app-space         Active   14m
+critical-space    Active   57s
+default           Active   25m
+ingress-nginx     Active   14m
+kube-flannel      Active   24m
+kube-node-lease   Active   25m
+kube-public       Active   25m
+kube-system       Active   25m
+
+controlplane ~ ➜  kubectl get all -n critical-space
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/webapp-pay-657d677c99-2hnq4   1/1     Running   0          64s
+
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/pay-service   ClusterIP   10.109.140.27   <none>        8282/TCP   64s
+
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-pay   1/1     1            1           64s
+
+NAME                                    DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-pay-657d677c99   1         1         1       64s
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+What is the name of the deployment of the new application?
+
+
+
+
+
+
+
+
+You are requested to make the new application available at /pay.
+
+Identify and implement the best approach to making this application available on the ingress controller and test to make sure its working. Look into annotations: rewrite-target as well.
+
+
+Ingress Created
+
+Path: /pay
+
+Configure correct backend service
+
+Configure correct backend port
+
+
+antes
+
+
+controlplane ~ ➜  kubectl get ingress ingress-wear-watch -n app-space -o yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-04-04T00:04:47Z"
+  generation: 3
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2570"
+  uid: dbd6ffc3-931d-499f-a9b4-8ca98f4fc17d
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.96.197.136
+
+controlplane ~ ➜  date
+Thu Apr  4 12:20:54 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+Ajustando
+
+
+controlplane ~ ➜  kubectl get ingress ingress-wear-watch -n app-space -o yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-04-04T00:04:47Z"
+  generation: 3
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2570"
+  uid: dbd6ffc3-931d-499f-a9b4-8ca98f4fc17d
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: food-service
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+      - backend:
+          service:
+            name: pay-service
+            port:
+              number: 8282
+        path: /pay
+        pathType: Prefix
+
+
+controlplane ~ ➜  kubectl edit ingress ingress-wear-watch -n app-space
+ingress.networking.k8s.io/ingress-wear-watch edited
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  date
+Thu Apr  4 12:22:18 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+- ERRO
+503 Service Temporarily Unavailable
+nginx
+
+
+
+controlplane ~ ➜  kubectl describe ingress ingress-wear-watch -n app-space
+Name:             ingress-wear-watch
+Labels:           <none>
+Namespace:        app-space
+Address:          10.96.197.136
+Ingress Class:    <none>
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /wear     wear-service:8080 (10.244.0.4:8080)
+              /stream   video-service:8080 (10.244.0.5:8080)
+              /eat      food-service:8080 (10.244.0.10:8080)
+              /pay      pay-service:8282 (<error: endpoints "pay-service" not found>)
+Annotations:  nginx.ingress.kubernetes.io/rewrite-target: /
+              nginx.ingress.kubernetes.io/ssl-redirect: false
+Events:
+  Type    Reason  Age                From                      Message
+  ----    ------  ----               ----                      -------
+  Normal  Sync    96s (x5 over 18m)  nginx-ingress-controller  Scheduled for sync
+
+controlplane ~ ➜  
+
+
+
+
+
 ## PENDENTE
 - Revisar a questão
     If the requirement does not match any of the configured paths in the Ingress, to which service are the requests forwarded?
