@@ -482,3 +482,191 @@ deployment.apps/ingress-nginx-controller created
 Error from server (BadRequest): error when creating "/root/ingress-editado.yaml": Service in version "v1" cannot be handled as a Service: strict decoding error: unknown field "spec.ports[0].nodeport"
 
 controlplane ~ ✖ 
+
+
+
+controlplane ~ ✖ vi /root/ingress-editado.yaml
+
+controlplane ~ ➜  kubectl apply -f /root/ingress-editado.yaml
+deployment.apps/ingress-nginx-controller configured
+Error from server (BadRequest): error when creating "/root/ingress-editado.yaml": Service in version "v1" cannot be handled as a Service: strict decoding error: unknown field "spec.ports[0].nodeport"
+
+controlplane ~ ✖ 
+
+
+
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ vi /root/ingress-editado.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f /root/ingress-editado.yaml
+deployment.apps/ingress-nginx-controller configured
+service/ingress-nginx-controller created
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Create the ingress resource to make the applications available at /wear and /watch on the Ingress service.
+
+Also, make use of rewrite-target annotation field: -
+
+nginx.ingress.kubernetes.io/rewrite-target: /
+
+
+Ingress resource comes under the namespace scoped, so don't forget to create the ingress in the app-space namespace.
+
+Ingress Created
+
+Path: /wear
+
+Path: /watch
+
+Configure correct backend service for /wear
+
+Configure correct backend service for /watch
+
+Configure correct backend port for /wear service
+
+Configure correct backend port for /watch service
+
+
+
+
+controlplane ~ ➜  kubectl get svc -A
+NAMESPACE       NAME                                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  AGE
+app-space       default-http-backend                 ClusterIP   10.108.61.186   <none>        80/TCP                   43m
+app-space       video-service                        ClusterIP   10.100.32.152   <none>        8080/TCP                 43m
+app-space       wear-service                         ClusterIP   10.110.180.68   <none>        8080/TCP                 43m
+default         kubernetes                           ClusterIP   10.96.0.1       <none>        443/TCP                  51m
+ingress-nginx   ingress-nginx-controller             NodePort    10.97.208.159   <none>        80:30080/TCP             14m
+ingress-nginx   ingress-nginx-controller-admission   ClusterIP   10.100.79.66    <none>        443/TCP                  33m
+kube-system     kube-dns                             ClusterIP   10.96.0.10      <none>        53/UDP,53/TCP,9153/TCP   51m
+
+controlplane ~ ➜  
+
+
+EXEMPLO
+
+
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        backend:
+          serviceName: wear-service
+          servicePort: 80
+      - path: /watch
+        backend:
+          serviceName: watch-service
+          servicePort: 80
+```
+
+
+
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+    
+
+EDITADO
+
+
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        backend:
+          serviceName: wear-service
+          servicePort: 8080
+      - path: /watch
+        backend:
+          serviceName: video-service
+          servicePort: 8080
+```
+
+
+controlplane ~ ➜  vi ingress-2.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-2.yaml
+error: resource mapping not found for name: "ingress-wear-watch" namespace: "app-space" from "ingress-2.yaml": no matches for kind "Ingress" in version "extensions/v1beta1"
+ensure CRDs are installed first
+
+controlplane ~ ✖ 
+
+
+
+apiVersion: networking.k8s.io/v1
+
+EDITADO
+
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        backend:
+          serviceName: wear-service
+          servicePort: 8080
+      - path: /watch
+        backend:
+          serviceName: video-service
+          servicePort: 8080
+```
+
+
+
+
+controlplane ~ ✖ vi ingress-2.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-2.yaml
+Error from server (BadRequest): error when creating "ingress-2.yaml": Ingress in version "v1" cannot be handled as a Ingress: strict decoding error: unknown field "spec.rules[0].http.paths[0].backend.serviceName", unknown field "spec.rules[0].http.paths[0].backend.servicePort", unknown field "spec.rules[0].http.paths[1].backend.serviceName", unknown field "spec.rules[0].http.paths[1].backend.servicePort"
+
+controlplane ~ ✖ 

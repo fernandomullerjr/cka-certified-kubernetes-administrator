@@ -132,10 +132,10 @@ metadata:
   namespace: ingress-nginx
 spec:
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-    nodeport: 30080
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 30080
   selector:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
