@@ -670,3 +670,329 @@ controlplane ~ ➜  kubectl apply -f ingress-2.yaml
 Error from server (BadRequest): error when creating "ingress-2.yaml": Ingress in version "v1" cannot be handled as a Ingress: strict decoding error: unknown field "spec.rules[0].http.paths[0].backend.serviceName", unknown field "spec.rules[0].http.paths[0].backend.servicePort", unknown field "spec.rules[0].http.paths[1].backend.serviceName", unknown field "spec.rules[0].http.paths[1].backend.servicePort"
 
 controlplane ~ ✖ 
+
+
+
+
+EDITADO
+
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        backend:
+          service: 
+          name: wear-service
+          port:
+            number: 8080
+      - path: /watch
+        backend:
+          service: video-service
+          port:
+            number: 8080
+```
+
+
+controlplane ~ ✖ vi ingress-2.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-2.yaml
+Error from server (BadRequest): error when creating "ingress-2.yaml": Ingress in version "v1" cannot be handled as a Ingress: json: cannot unmarshal string into Go struct field IngressBackend.spec.rules.http.paths.backend.service of type v1.IngressServiceBackend
+
+controlplane ~ ✖ 
+
+
+
+
+  # Create an ingress with the same host and multiple paths
+  kubectl create ingress multipath --class=default \
+  --rule="foo.com/=svc:port" \
+  --rule="foo.com/admin/=svcadmin:portadmin"
+
+
+
+
+
+  # Create an ingress with the same host and multiple paths
+  kubectl create ingress multipath --class=default --dry-run=client -o yaml \
+  --rule="foo.com/=svc:port" \
+  --rule="foo.com/admin/=svcadmin:portadmin"
+
+
+
+controlplane ~ ➜  
+  kubectl create ingress multipath --class=default --dry-run=client -o yaml \
+  --rule="foo.com/=svc:port" \
+  --rule="foo.com/admin/=svcadmin:portadmin"
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: multipath
+spec:
+  ingressClassName: default
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc
+            port:
+              name: port
+        path: /
+        pathType: Exact
+      - backend:
+          service:
+            name: svcadmin
+            port:
+              name: portadmin
+        path: /admin/
+        pathType: Exact
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+
+
+
+EDITADO
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              name: 8080
+        path: /wear
+      - backend:
+          service:
+            name: video-service
+            port:
+              name: 8080
+        path: /watch
+```
+
+
+
+controlplane ~ ➜  vi ingress-3.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-3.yaml
+Error from server (BadRequest): error when creating "ingress-3.yaml": Ingress in version "v1" cannot be handled as a Ingress: json: cannot unmarshal number into Go struct field ServiceBackendPort.spec.rules.http.paths.backend.service.port.name of type string
+
+controlplane ~ ✖ 
+
+
+
+EDITADO
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              name: 8080
+        path: /wear
+      - backend:
+          service:
+            name: video-service
+            port:
+              name: 8080
+        path: /watch
+```
+
+
+
+  # Create an ingress with multiple hosts and the pathType as Prefix
+  kubectl create ingress ingress1 --class=default --dry-run=client -o yaml \
+  --rule="foo.com/path*=svc:8080" \
+  --rule="bar.com/admin*=svc2:http"
+
+
+
+
+controlplane ~ ➜  
+  kubectl create ingress ingress1 --class=default --dry-run=client -o yaml \
+  --rule="foo.com/path*=svc:8080" \
+  --rule="bar.com/admin*=svc2:http"
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: ingress1
+spec:
+  ingressClassName: default
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc
+            port:
+              number: 8080
+        path: /path
+        pathType: Prefix
+  - host: bar.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc2
+            port:
+              name: http
+        path: /admin
+        pathType: Prefix
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+
+
+EDITADO
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /watch
+```
+
+
+
+controlplane ~ ➜  vi ingress-3.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-3.yaml
+The Ingress "ingress-wear-watch" is invalid: 
+* spec.rules[0].http.paths[0].pathType: Required value: pathType must be specified
+* spec.rules[0].http.paths[1].pathType: Required value: pathType must be specified
+
+controlplane ~ ✖ 
+
+
+
+EDITADO
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /watch
+        pathType: Prefix
+```
+
+
+
+
+controlplane ~ ✖ vi ingress-3.yaml
+
+controlplane ~ ➜  kubectl apply -f ingress-3.yaml
+ingress.networking.k8s.io/ingress-wear-watch created
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+Access the application using the Ingress tab on top of your terminal.
+
+Make sure you can access the right applications at /wear and /watch paths.
+
+
+
+
+## PENDENTE
+- Ver sobre manifesto ingress, estrutura e yaml base.
+
+- Ver sobre manifesto ingress, estrutura e yaml base.
+- Ver sobre manifesto ingress, estrutura e yaml base.
+- Ver sobre manifesto ingress, estrutura e yaml base.
