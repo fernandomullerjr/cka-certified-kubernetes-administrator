@@ -289,4 +289,12 @@ git status
 - Ver sobre manifesto ingress, estrutura e yaml base.
 
 
-     
+- No video de solução é utilizado o "kubectl expose" ao invés do manifesto do Service.
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- No video de solução é utilizado o "kubectl expose" ao invés do manifesto do Service.
