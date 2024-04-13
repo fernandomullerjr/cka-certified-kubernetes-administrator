@@ -15,10 +15,7 @@ git status
 # ###################################################################################################################### 
 ##  236. Solution - Ingress Networking - 2
 
-
 # Practice Test CKA Ingress 2
-
-  - Take me to [Practice Test](https://kodekloud.com/topic/practice-test-cka-ingress-networking-2/)
 
 #### Solution 
 
@@ -277,3 +274,19 @@ git status
       In the browser tab that opens, try appending `/wear` or `/watch` after `labs.kodekloud.com` in the browser address bar.
 
      </details>
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  236. Solution - Ingress Networking - 2
+
+
+## PENDENTE
+- Ver sobre manifesto ingress, estrutura e yaml base.
+
+
+     
