@@ -427,6 +427,274 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
 
 
 
+- Exemplo
+ kubectl create ingress ingtls --class=default \
+  --rule="foo.com/=svc:https,tls" \
+  --rule="foo.com/path/subpath*=othersvc:8080"
+
+
+ kubectl create ingress ingtls -- namespace ingress-nginx --class=default \
+  --rule="foo.com/=svc:https,tls" \
+  --rule="foo.com/path/subpath*=othersvc:8080" \
+  --dry-run=client -o yaml
+
+- ERRO
+
+~~~~BASH
+
+root@debian10x64:/home/fernando#  kubectl create ingress ingtls -- namespace ingress-nginx --class=default \
+>   --rule="foo.com/=svc:https,tls" \
+>   --rule="foo.com/path/subpath*=othersvc:8080" \
+>   --dry-run=client -o yaml
+error: not enough information provided: every ingress has to either specify a default-backend (which catches all traffic) or a list of rules (which catch specific paths)
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+- Ajustando:
+
+ kubectl create ingress ingtls -- namespace ingress-nginx --class=default \
+  --rule="foo.com/=svc:https,tls" \
+  --rule="foo.com/path/subpath*=othersvc:8080" \
+  --dry-run=client -o yaml \
+  --default-backend=defaultsvc:http
+
+
+- ERRO
+
+~~~~BASH
+root@debian10x64:/home/fernando#  kubectl create ingress ingtls -- namespace ingress-nginx --class=default \
+>   --rule="foo.com/=svc:https,tls" \
+>   --rule="foo.com/path/subpath*=othersvc:8080" \
+>   --dry-run=client -o yaml \
+>   --default-backend=defaultsvc:http
+error: not enough information provided: every ingress has to either specify a default-backend (which catches all traffic) or a list of rules (which catch specific paths)
+root@debian10x64:/home/fernando#
+~~~~
+
+
+
+
+
+  # Create a single ingress called 'simple' that directs requests to foo.com/bar to svc
+  # svc1:8080 with a tls secret "my-cert"
+  kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert"
+
+
+kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert" --dry-run=client -o yaml
+
+Assim funcionou
+
+~~~~bash
+
+root@debian10x64:/home/fernando# kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert" --dry-run=client -o yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: simple
+spec:
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc1
+            port:
+              number: 8080
+        path: /bar
+        pathType: Exact
+  tls:
+  - hosts:
+    - foo.com
+    secretName: my-cert
+status:
+  loadBalancer: {}
+root@debian10x64:/home/fernando#
+
+~~~~
+
+
+
+
+
+
+kubectl create ingress simple --rule="foo.com/bar=svc1:8080,tls=my-cert" \
+    --dry-run=client -o yaml \
+    --rule="baresquinao.com.br/path/subpath*=othersvc:8080"
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: simple
+spec:
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc1
+            port:
+              number: 8080
+        path: /bar
+        pathType: Exact
+  - host: baresquinao.com.br
+    http:
+      paths:
+      - backend:
+          service:
+            name: othersvc
+            port:
+              number: 8080
+        path: /path/subpath
+        pathType: Prefix
+  tls:
+  - hosts:
+    - foo.com
+    secretName: my-cert
+~~~~
+
+
+
+
+
+
+
+
+  # Create an ingress with the same host and multiple paths
+  kubectl create ingress multipath --class=default \
+  --rule="foo.com/=svc:port" \
+  --dry-run=client -o yaml \
+  --rule="foo.com/admin/=svcadmin:portadmin"
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: multipath
+spec:
+  ingressClassName: default
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc
+            port:
+              name: port
+        path: /
+        pathType: Exact
+      - backend:
+          service:
+            name: svcadmin
+            port:
+              name: portadmin
+        path: /admin/
+        pathType: Exact
+~~~~
+
+
+
+
+
+
+  # Create an ingress with multiple hosts and the pathType as Prefix
+  kubectl create ingress ingress1 --class=default \
+  --rule="foo.com/path*=svc:8080" \
+  --rule="bar.com/admin*=svc2:http"
+
+
+
+  kubectl create ingress ingress1 --class=default \
+  --rule="foo.com/path*=svc:8080" \
+  --rule="foo.com/path*=backend-teste:5233" \
+  --dry-run=client -o yaml \
+  --rule="bar.com/admin*=svc2:http"
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: ingress1
+spec:
+  ingressClassName: default
+  rules:
+  - host: foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc
+            port:
+              number: 8080
+        path: /path
+        pathType: Prefix
+      - backend:
+          service:
+            name: backend-teste
+            port:
+              number: 5233
+        path: /path
+        pathType: Prefix
+  - host: bar.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc2
+            port:
+              name: http
+        path: /admin
+        pathType: Prefix
+~~~~
+
+
+
+
+- Para a solução
+é necessário analisar os logs dos Pods, neles não tem insumos suficientes
+já nos logs do ingress, é possível verificar ocorrencias de código 308, indicando encaminhamento
+ao acessar o path /watch no browser, toma erro de ERR_TOO_MANY_CONNECTIONS
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        pathType: Prefix
+        backend:
+          service:
+          name: wear-service
+          port: 
+            number: 8080
+      - path: /watch
+        pathType: Prefix
+        backend:
+          service:
+          name: video-service
+          port:
+            number: 8080
+~~~~
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO
