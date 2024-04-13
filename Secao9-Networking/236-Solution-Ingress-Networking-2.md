@@ -289,7 +289,25 @@ git status
 - Ver sobre manifesto ingress, estrutura e yaml base.
 
 
+
+
+
+
 - No video de solução é utilizado o "kubectl expose" ao invés do manifesto do Service.
+
+- Exemplo de comando:
+
+  # Create a service for an nginx deployment, which serves on port 80 and connects to the containers on port 8000
+  kubectl expose deployment nginx --port=80 --target-port=8000
+
+
+- No uso do "kubectl expose", não é possível definir o nodePort via comando imperativo.
+- É necessário editar o recurso do Service e adicionar o nodePort desejado.
+
+
+
+
+
 
 
 
