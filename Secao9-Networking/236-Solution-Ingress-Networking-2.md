@@ -664,6 +664,13 @@ spec:
 é necessário analisar os logs dos Pods, neles não tem insumos suficientes
 já nos logs do ingress, é possível verificar ocorrencias de código 308, indicando encaminhamento
 ao acessar o path /watch no browser, toma erro de ERR_TOO_MANY_CONNECTIONS
+para resolver o erro é necessário adicionar os annotations:
+
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+- Manifesto ajustado fica assim:
 
 ~~~~yaml
 apiVersion: networking.k8s.io/v1
@@ -695,10 +702,30 @@ spec:
 ~~~~
 
 
+- Com o "rewrite-target", o que vem após a barra antes de ser processado pelo ingress é removido depois de ser processado, para evitar erros 404.
+exemplo:
+http://<ingress-service>:<ingress-port>/watch --> http://<watch-service>:<port>/
+http://<ingress-service>:<ingress-port>/wear --> http://<wear-service>:<port>/
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO
 
 - No video de solução é utilizado o "kubectl expose" ao invés do manifesto do Service.
 
-- Utilizar comandos imperativos, para facilitar a criação do esqueleto em alguns casos.
+- Utilizar comandos imperativos, para facilitar a criação do esqueleto em alguns casos!
+- Utilizar comandos imperativos, para facilitar a criação do esqueleto em alguns casos!
+- Utilizar comandos imperativos, para facilitar a criação do esqueleto em alguns casos!
+
+- Para a solução
+é necessário analisar os logs dos Pods, neles não tem insumos suficientes
+já nos logs do ingress, é possível verificar ocorrencias de código 308, indicando encaminhamento
+ao acessar o path /watch no browser, toma erro de ERR_TOO_MANY_CONNECTIONS
+para resolver o erro é necessário adicionar os annotations:
+
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
