@@ -11,6 +11,7 @@ git status
 
 
 
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## 240. Configure High Availability
@@ -29,6 +30,7 @@ kube-controller-manager --leader-elect true [other options]
 --leader-elect-retry-period 2s
 
 
+também é necessário um Load Balancer, para balancear as requisições entre os nodes.
 
 
 
@@ -61,3 +63,14 @@ ExecStart=/usr/local/bin/kube-apiserver \\
 --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
 --etcd-servers=https://10.240.0.10:2379,https://10.240.0.11:2379
 ~~~~
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Quando temos mais de um Master Node, temos que configurar os parametros --leader-elect
+
+- também é necessário um Load Balancer, para balancear as requisições entre os nodes.
