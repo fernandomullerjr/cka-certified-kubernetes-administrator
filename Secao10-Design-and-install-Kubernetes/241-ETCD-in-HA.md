@@ -1,4 +1,4 @@
-
+#
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 #  push
@@ -28,24 +28,59 @@ Objectives
 
 
 
-
 ETCD is a distributed and reliable key-value store.
 
 
-Leader Election - RAFT
 
 
+##  Getting Started
 
-
-
-
-Getting Started
+~~~~bash
 wget -q --https-only \
 "https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz"
 tar -xvf etcd-v3.3.9-linux-amd64.tar.gz
 mv etcd-v3.3.9-linux-amd64/etcd* /usr/local/bin/
 mkdir -p /etc/etcd /var/lib/etcd
 cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd
+~~~~
+
+
+
+~~~~bash
+etcd.service
+ExecStart=/usr/local/bin/etcd \\
+--name ${ETCD_NAME} \\
+--cert-file=/etc/etcd/kubernetes.pem \\
+--key-file=/etc/etcd/kubernetes-key.pem \\
+--peer-cert-file=/etc/etcd/kubernetes.pem \\
+--peer-key-file=/etc/etcd/kubernetes-key.pem \\
+--trusted-ca-file=/etc/etcd/ca.pem \\
+--peer-trusted-ca-file=/etc/etcd/ca.pem \\
+--peer-client-cert-auth \\
+--client-cert-auth \\
+--initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
+--listen-peer-urls https://${INTERNAL_IP}:2380 \\
+--listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
+--advertise-client-urls https://${INTERNAL_IP}:2379 \\
+--initial-cluster-token etcd-cluster-0 \\
+--initial-cluster controller-0=https://${CONTROLLER0_IP}:2380,controller-1=https://${CONTROLLER1_IP}:2380 \\
+--initial-cluster-state new \\
+--data-dir=/var/lib/etcd
+~~~~
+
+
+
+
+
+## Leader Election - RAFT
+
+algoritmo RAFT
+
+Resumidamente:
+
+     Todos os nós começam como seguidores. Se um seguidor não receber notícias de um líder ou candidato dentro de um prazo definido (tempo limite da eleição), ele se tornará um candidato.
+     O candidato busca votos de outros nós do cluster.
+     Se o candidato obtiver votos da maioria dos nós, ele se tornará o novo líder para o próximo mandato.
 
 
 
@@ -65,6 +100,20 @@ cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd
  So it is Best Practice to have odd number of ETCD nodes for the highest fault tolerance. 
 
 
+
+
+
+## ETCDCTL
+etcdctl put name john
+etcdctl get name
+export ETCDCTL_API=3
+name
+
+
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO
@@ -73,3 +122,11 @@ cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd
 
 - ETCD em HA elege um lider.
 - O lider processa os dados e envia uma cópia aos demais membros.
+- Após certo tempo, o algoritmo RAFT inicia uma nova votação e descarta aquele candidato que não enviar um sinal que está online ainda.
+
+- Quorum = N/2 +1
+
+- Principal material
+<https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/>
+
+- ETCDCTL é utilizado para inserir ou obter dados do etcd. Ele existe nas versões 2 ou 3. Importante setar a versão via variável "export ETCDCTL_API=3", pois alguns comandos podem não funcionar entre as versões.
