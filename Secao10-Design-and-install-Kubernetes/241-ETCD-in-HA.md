@@ -130,3 +130,8 @@ name
 <https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/>
 
 - ETCDCTL é utilizado para inserir ou obter dados do etcd. Ele existe nas versões 2 ou 3. Importante setar a versão via variável "export ETCDCTL_API=3", pois alguns comandos podem não funcionar entre as versões.
+
+- As quantidades de 3, 5 ou 7, são bons números para se usar, na quantidade de etcd para HA.
+3 suporta 1 instancia down.
+5 suporta 2 instancias down.
+7 suporta 3 instancias down.
