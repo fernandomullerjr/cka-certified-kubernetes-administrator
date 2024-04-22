@@ -23,3 +23,25 @@ Note that this section is for your own practice only. To our knowledge there has
   - Take me to [Introduction](https://kodekloud.com/topic/introduction-to-deployment-with-kubeadm/)
 
 If you have an Apple M1 or M2 (Apple Silicon) machine, then please follow the separate instructions [here](../../apple-silicon/README.md).
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  243. Introduction to Deployment with Kubeadm
+
+1. Instalar o containerd em cada um dos nodes.
+2. Instalar o kubeadm em cada um dos nodes.
+3. Inicializar o node Master.
+4. Configurar Pod Network.
+5. Efetuar o join dos Worker Nodes.
