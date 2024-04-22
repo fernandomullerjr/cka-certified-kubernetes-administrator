@@ -16,6 +16,16 @@ git status
 # ###################################################################################################################### 
 ##   245. Deploy with Kubeadm - Provision VMs with Vagrant
 
+# Provision VMs with Vagrant tool
+
+  - Take me to [Lecture](https://kodekloud.com/topic/deploy-with-kubeadm-provision-vms-with-vagrant/)
+
+If you want to build your own cluster, check these out. They are more up to date than the video currently :smile:
+
+* [Kubeadm Clusters](../../kubeadm-clusters/)
+* [Managed Clusters](../../managed-clusters/)
+
+
 # Demo - Deployment with Kubeadm tool
 
 - Take me to [Lecture](https://kodekloud.com/topic/demo-deployment-with-kubeadm/)
@@ -244,3 +254,34 @@ Docker is no longer supported as a container driver. Instead we will install the
     * Paste the `kubeadm join` command from above step to the command prompt and enter it.
 
     </details>
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##   245. Deploy with Kubeadm - Provision VMs with Vagrant
+
+- Instalar VirtualBox
+
+
+
+## PENDENTE
+- Instalar
+<https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/docs/01-prerequisites.md>
+
+- Pasta que tem o  Vagrantfile:
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/Vagrantfile
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##   RESUMO
+
+
+- Instalar VirtualBox
+
+- Pasta que tem o  Vagrantfile:
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/Vagrantfile
