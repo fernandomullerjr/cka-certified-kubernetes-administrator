@@ -447,6 +447,126 @@ cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-
 vagrant up
 
 
+~~~~bash
+
+root@debian10x64:/home/fernando# cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox# vagrant up
+Bringing machine 'controlplane' up with 'virtualbox' provider...
+Bringing machine 'node01' up with 'virtualbox' provider...
+Bringing machine 'node02' up with 'virtualbox' provider...
+==> controlplane: Box 'ubuntu/jammy64' could not be found. Attempting to find and install...
+    controlplane: Box Provider: virtualbox
+    controlplane: Box Version: >= 0
+==> controlplane: Loading metadata for box 'ubuntu/jammy64'
+    controlplane: URL: https://vagrantcloud.com/api/v2/vagrant/ubuntu/jammy64
+==> controlplane: Adding box 'ubuntu/jammy64' (v20240417.0.0) for provider: virtualbox
+    controlplane: Downloading: https://vagrantcloud.com/ubuntu/boxes/jammy64/versions/20240417.0.0/providers/virtualbox/unknown/vagrant.box
+Download redirected to host: cloud-images.ubuntu.com
+==> controlplane: Successfully added box 'ubuntu/jammy64' (v20240417.0.0) for 'virtualbox'!
+==> controlplane: Importing base box 'ubuntu/jammy64'...
+==> controlplane: Matching MAC address for NAT networking...
+==> controlplane: Setting the name of the VM: controlplane
+Vagrant is currently configured to create VirtualBox synced folders with
+the `SharedFoldersEnableSymlinksCreate` option enabled. If the Vagrant
+guest is not trusted, you may want to disable this option. For more
+information on this option, please refer to the VirtualBox manual:
+
+  https://www.virtualbox.org/manual/ch04.html#sharedfolders
+
+This option can be disabled globally with an environment variable:
+
+  VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+
+or on a per folder basis within the Vagrantfile:
+
+  config.vm.synced_folder '/host/path', '/guest/path', SharedFoldersEnableSymlinksCreate: false
+==> controlplane: Clearing any previously set network interfaces...
+==> controlplane: Specific bridge 'ens33
+==> controlplane: ens35' not found. You may be asked to specify
+==> controlplane: which network to bridge to.
+==> controlplane: Available bridged network interfaces:
+1) ens33
+2) lxcf5241d44ac8a
+3) lxc677db2396324
+4) cilium_host
+5) lxc7b3c1c2eea67
+6) lxc0aae936bbdc6
+7) lxc3fb7b8b228c3
+8) lxca6380563e374
+9) lxcbd5c1bc3702a
+10) lxc897bec8e8939
+11) lxc45f0ec14ed1b
+12) lxc_health
+13) lxc84b009902d42
+14) docker0
+15) cilium_vxlan
+16) lxcaf867b747dae
+17) lxc51e905357a17
+18) lxc1d2325f894b3
+19) ens35
+20) cilium_net
+21) lxcca5389ab0c7b
+22) lxc3f849cab763f
+==> controlplane: When choosing an interface, it is usually the one that is
+==> controlplane: being used to connect to the internet.
+==> controlplane:
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to? ens33
+    controlplane: Which interface should the network bridge to? ens33
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+
+==> controlplane: When choosing an interface, it is usually the one that is
+==> controlplane: being used to connect to the internet.
+==> controlplane:
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to? ens33
+    controlplane: Which interface should the network bridge to? ens33
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to? ens35
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to?
+    controlplane: Which interface should the network bridge to? 1
+==> controlplane: Preparing network interfaces based on configuration...
+    controlplane: Adapter 1: nat
+    controlplane: Adapter 2: bridged
+==> controlplane: Forwarding ports...
+    controlplane: 22 (guest) => 2222 (host) (adapter 1)
+==> controlplane: Running 'pre-boot' VM customizations...
+==> controlplane: Booting VM...
+There was an error while executing `VBoxManage`, a CLI used by Vagrant
+for controlling VirtualBox. The command and stderr is shown below.
+
+Command: ["startvm", "9f87109e-5a72-4fe1-836d-f79027ca361a", "--type", "headless"]
+
+Stderr: VBoxManage: error: AMD-V is not available (VERR_SVM_NO_SVM)
+VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
+
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+
+~~~~
+
+
+
+
+
+## PENDENTE
+
+- TSHOOT, erro:
+
+Stderr: VBoxManage: error: AMD-V is not available (VERR_SVM_NO_SVM)
+VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
+
+
 
 
 # ###################################################################################################################### 
