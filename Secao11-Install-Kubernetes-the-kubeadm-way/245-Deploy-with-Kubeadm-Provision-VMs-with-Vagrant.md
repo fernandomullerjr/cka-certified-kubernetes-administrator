@@ -321,6 +321,81 @@ fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Ins
 
 <https://www.virtualbox.org/wiki/Linux_Downloads>
 
+Debian-based Linux distributions
+
+Add the following line to your /etc/apt/sources.list. For Debian 11 and older, replace '<mydist>' with 'bullseye', 'buster', or 'stretch'. For Ubuntu 22.04 and older, 'replace '<mydist>' with 'jammy', 'eoan', 'bionic', 'xenial',
+
+deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian <mydist> contrib
+
+
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$ lsb_release -cs
+buster
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator$
+
+
+- Comando ajustado:
+vi /etc/apt/sources.list
+
+deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian buster contrib
+
+
+
+
+ The Oracle public key for verifying the signatures can be downloaded here. You can add these keys with
+
+sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor oracle_vbox_2016.asc
+
+or combine downloading and registering:
+
+wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+
+The key fingerprint for oracle_vbox_2016.asc is
+
+B9F8 D658 297A F3EF C18D  5CDF A2F6 83C5 2980 AECF
+Oracle Corporation (VirtualBox archive signing key) <info@virtualbox.org>
+
+~~~~bash
+fernando@debian10x64:/tmp$ wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+--2024-04-23 08:50:52--  https://www.virtualbox.org/download/oracle_vbox_2016.asc
+[sudo] password for fernando: Resolving www.virtualbox.org (www.virtualbox.org)... 184.85.41.242, 2600:1419:3e00:187::37b7, 2600:1419:3e00:183::37b7
+Connecting to www.virtualbox.org (www.virtualbox.org)|184.85.41.242|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3157 (3.1K) [application/pgp-signature]
+Saving to: ‘STDOUT’
+
+-                                                                  100%[==============================================================================================================================================================>]   3.08K  --.-KB/s    in 0s
+
+2024-04-23 08:50:52 (21.3 MB/s) - written to stdout [3157/3157]
+
+
+Sorry, try again.
+[sudo] password for fernando:
+You have new mail in /var/mail/fernando
+fernando@debian10x64:/tmp$
+fernando@debian10x64:/tmp$ wget https://www.virtualbox.org/download/oracle_vbox_2016.asc
+--2024-04-23 08:53:35--  https://www.virtualbox.org/download/oracle_vbox_2016.asc
+Resolving www.virtualbox.org (www.virtualbox.org)... 184.85.41.242, 2600:1419:3e00:183::37b7, 2600:1419:3e00:187::37b7
+Connecting to www.virtualbox.org (www.virtualbox.org)|184.85.41.242|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3157 (3.1K) [application/pgp-signature]
+Saving to: ‘oracle_vbox_2016.asc’
+
+oracle_vbox_2016.asc                                               100%[==============================================================================================================================================================>]   3.08K  --.-KB/s    in 0s
+
+2024-04-23 08:53:35 (11.7 MB/s) - ‘oracle_vbox_2016.asc’ saved [3157/3157]
+
+fernando@debian10x64:/tmp$ sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor oracle_vbox_2016.asc
+You have new mail in /var/mail/fernando
+
+~~~~
+
+
+ To install VirtualBox, do
+
+sudo apt-get update
+sudo apt-get install virtualbox-6.1
+
 
 
 
@@ -336,13 +411,41 @@ echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://
 sudo apt update && sudo apt install vagrant
 
 
+~~~~bash
+
+root@debian10x64:/tmp# vagrant status
+
+A Vagrant environment or target machine is required to run this
+command. Run `vagrant init` to create a new Vagrant environment. Or,
+get an ID of a target machine from `vagrant global-status` to run
+this command on. A final option is to change to a directory with a
+Vagrantfile and to try again.
+root@debian10x64:/tmp#
+root@debian10x64:/tmp#
+root@debian10x64:/tmp# date
+Tue 23 Apr 2024 08:57:59 AM -03
+root@debian10x64:/tmp#
+
+~~~~
+
+
+- Efetuada instalação do Virtualbox e Vagrant.
+
+
+## PENDENTE
+
+- Efetuar proximos passos.
+
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##   RESUMO
 
+.- Instalar VirtualBox
 
-- Instalar VirtualBox
+- Instalar o Vagrant.
 
 - Pasta que tem o  Vagrantfile:
 https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/Vagrantfile
