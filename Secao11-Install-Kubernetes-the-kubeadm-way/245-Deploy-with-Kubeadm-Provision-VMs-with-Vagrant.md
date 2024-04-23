@@ -276,6 +276,67 @@ Docker is no longer supported as a container driver. Instead we will install the
 https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/Vagrantfile
 
 
+
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters
+
+~~~~bash
+
+fernando@debian10x64:~$ cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$ ls
+apple-silicon  aws  aws-ha  generic  README.md  virtualbox
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$ ls -lhasp
+total 32K
+4.0K drwxr-xr-x 7 fernando fernando 4.0K Apr 23 08:43 ./
+4.0K drwxr-xr-x 3 fernando fernando 4.0K Apr 23 08:43 ../
+4.0K drwxr-xr-x 4 fernando fernando 4.0K Apr 23 08:43 apple-silicon/
+4.0K drwxr-xr-x 4 fernando fernando 4.0K Apr 23 08:43 aws/
+4.0K drwxr-xr-x 4 fernando fernando 4.0K Apr 23 08:43 aws-ha/
+4.0K drwxr-xr-x 2 fernando fernando 4.0K Apr 23 08:43 generic/
+4.0K -rw-r--r-- 1 fernando fernando  731 Apr 23 08:43 README.md
+4.0K drwxr-xr-x 6 fernando fernando 4.0K Apr 23 08:43 virtualbox/
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$ ls -lhasp virtualbox/
+total 40K
+4.0K drwxr-xr-x 6 fernando fernando 4.0K Apr 23 08:43 ./
+4.0K drwxr-xr-x 7 fernando fernando 4.0K Apr 23 08:43 ../
+4.0K drwxr-xr-x 2 fernando fernando 4.0K Apr 23 08:43 docs/
+4.0K -rw-r--r-- 1 fernando fernando   12 Apr 23 08:43 .gitignore
+4.0K drwxr-xr-x 2 fernando fernando 4.0K Apr 23 08:43 mac/
+4.0K -rw-r--r-- 1 fernando fernando  127 Apr 23 08:43 README.md
+4.0K drwxr-xr-x 2 fernando fernando 4.0K Apr 23 08:43 tools/
+4.0K drwxr-xr-x 3 fernando fernando 4.0K Apr 23 08:43 ubuntu/
+8.0K -rw-r--r-- 1 fernando fernando 6.9K Apr 23 08:43 Vagrantfile
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$ date
+Tue 23 Apr 2024 08:44:07 AM -03
+fernando@debian10x64:~/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters$
+
+~~~~
+
+
+
+
+## VirtualBox
+
+<https://www.virtualbox.org/wiki/Linux_Downloads>
+
+
+
+
+## Vagrant
+
+<https://developer.hashicorp.com/vagrant/install?product_intent=vagrant>
+
+Linux
+Package manager
+
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install vagrant
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##   RESUMO
