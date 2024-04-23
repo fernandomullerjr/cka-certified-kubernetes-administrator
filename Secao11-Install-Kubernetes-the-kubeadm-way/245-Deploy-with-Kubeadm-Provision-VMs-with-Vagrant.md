@@ -11,7 +11,6 @@ git status
 
 
 
-
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##   245. Deploy with Kubeadm - Provision VMs with Vagrant
@@ -442,8 +441,9 @@ root@debian10x64:/tmp#
 
 <https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/11-Install-Kubernetes-the-kubeadm-way/04-Demo-Deployment-with-Kubeadm.md>
 
+- Subindo o Vagrant
+acessar o diretório onde está o Vagrantfile:
 cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox
-
 vagrant up
 
 
@@ -459,3 +459,5 @@ vagrant up
 
 - Pasta que tem o  Vagrantfile:
 https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/kubeadm-clusters/virtualbox/Vagrantfile
+
+
