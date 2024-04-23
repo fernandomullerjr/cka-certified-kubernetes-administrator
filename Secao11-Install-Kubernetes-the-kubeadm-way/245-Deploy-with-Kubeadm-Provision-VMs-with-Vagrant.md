@@ -438,6 +438,16 @@ root@debian10x64:/tmp#
 
 
 
+## Dia 25/04/2024
+
+<https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/11-Install-Kubernetes-the-kubeadm-way/04-Demo-Deployment-with-Kubeadm.md>
+
+cd /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox
+
+vagrant up
+
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
