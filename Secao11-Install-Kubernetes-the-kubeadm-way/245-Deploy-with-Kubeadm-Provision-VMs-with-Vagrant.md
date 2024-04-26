@@ -521,7 +521,6 @@ or on a per folder basis within the Vagrantfile:
     controlplane: Which interface should the network bridge to?
     controlplane: Which interface should the network bridge to?
     controlplane: Which interface should the network bridge to?
-
 ==> controlplane: When choosing an interface, it is usually the one that is
 ==> controlplane: being used to connect to the internet.
 ==> controlplane:
@@ -552,13 +551,15 @@ Stderr: VBoxManage: error: AMD-V is not available (VERR_SVM_NO_SVM)
 VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
 
 root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
-
 ~~~~
 
 
 
 
 
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 ## PENDENTE
 
 - TSHOOT, erro:
