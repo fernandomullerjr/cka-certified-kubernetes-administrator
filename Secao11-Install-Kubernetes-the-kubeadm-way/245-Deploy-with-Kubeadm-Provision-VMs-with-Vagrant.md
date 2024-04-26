@@ -551,6 +551,19 @@ Stderr: VBoxManage: error: AMD-V is not available (VERR_SVM_NO_SVM)
 VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
 
 root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox# vagrant status
+Current machine states:
+
+controlplane              poweroff (virtualbox)
+node01                    not created (virtualbox)
+node02                    not created (virtualbox)
+
+This environment represents multiple VMs. The VMs are all listed
+above with their current state. For more information about a specific
+VM, run `vagrant status NAME`.
+root@debian10x64:/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao11-Install-Kubernetes-the-kubeadm-way/kubeadm-clusters/virtualbox#
+
 ~~~~
 
 
