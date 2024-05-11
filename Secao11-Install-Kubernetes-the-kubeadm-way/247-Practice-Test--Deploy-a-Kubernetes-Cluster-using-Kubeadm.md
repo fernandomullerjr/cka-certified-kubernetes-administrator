@@ -1364,3 +1364,21 @@ PARA:
         - --ip-masq
         - --kube-subnet-mgr
         - --iface=eth0
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Iniciando kubeadm com parametros:
+sudo kubeadm init --apiserver-advertise-address 192.0.68.12 --apiserver-cert-extra-sans controlplane  --pod-network-cidr 10.244.0.0/16
+
+- Para configurar interface especifica no flannel, usar o parametro sem aspas nos args do container do DaemonSet:
+    --iface=eth0
+
+
+

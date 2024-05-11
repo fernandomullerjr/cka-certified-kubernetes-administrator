@@ -259,6 +259,5 @@ Docker is no longer supported as a container driver. Instead we will install the
 Stderr: VBoxManage: error: AMD-V is not available (VERR_SVM_NO_SVM)
 VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
 
-
 ao tentar subir maquinas/VMs via Vagrant
 então não foi possivel instalar o Kubeadm nelas
