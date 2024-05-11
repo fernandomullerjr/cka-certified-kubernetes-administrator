@@ -878,4 +878,489 @@ configmap/kube-flannel-cfg created
 daemonset.apps/kube-flannel-ds created
 
 controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+kube-flannel   kube-flannel-ds-mmvcw                  1/1     Running   0          75s
+kube-flannel   kube-flannel-ds-wq4jh                  1/1     Running   0          75s
+kube-system    coredns-76f75df574-6dhtl               1/1     Running   0          7m23s
+kube-system    coredns-76f75df574-c7th2               1/1     Running   0          7m23s
+kube-system    etcd-controlplane                      1/1     Running   0          7m33s
+kube-system    kube-apiserver-controlplane            1/1     Running   0          7m40s
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          7m37s
+kube-system    kube-proxy-cnplh                       1/1     Running   0          5m23s
+kube-system    kube-proxy-np929                       1/1     Running   0          7m23s
+kube-system    kube-scheduler-controlplane            1/1     Running   0          7m35s
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl describe pod kube-flannel-ds-mmvcw -n kube-flannel
+Name:                 kube-flannel-ds-mmvcw
+Namespace:            kube-flannel
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Service Account:      flannel
+Node:                 node01/192.0.68.3
+Start Time:           Fri, 10 May 2024 21:02:17 -0400
+Labels:               app=flannel
+                      controller-revision-hash=fb78fc6b9
+                      k8s-app=flannel
+                      pod-template-generation=1
+                      tier=node
+Annotations:          <none>
+Status:               Running
+IP:                   192.0.68.3
+IPs:
+  IP:           192.0.68.3
+Controlled By:  DaemonSet/kube-flannel-ds
+Init Containers:
+  install-cni-plugin:
+    Container ID:  containerd://c64c8339b2651efb443b3938a312b0dee2fe22cdf64c34fbadec444e532fc24d
+    Image:         docker.io/flannel/flannel-cni-plugin:v1.4.0-flannel1
+    Image ID:      docker.io/flannel/flannel-cni-plugin@sha256:743c25e5e477527d8e54faa3e5259fbbee3463a335de1690879fc74305edc79b
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      cp
+    Args:
+      -f
+      /flannel
+      /opt/cni/bin/flannel
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Fri, 10 May 2024 21:02:20 -0400
+      Finished:     Fri, 10 May 2024 21:02:20 -0400
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /opt/cni/bin from cni-plugin (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kd5qh (ro)
+  install-cni:
+    Container ID:  containerd://c72f46e8655cd14b77421dae55cc06ef92a3405a12c44dd14b4e0faa1fe1a007
+    Image:         docker.io/flannel/flannel:v0.25.1
+    Image ID:      docker.io/flannel/flannel@sha256:0483b9a62c8190ac36d9aa4f7f9b0d5f914353f7ef3b56727d1947b209e49e39
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      cp
+    Args:
+      -f
+      /etc/kube-flannel/cni-conf.json
+      /etc/cni/net.d/10-flannel.conflist
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Fri, 10 May 2024 21:02:24 -0400
+      Finished:     Fri, 10 May 2024 21:02:24 -0400
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /etc/cni/net.d from cni (rw)
+      /etc/kube-flannel/ from flannel-cfg (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kd5qh (ro)
+Containers:
+  kube-flannel:
+    Container ID:  containerd://1c08868878a029d4312179c094f7ef4486d859714351f346390f076c155ffac1
+    Image:         docker.io/flannel/flannel:v0.25.1
+    Image ID:      docker.io/flannel/flannel@sha256:0483b9a62c8190ac36d9aa4f7f9b0d5f914353f7ef3b56727d1947b209e49e39
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /opt/bin/flanneld
+    Args:
+      --ip-masq
+      --kube-subnet-mgr
+    State:          Running
+      Started:      Fri, 10 May 2024 21:02:25 -0400
+    Ready:          True
+    Restart Count:  0
+    Requests:
+      cpu:     100m
+      memory:  50Mi
+    Environment:
+      POD_NAME:           kube-flannel-ds-mmvcw (v1:metadata.name)
+      POD_NAMESPACE:      kube-flannel (v1:metadata.namespace)
+      EVENT_QUEUE_DEPTH:  5000
+    Mounts:
+      /etc/kube-flannel/ from flannel-cfg (rw)
+      /run/flannel from run (rw)
+      /run/xtables.lock from xtables-lock (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kd5qh (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  run:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/flannel
+    HostPathType:  
+  cni-plugin:
+    Type:          HostPath (bare host directory volume)
+    Path:          /opt/cni/bin
+    HostPathType:  
+  cni:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/cni/net.d
+    HostPathType:  
+  flannel-cfg:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      kube-flannel-cfg
+    Optional:  false
+  xtables-lock:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/xtables.lock
+    HostPathType:  FileOrCreate
+  kube-api-access-kd5qh:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 :NoSchedule op=Exists
+                             node.kubernetes.io/disk-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/memory-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/network-unavailable:NoSchedule op=Exists
+                             node.kubernetes.io/not-ready:NoExecute op=Exists
+                             node.kubernetes.io/pid-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/unreachable:NoExecute op=Exists
+                             node.kubernetes.io/unschedulable:NoSchedule op=Exists
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  100s  default-scheduler  Successfully assigned kube-flannel/kube-flannel-ds-mmvcw to node01
+  Normal  Pulling    99s   kubelet            Pulling image "docker.io/flannel/flannel-cni-plugin:v1.4.0-flannel1"
+  Normal  Pulled     98s   kubelet            Successfully pulled image "docker.io/flannel/flannel-cni-plugin:v1.4.0-flannel1" in 1.403s (1.403s including waiting)
+  Normal  Created    98s   kubelet            Created container install-cni-plugin
+  Normal  Started    97s   kubelet            Started container install-cni-plugin
+  Normal  Pulling    96s   kubelet            Pulling image "docker.io/flannel/flannel:v0.25.1"
+  Normal  Pulled     93s   kubelet            Successfully pulled image "docker.io/flannel/flannel:v0.25.1" in 3.437s (3.437s including waiting)
+  Normal  Created    93s   kubelet            Created container install-cni
+  Normal  Started    93s   kubelet            Started container install-cni
+  Normal  Pulled     92s   kubelet            Container image "docker.io/flannel/flannel:v0.25.1" already present on machine
+  Normal  Created    92s   kubelet            Created container kube-flannel
+  Normal  Started    92s   kubelet            Started container kube-flannel
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get configmap -A
+NAMESPACE         NAME                                                   DATA   AGE
+default           kube-root-ca.crt                                       1      8m24s
+kube-flannel      kube-flannel-cfg                                       2      2m16s
+kube-flannel      kube-root-ca.crt                                       1      2m16s
+kube-node-lease   kube-root-ca.crt                                       1      8m24s
+kube-public       cluster-info                                           2      8m38s
+kube-public       kube-root-ca.crt                                       1      8m24s
+kube-system       coredns                                                1      8m36s
+kube-system       extension-apiserver-authentication                     6      8m41s
+kube-system       kube-apiserver-legacy-service-account-token-tracking   1      8m41s
+kube-system       kube-proxy                                             2      8m36s
+kube-system       kube-root-ca.crt                                       1      8m24s
+kube-system       kubeadm-config                                         1      8m39s
+kube-system       kubelet-config                                         1      8m39s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe configmap kube-flannel-cfg -n kube-flannel
+Name:         kube-flannel-cfg
+Namespace:    kube-flannel
+Labels:       app=flannel
+              k8s-app=flannel
+              tier=node
+Annotations:  <none>
+
+Data
+====
+cni-conf.json:
+----
+{
+  "name": "cbr0",
+  "cniVersion": "0.3.1",
+  "plugins": [
+    {
+      "type": "flannel",
+      "delegate": {
+        "hairpinMode": true,
+        "isDefaultGateway": true
+      }
+    },
+    {
+      "type": "portmap",
+      "capabilities": {
+        "portMappings": true
+      }
+    }
+  ]
+}
+
+net-conf.json:
+----
+{
+  "Network": "10.244.0.0/16",
+  "Backend": {
+    "Type": "vxlan"
+  }
+}
+
+
+BinaryData
+====
+
+Events:  <none>
+
+controlplane ~ ➜  
 ~~~~
+
+
+Is Flannel using "eth0" interface for inter-host communication ?
+
+- ERRO
+necessário ajustar para usar eth0
+
+
+<https://github.com/flannel-io/flannel/blob/master/Documentation/configuration.md>
+--iface="": interface to use (IP or name) for inter-host communication. Defaults to the interface for the default route on the machine. This can be specified multiple times to check each option in order. Returns the first match found.
+
+
+
+
+
+
+
+
+
+      containers:
+      - args:
+        - --ip-masq
+        - --kube-subnet-mgr
+
+
+
+
+      containers:
+      - args:
+        - --ip-masq
+        - --kube-subnet-mgr
+        
+        
+
+
+
+
+
+kubectl delete -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+
+
+
+
+controlplane ~ ➜  kubectl delete -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+namespace "kube-flannel" deleted
+serviceaccount "flannel" deleted
+clusterrole.rbac.authorization.k8s.io "flannel" deleted
+clusterrolebinding.rbac.authorization.k8s.io "flannel" deleted
+configmap "kube-flannel-cfg" deleted
+daemonset.apps "kube-flannel-ds" deleted
+
+controlplane ~ ➜  vi kube-flannel.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f kube-flannel.yaml
+namespace/kube-flannel created
+serviceaccount/flannel created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds created
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS      AGE
+kube-flannel   kube-flannel-ds-4t4vr                  0/1     Error     1 (13s ago)   17s
+kube-flannel   kube-flannel-ds-mtl62                  0/1     Error     1 (13s ago)   17s
+kube-system    coredns-76f75df574-6dhtl               1/1     Running   0             18m
+kube-system    coredns-76f75df574-c7th2               1/1     Running   0             18m
+kube-system    etcd-controlplane                      1/1     Running   0             18m
+kube-system    kube-apiserver-controlplane            1/1     Running   0             19m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0             18m
+kube-system    kube-proxy-cnplh                       1/1     Running   0             16m
+kube-system    kube-proxy-np929                       1/1     Running   0             18m
+kube-system    kube-scheduler-controlplane            1/1     Running   0             18m
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ✖ kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS             RESTARTS      AGE
+kube-flannel   kube-flannel-ds-4t4vr                  0/1     CrashLoopBackOff   5 (72s ago)   4m17s
+kube-flannel   kube-flannel-ds-mtl62                  0/1     CrashLoopBackOff   5 (72s ago)   4m17s
+
+
+
+
+  Warning  BackOff    8s (x24 over 5m2s)    kubelet            Back-off restarting failed container kube-flannel in pod kube-flannel-ds-4t4vr_kube-flannel(d8bcb85c-f60e-4300-ade7-a6fd1ee0494e)
+
+
+
+
+  Warning  BackOff    8s (x24 over 5m2s)    kubelet            Back-off restarting failed container kube-flannel in pod kube-flannel-ds-4t4vr_kube-flannel(d8bcb85c-f60e-4300-ade7-a6fd1ee0494e)
+
+
+
+
+
+controlplane ~ ➜  kubectl logs kube-flannel-ds-4t4vr -n kube-flannel
+Defaulted container "kube-flannel" out of: kube-flannel, install-cni-plugin (init), install-cni (init)
+I0511 01:17:41.743397       1 main.go:210] CLI flags config: {etcdEndpoints:http://127.0.0.1:4001,http://127.0.0.1:2379 etcdPrefix:/coreos.com/network etcdKeyfile: etcdCertfile: etcdCAFile: etcdUsername: etcdPassword: version:false kubeSubnetMgr:true kubeApiUrl: kubeAnnotationPrefix:flannel.alpha.coreos.com kubeConfigFile: iface:["eth0"] ifaceRegex:[] ipMasq:true ifaceCanReach: subnetFile:/run/flannel/subnet.env publicIP: publicIPv6: subnetLeaseRenewMargin:60 healthzIP:0.0.0.0 healthzPort:0 iptablesResyncSeconds:5 iptablesForwardRules:true netConfPath:/etc/kube-flannel/net-conf.json setNodeNetworkUnavailable:true}
+W0511 01:17:41.743485       1 client_config.go:618] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0511 01:17:41.791630       1 kube.go:139] Waiting 10m0s for node controller to sync
+I0511 01:17:41.791783       1 kube.go:455] Starting kube subnet manager
+I0511 01:17:41.795340       1 kube.go:476] Creating the node lease for IPv4. This is the n.Spec.PodCIDRs: [10.244.0.0/24]
+I0511 01:17:41.795411       1 kube.go:476] Creating the node lease for IPv4. This is the n.Spec.PodCIDRs: [10.244.1.0/24]
+I0511 01:17:42.792121       1 kube.go:146] Node controller sync successful
+I0511 01:17:42.792165       1 main.go:230] Created subnet manager: Kubernetes Subnet Manager - controlplane
+I0511 01:17:42.792170       1 main.go:233] Installing signal handlers
+I0511 01:17:42.792359       1 main.go:442] Found network config - Backend type: vxlan
+I0511 01:17:42.792688       1 main.go:285] Could not find valid interface matching "eth0": error looking up interface "eth0": route ip+net: no such network interface
+E0511 01:17:42.792706       1 main.go:316] Failed to find interface to use that matches the interfaces and/or regexes provided
+
+controlplane ~ ➜  
+
+
+
+
+
+kubectl delete -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+
+
+controlplane ~ ➜  kubectl delete -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+namespace "kube-flannel" deleted
+serviceaccount "flannel" deleted
+clusterrole.rbac.authorization.k8s.io "flannel" deleted
+clusterrolebinding.rbac.authorization.k8s.io "flannel" deleted
+configmap "kube-flannel-cfg" deleted
+daemonset.apps "kube-flannel-ds" deleted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+namespace/kube-flannel created
+serviceaccount/flannel created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods 
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get pods  -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+kube-flannel   kube-flannel-ds-n88tw                  1/1     Running   0          13s
+kube-flannel   kube-flannel-ds-tdmp4                  1/1     Running   0          13s
+kube-system    coredns-76f75df574-6dhtl               1/1     Running   0          29m
+kube-system    coredns-76f75df574-c7th2               1/1     Running   0          29m
+kube-system    etcd-controlplane                      1/1     Running   0          29m
+kube-system    kube-apiserver-controlplane            1/1     Running   0          29m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          29m
+kube-system    kube-proxy-cnplh                       1/1     Running   0          27m
+kube-system    kube-proxy-np929                       1/1     Running   0          29m
+kube-system    kube-scheduler-controlplane            1/1     Running   0          29m
+
+controlplane ~ ➜  kubectl exec -ti kube-flannel-ds-n88tw -n kube-flannel sh
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+Defaulted container "kube-flannel" out of: kube-flannel, install-cni-plugin (init), install-cni (init)
+/ # / # flannel --help
+sh: flannel: not found
+/ # flannel -help
+sh: flannel: not found
+/ # flannel -h
+sh: flannel: not found
+/ # 
+
+
+
+
+
+controlplane ~ ➜  vi kube-flannel-2.yaml
+
+controlplane ~ ➜  kubectl apply - kube-flannel-2.yaml
+error: Unexpected args: [- kube-flannel-2.yaml]
+See 'kubectl apply -h' for help and examples
+
+controlplane ~ ✖ kubectl apply -f kube-flannel-2.yaml
+namespace/kube-flannel created
+serviceaccount/flannel created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds created
+
+controlplane ~ ➜  kubectl get pods -A -w
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+kube-flannel   kube-flannel-ds-g4bpm                  1/1     Running   0          4s
+kube-flannel   kube-flannel-ds-kq4r6                  1/1     Running   0          4s
+kube-system    coredns-76f75df574-6dhtl               1/1     Running   0          31m
+kube-system    coredns-76f75df574-c7th2               1/1     Running   0          31m
+kube-system    etcd-controlplane                      1/1     Running   0          31m
+kube-system    kube-apiserver-controlplane            1/1     Running   0          31m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          31m
+kube-system    kube-proxy-cnplh                       1/1     Running   0          29m
+kube-system    kube-proxy-np929                       1/1     Running   0          31m
+kube-system    kube-scheduler-controlplane            1/1     Running   0          31m
+^C
+controlplane ~ ✖ 
+
+
+
+- OK!
+
+- Resolvido após ajustar manifesto
+removendo as aspas
+
+DE:
+
+      containers:
+      - args:
+        - --ip-masq
+        - --kube-subnet-mgr
+        - --iface="eth0"
+
+PARA:
+
+      containers:
+      - args:
+        - --ip-masq
+        - --kube-subnet-mgr
+        - --iface=eth0
