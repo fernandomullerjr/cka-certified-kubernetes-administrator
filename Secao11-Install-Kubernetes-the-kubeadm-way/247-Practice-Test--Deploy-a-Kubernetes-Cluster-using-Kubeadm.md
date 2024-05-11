@@ -376,3 +376,506 @@ kubelet installed on controlplane?
 Kubeadm installed on worker node01?
 
 Kubelet installed on worker node01 ?
+
+
+
+controlplane ~ ➜  sudo apt-get install -y kubelet=1.29.0-1.1 kubectl=1.29.0-1.1 kubeadm=1.29.0-1.1
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+E: Version '1.29.0-1.1' for 'kubelet' was not found
+E: Version '1.29.0-1.1' for 'kubectl' was not found
+E: Version '1.29.0-1.1' for 'kubeadm' was not found
+
+controlplane ~ ✖ 
+
+
+controlplane ~ ✖ apt-cache madison kubeadm | tac
+   kubeadm | 1.30.0-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+
+controlplane ~ ➜  
+
+
+
+
+- Ajustando para 1.29:
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+
+
+- Ajustada para 1.29
+
+
+~~~~bash
+sudo apt-get update -y
+# apt-transport-https may be a dummy package; if so, you can skip that package
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+
+# If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command, read the note below.
+sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+sudo apt-get install -y kubelet=1.29.0-1.1 kubectl=1.29.0-1.1 kubeadm=1.29.0-1.1
+
+sudo apt-mark hold kubelet kubeadm kubectl
+
+sudo systemctl enable --now kubelet
+~~~~
+
+
+
+
+
+- Instalado:
+só não está up
+tem falha
+
+~~~~bash
+root@node01 ~ ➜  sudo apt-mark hold kubelet kubeadm kubectl
+kubelet set on hold.
+kubeadm set on hold.
+kubectl set on hold.
+
+root@node01 ~ ➜  sudo systemctl enable --now kubelet
+
+root@node01 ~ ➜  systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    Drop-In: /usr/lib/systemd/system/kubelet.service.d
+             └─10-kubeadm.conf
+     Active: activating (auto-restart) (Result: exit-code) since Fri 2024-05-10 20:40:10 EDT; 9s ago
+       Docs: https://kubernetes.io/docs/
+    Process: 18150 ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS (code=exited, status=1/FAILURE)
+   Main PID: 18150 (code=exited, status=1/FAILURE)
+
+root@node01 ~ ✖ 
+
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What is the version of kubelet installed?
+
+
+~~~~bash
+root@node01 ~ ✖ kubelet
+I0510 20:42:16.547667   19114 server.go:487] "Kubelet version" kubeletVersion="v1.29.0"
+
+~~~~
+
+
+
+
+
+
+
+
+How many nodes are part of kubernetes cluster currently?
+
+Are you able to run kubectl get nodes?
+
+
+~~~~bash
+root@node01 ~ ➜  kubectl get nodes
+E0510 20:42:45.217402   19327 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:42:45.217903   19327 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:42:45.219352   19327 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:42:45.219722   19327 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:42:45.221242   19327 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+
+root@node01 ~ ✖ 
+
+
+root@node01 ~ ✖ exit
+logout
+Connection to node01 closed.
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl get nodes
+E0510 20:43:00.697129   24776 memcache.go:265] couldn't get current server API group list: the server could not find the requested resource
+E0510 20:43:00.698340   24776 memcache.go:265] couldn't get current server API group list: the server could not find the requested resource
+E0510 20:43:00.699331   24776 memcache.go:265] couldn't get current server API group list: the server could not find the requested resource
+E0510 20:43:00.701046   24776 memcache.go:265] couldn't get current server API group list: the server could not find the requested resource
+E0510 20:43:00.702175   24776 memcache.go:265] couldn't get current server API group list: the server could not find the requested resource
+Error from server (NotFound): the server could not find the requested resource
+
+controlplane ~ ✖ 
+
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lets now bootstrap a kubernetes cluster using kubeadm.
+
+The latest version of Kubernetes will be installed.
+
+
+Initialize Control Plane Node (Master Node). Use the following options:
+
+    apiserver-advertise-address - Use the IP address allocated to eth0 on the controlplane node
+
+    apiserver-cert-extra-sans - Set it to controlplane
+
+    pod-network-cidr - Set to 10.244.0.0/16
+
+
+Once done, set up the default kubeconfig file and wait for node to be part of the cluster.
+
+Controlplane node initialized
+
+~~~~bash
+controlplane ~ ✖ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: flannel.1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc noqueue state UNKNOWN group default 
+    link/ether 0a:1f:51:de:ca:14 brd ff:ff:ff:ff:ff:ff
+    inet 10.244.0.0/32 scope global flannel.1
+       valid_lft forever preferred_lft forever
+3: cni0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 8a:6d:43:4c:0a:2a brd ff:ff:ff:ff:ff:ff
+    inet 10.244.0.1/24 brd 10.244.0.255 scope global cni0
+       valid_lft forever preferred_lft forever
+13679: eth0@if13680: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default 
+    link/ether 02:42:c0:00:44:0c brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.0.68.12/24 brd 192.0.68.255 scope global eth0
+       valid_lft forever preferred_lft forever
+13681: eth1@if13682: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:ac:19:00:2c brd ff:ff:ff:ff:ff:ff link-netnsid 1
+    inet 172.25.0.44/24 brd 172.25.0.255 scope global eth1
+       valid_lft forever preferred_lft forever
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  ip route show
+default via 172.25.0.1 dev eth1 
+10.244.0.0/24 dev cni0 proto kernel scope link src 10.244.0.1 linkdown 
+10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink 
+172.25.0.0/24 dev eth1 proto kernel scope link src 172.25.0.44 
+192.0.68.0/24 dev eth0 proto kernel scope link src 192.0.68.12 
+
+controlplane ~ ➜  
+~~~~
+
+
+<https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/>
+<https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#steps-for-the-first-control-plane-node>
+
+## Steps for the first control plane node
+
+Initialize the control plane:
+
+sudo kubeadm init --control-plane-endpoint "LOAD_BALANCER_DNS:LOAD_BALANCER_PORT" --upload-certs
+
+Flags:
+      --apiserver-advertise-address string   The IP address the API Server will advertise it's listening on. If not set the default network interface will be used.
+      --apiserver-cert-extra-sans strings    Optional extra Subject Alternative Names (SANs) to use for the API Server serving certificate. Can be both IP addresses and DNS names.
+      --pod-network-cidr string              Specify range of IP addresses for the pod network. If set, the control plane will automatically allocate CIDRs for every node.
+
+
+- Editado
+sudo kubeadm init --apiserver-advertise-address 192.0.68.12/24 --apiserver-cert-extra-sans controlplane  --pod-network-cidr 10.244.0.0/16
+
+- ERRO:
+
+~~~~bash
+controlplane ~ ➜  sudo kubeadm init --apiserver-advertise-address 192.0.68.12/24 --apiserver-cert-extra-sans controlplane  --pod-network-cidr 10.244.0.0/16
+couldn't use "192.0.68.12/24" as "apiserver-advertise-address", must be ipv4 or ipv6 address
+To see the stack trace of this error execute with --v=5 or higher
+
+controlplane ~ ✖ 
+~~~~
+
+- Ajustando:
+sudo kubeadm init --apiserver-advertise-address 192.0.68.12 --apiserver-cert-extra-sans controlplane  --pod-network-cidr 10.244.0.0/16
+
+- OK:
+
+~~~~BASH
+
+controlplane ~ ✖ sudo kubeadm init --apiserver-advertise-address 192.0.68.12 --apiserver-cert-extra-sans controlplane  --pod-network-cidr 10.244.0.0/16
+I0510 20:55:15.227236   27267 version.go:256] remote version is much newer: v1.30.0; falling back to: stable-1.29
+[init] Using Kubernetes version: v1.29.4
+[preflight] Running pre-flight checks
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+W0510 20:55:32.899868   27267 checks.go:835] detected that the sandbox image "k8s.gcr.io/pause:3.6" of the container runtime is inconsistent with that used by kubeadm. It is recommended that using "registry.k8s.io/pause:3.9" as the CRI sandbox image.
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+[certs] Generating "ca" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [controlplane kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 192.0.68.12]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] Generating "front-proxy-ca" certificate and key
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/ca" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [controlplane localhost] and IPs [192.0.68.12 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [controlplane localhost] and IPs [192.0.68.12 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "sa" key and public key
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+[kubeconfig] Writing "admin.conf" kubeconfig file
+[kubeconfig] Writing "super-admin.conf" kubeconfig file
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[apiclient] All control plane components are healthy after 11.502714 seconds
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config" in namespace kube-system with the configuration for the kubelets in the cluster
+[upload-certs] Skipping phase. Please see --upload-certs
+[mark-control-plane] Marking the node controlplane as control-plane by adding the labels: [node-role.kubernetes.io/control-plane node.kubernetes.io/exclude-from-external-load-balancers]
+[mark-control-plane] Marking the node controlplane as control-plane by adding the taints [node-role.kubernetes.io/control-plane:NoSchedule]
+[bootstrap-token] Using token: tojk0g.3235g2sdu877zao1
+[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to get nodes
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.0.68.12:6443 --token tojk0g.3235g2sdu877zao1 \
+        --discovery-token-ca-cert-hash sha256:0389e5959ca2430f10a1e1ce3b93d775b4b1e098262a8a9cc53ccc250d50b2cf 
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜    mkdir -p $HOME/.kube
+
+controlplane ~ ➜    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+controlplane ~ ➜    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+controlplane ~ ➜  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS     ROLES           AGE   VERSION
+controlplane   NotReady   control-plane   73s   v1.29.0
+
+controlplane ~ ➜  
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Generate a kubeadm join token
+
+Or copy the one that was generated by kubeadm init command
+
+
+
+kubeadm join 192.0.68.12:6443 --token tojk0g.3235g2sdu877zao1 \
+        --discovery-token-ca-cert-hash sha256:0389e5959ca2430f10a1e1ce3b93d775b4b1e098262a8a9cc53ccc250d50b2cf 
+
+
+
+
+
+
+
+
+
+
+
+Join node01 to the cluster using the join token
+
+Node01 joined the cluster?
+
+
+~~~~bash
+
+kubeadm join 192.0.68.12:6443 --token tojk0g.3235g2sdu877zao1 \
+        --discovery-token-ca-cert-hash sha256:0389e5959ca2430f10a1e1ce3b93d775b4b1e098262a8a9cc53ccc250d50b2cf 
+
+
+root@node01 ~ ➜  kubeadm join 192.0.68.12:6443 --token tojk0g.3235g2sdu877zao1 \
+>         --discovery-token-ca-cert-hash sha256:0389e5959ca2430f10a1e1ce3b93d775b4b1e098262a8a9cc53ccc250d50b2cf 
+[preflight] Running pre-flight checks
+[preflight] Reading configuration from the cluster...
+[preflight] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Starting the kubelet
+[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...
+
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+
+
+root@node01 ~ ➜  kubectl get nodes
+E0510 20:58:15.331528   22762 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:58:15.331848   22762 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:58:15.333269   22762 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:58:15.333520   22762 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E0510 20:58:15.334994   22762 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+
+root@node01 ~ ✖ 
+
+
+root@node01 ~ ✖ exit
+logout
+Connection to node01 closed.
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl get nodes
+NAME           STATUS     ROLES           AGE    VERSION
+controlplane   NotReady   control-plane   3m3s   v1.29.0
+node01         NotReady   <none>          45s    v1.29.0
+
+controlplane ~ ➜  date
+Fri 10 May 2024 08:58:59 PM EDT
+
+controlplane ~ ➜  
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+To install a network plugin, we will go with Flannel as the default choice. For inter-host communication, we will utilize the eth0 interface.
+
+
+Please ensure that the Flannel manifest includes the appropriate options for this configuration.
+
+Refer to the official documentation for the procedure.
+
+Network Plugin deployed?
+
+Is Flannel using "eth0" interface for inter-host communication ?
+
+
+<https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy>
+
+<https://github.com/flannel-io/flannel#deploying-flannel-manually>
+
+
+
+For Kubernetes v1.17+
+Deploying Flannel with kubectl
+
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+If you use custom podCIDR (not 10.244.0.0/16) you first need to download the above manifest and modify the network to match your one.
+
+~~~~bash
+
+
+controlplane ~ ✖ kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+namespace/kube-flannel created
+serviceaccount/flannel created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds created
+
+controlplane ~ ➜  
+~~~~
