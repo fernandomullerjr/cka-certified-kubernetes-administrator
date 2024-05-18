@@ -74,3 +74,20 @@ git status
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##  252. Application Failure
+
+
+- Checar o endpoint, se está acessível, utilizar o curl para tentar acessar o ip ou endereço, por exemplo.
+curl http://web-service-ip:node-port
+
+- Verificar o Service
+conferir o Selector, bater com os Labels dos Pods
+conferir os Endpoints
+
+- Conferir o Pod usando "kubectl describe pod" e "kubectl logs <nome-do-pod>".
+
+- Também existe a opção de verificar os logs de um Pod anterior:
+kubectl logs web -f --previous
+
+- Conferir logs do Pod do DB.
+
+
