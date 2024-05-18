@@ -78,4 +78,56 @@ error: At least one of apiVersion, kind and name was changed
 controlplane ~ ✖ 
 
 
+controlplane ~ ➜  kubectl get service mysql -n alpha -o yaml > service-editado.yaml
+
+controlplane ~ ➜  vi 
+
+controlplane ~ ➜  vi service-editado.yaml 
+
+controlplane ~ ➜  kubectl delete service mysql -n alpha
+service "mysql" deleted
+
+controlplane ~ ➜  kubectl apply -f service-editado.yaml 
+service/mysql-service created
+
+controlplane ~ ➜  
+
+
+https://30081-port-dd2c4d4a211e4cff.labs.kodekloud.com/
+
+Environment Variables: DB_Host=mysql-service; DB_Database=Not Set; DB_User=root; DB_Password=paswrd;
+
+From webapp-mysql-b68bb6bc8-gzzqt!
+
+
+
+
+
+
+
+
+Troubleshooting Test 2: The same 2 tier application is deployed in the beta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+
+
+controlplane ~ ➜  kubectl get all -n beta
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/webapp-mysql-b68bb6bc8-2vxkw   1/1     Running   0          2m49s
+pod/mysql                          1/1     Running   0          2m49s
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/mysql-service   ClusterIP   10.43.72.191    <none>        3306/TCP         2m49s
+service/web-service     NodePort    10.43.197.220   <none>        8080:30081/TCP   2m49s
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-mysql   1/1     1            1           2m49s
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-mysql-b68bb6bc8   1         1         1       2m49s
+
+controlplane ~ ➜  
 
