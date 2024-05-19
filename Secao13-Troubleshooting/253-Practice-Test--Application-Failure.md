@@ -26,8 +26,6 @@ Stick to the given architecture. Use the same names and port numbers as given in
 
 Fix Issue
 
-
-
 controlplane ~ ➜  kubectl get pods -A
 NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
 kube-system   coredns-6799fbcd5-xl2ll                   1/1     Running     0          12m
@@ -99,9 +97,11 @@ Environment Variables: DB_Host=mysql-service; DB_Database=Not Set; DB_User=root;
 
 From webapp-mysql-b68bb6bc8-gzzqt!
 
-
-
-
+- SOLUÇÃO1:
+Deletar o service mysql
+kubectl delete service mysql -n alpha
+Editar e aplicar o novo
+kubectl apply -f service-editado.yaml 
 
 
 
@@ -375,7 +375,7 @@ Environment Variables: DB_Host=mysql-service; DB_Database=Not Set; DB_User=root;
 
 From webapp-mysql-b68bb6bc8-2vxkw!
 
-- SOLUÇÃO
+- SOLUÇÃO2
 Foi ajuste na targetPort do mysql, para 3306
 
 
@@ -476,7 +476,7 @@ controlplane ~ ➜
 https://30081-port-dd2c4d4a211e4cff.labs.kodekloud.com/
 Success
 
-- SOLUÇÃO:
+- SOLUÇÃO3:
 ajustar o selector
 então o service conseguiu gerar os devidos endpoints
 
@@ -718,3 +718,19 @@ status:
   updatedReplicas: 1
 
 controlplane ~ ➜  
+
+- SOLUÇÃO4
+Editar variável via edição do Deployment:
+DE:
+DB_User=sql-user
+PARA:
+DB_User=root
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##   253. Practice Test - Application Failure - 2º TENTATIVA
+
