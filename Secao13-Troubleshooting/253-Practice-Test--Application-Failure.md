@@ -1904,6 +1904,12 @@ kubectl apply -f deployment-editado-2.yaml
 
 
 
+
+
+
+
+
+
 Troubleshooting Test 6: The same 2 tier application is deployed in the zeta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
 
 Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
@@ -2209,3 +2215,40 @@ NAME                           READY   STATUS    RESTARTS   AGE
 webapp-mysql-b68bb6bc8-pcjkh   1/1     Running   0          6m48s
 
 controlplane ~ ➜  
+
+
+- ÑOK,
+terminou tempo do lab
+
+- Revisando, pode ser o NodePort
+  - nodePort: 30088
+
+- Como o endpoint da aplicação utilizar https://30081-port-abd0753533f943c3.labs.kodekloud.com/
+pode ser necessário ajustar o Service do app, para utilizar o nodeport 30081
+
+- SOLUÇÃO6
+pt1
+ajustando variável DB_User
+vi deployment-editado-3.yaml
+kubectl delete -f deployment-editado-3.yaml
+kubectl apply -f deployment-editado-3.yaml
+pt2
+possível solução, utilizar o nodeport 30081 no Service do 
+web-service
+kubectl edit service mysql-service -n zeta
+
+
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  RESUMO
+
+- Cuidar endpoints do Service.
+- Validar variáveis de ambiente.
+- Bater Port, TargetPort, NodePort, Selector.
