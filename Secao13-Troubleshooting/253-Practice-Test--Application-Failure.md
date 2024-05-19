@@ -1046,9 +1046,290 @@ Stick to the given architecture. Use the same names and port numbers as given in
 
 Fix Issue
 
+controlplane ~ ➜  kubectl get all -n delta
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/mysql                          1/1     Running   0          5m15s
+pod/webapp-mysql-785cd8f94-d2vjk   1/1     Running   0          5m15s
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/mysql-service   ClusterIP   10.43.8.6       <none>        3306/TCP         5m15s
+service/web-service     NodePort    10.43.206.124   <none>        8080:30081/TCP   5m15s
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-mysql   1/1     1            1           5m15s
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-mysql-785cd8f94   1         1         1       5m15s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get deployment webapp-mysql -n delta
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+webapp-mysql   1/1     1            1           5m40s
+
+controlplane ~ ➜  kubectl get deployment webapp-mysql -n delta -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2024-05-19T17:16:58Z"
+  generation: 1
+  labels:
+    name: webapp-mysql
+  name: webapp-mysql
+  namespace: delta
+  resourceVersion: "1565"
+  uid: 6acfe0a9-cd61-42b3-8ba2-ed13cae8fb9e
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: webapp-mysql
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: webapp-mysql
+      name: webapp-mysql
+    spec:
+      containers:
+      - env:
+        - name: DB_Host
+          value: mysql-service
+        - name: DB_User
+          value: sql-user
+        - name: DB_Password
+          value: paswrd
+        image: mmumshad/simple-webapp-mysql
+        imagePullPolicy: Always
+        name: webapp-mysql
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-05-19T17:17:00Z"
+    lastUpdateTime: "2024-05-19T17:17:00Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-05-19T17:16:58Z"
+    lastUpdateTime: "2024-05-19T17:17:00Z"
+    message: ReplicaSet "webapp-mysql-785cd8f94" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
+- Ajustando
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: webapp-mysql
+  name: webapp-mysql
+  namespace: delta
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: webapp-mysql
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: webapp-mysql
+      name: webapp-mysql
+    spec:
+      containers:
+      - env:
+        - name: DB_Host
+          value: mysql-service
+        - name: DB_User
+          value: root
+        - name: DB_Password
+          value: paswrd
+        image: mmumshad/simple-webapp-mysql
+        imagePullPolicy: Always
+        name: webapp-mysql
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+~~~~
+
+controlplane ~ ➜  vi deployment-editado.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+Warning: resource deployments/webapp-mysql is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+deployment.apps/webapp-mysql configured
+
+controlplane ~ ➜  kubectl delete -f deployment-editado.yaml
+deployment.apps "webapp-mysql" deleted
+
+controlplane ~ ➜  kubectl apply -f deployment-editado.yaml
+deployment.apps/webapp-mysql created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deployment webapp-mysql -n delta -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"name":"webapp-mysql"},"name":"webapp-mysql","namespace":"delta"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"name":"webapp-mysql"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"name":"webapp-mysql"},"name":"webapp-mysql"},"spec":{"containers":[{"env":[{"name":"DB_Host","value":"mysql-service"},{"name":"DB_User","value":"root"},{"name":"DB_Password","value":"paswrd"}],"image":"mmumshad/simple-webapp-mysql","imagePullPolicy":"Always","name":"webapp-mysql","ports":[{"containerPort":8080,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}}}
+  creationTimestamp: "2024-05-19T17:24:19Z"
+  generation: 1
+  labels:
+    name: webapp-mysql
+  name: webapp-mysql
+  namespace: delta
+  resourceVersion: "1757"
+  uid: f69ebb3a-197f-470c-bc0f-4dfc840773ec
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: webapp-mysql
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: webapp-mysql
+      name: webapp-mysql
+    spec:
+      containers:
+      - env:
+        - name: DB_Host
+          value: mysql-service
+        - name: DB_User
+          value: root
+        - name: DB_Password
+          value: paswrd
+        image: mmumshad/simple-webapp-mysql
+        imagePullPolicy: Always
+        name: webapp-mysql
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-05-19T17:24:21Z"
+    lastUpdateTime: "2024-05-19T17:24:21Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-05-19T17:24:19Z"
+    lastUpdateTime: "2024-05-19T17:24:21Z"
+    message: ReplicaSet "webapp-mysql-b68bb6bc8" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
 - SOLUÇÃO4
 Editar variável via edição do Deployment:
 DE:
 DB_User=sql-user
 PARA:
 DB_User=root
+
+
+
+
+
+
+
+
+Troubleshooting Test 5: The same 2 tier application is deployed in the epsilon namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+Fix Issue
+
+
+controlplane ~ ➜  kubectl get all -n epsilon
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/mysql                          1/1     Running   0          34s
+pod/webapp-mysql-785cd8f94-tt4fh   1/1     Running   0          34s
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/mysql-service   ClusterIP   10.43.197.95    <none>        3306/TCP         34s
+service/web-service     NodePort    10.43.121.186   <none>        8080:30081/TCP   34s
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-mysql   1/1     1            1           34s
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-mysql-785cd8f94   1         1         1       34s
+
+controlplane ~ ➜  
