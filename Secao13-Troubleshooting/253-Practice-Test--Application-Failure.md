@@ -734,3 +734,321 @@ DB_User=root
 # ###################################################################################################################### 
 ##   253. Practice Test - Application Failure - 2º TENTATIVA
 
+Troubleshooting Test 1: A simple 2 tier application is deployed in the alpha namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+kubectl get service mysql -n alpha
+kubectl get service mysql -n alpha -o yaml
+
+controlplane ~ ➜  kubectl get service mysql -n alpha
+NAME    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+mysql   ClusterIP   10.43.131.159   <none>        3306/TCP   35s
+
+controlplane ~ ➜  kubectl get service mysql -n alpha -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-19T16:59:14Z"
+  name: mysql
+  namespace: alpha
+  resourceVersion: "931"
+  uid: 071f3dc7-ab6e-4354-9828-eaf38ba22ee1
+spec:
+  clusterIP: 10.43.131.159
+  clusterIPs:
+  - 10.43.131.159
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    name: mysql
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+
+- Ajustando
+
+~~~~yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: alpha
+spec:
+  clusterIP: 10.43.131.159
+  clusterIPs:
+  - 10.43.131.159
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    name: mysql
+  sessionAffinity: None
+  type: ClusterIP
+~~~~
+
+
+controlplane ~ ➜  kubectl apply -f service-editado.yaml
+The Service "mysql-service" is invalid: spec.clusterIPs: Invalid value: []string{"10.43.131.159"}: failed to allocate IP 10.43.131.159: provided IP is already allocated
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ kubectl delete service mysql -n alpha
+service "mysql" deleted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl apply -f service-editado.yaml
+service/mysql-service created
+
+controlplane ~ ➜  kubectl get svc -A
+NAMESPACE     NAME             TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                      AGE
+default       kubernetes       ClusterIP      10.43.0.1       <none>         443/TCP                      17m
+kube-system   kube-dns         ClusterIP      10.43.0.10      <none>         53/UDP,53/TCP,9153/TCP       17m
+kube-system   metrics-server   ClusterIP      10.43.205.184   <none>         443/TCP                      17m
+kube-system   traefik          LoadBalancer   10.43.98.187    192.25.151.6   80:31165/TCP,443:32328/TCP   16m
+alpha         web-service      NodePort       10.43.7.188     <none>         8080:30081/TCP               2m47s
+alpha         mysql-service    ClusterIP      10.43.131.159   <none>         3306/TCP                     7s
+
+controlplane ~ ➜  
+
+- SOLUÇÃO1:
+Deletar o service mysql
+kubectl delete service mysql -n alpha
+Editar e aplicar o novo, contendo o nome correto "mysql-service"
+kubectl apply -f service-editado.yaml 
+
+
+
+
+
+
+
+Troubleshooting Test 2: The same 2 tier application is deployed in the beta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+
+controlplane ~ ➜  kubectl get svc -n beta
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+mysql-service   ClusterIP   10.43.33.136    <none>        3306/TCP         34s
+web-service     NodePort    10.43.220.151   <none>        8080:30081/TCP   34s
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get svc mysql-service -n beta -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-19T17:02:37Z"
+  name: mysql-service
+  namespace: beta
+  resourceVersion: "1089"
+  uid: cecef3d1-2d80-41b7-b152-b2764e2d1b23
+spec:
+  clusterIP: 10.43.33.136
+  clusterIPs:
+  - 10.43.33.136
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    name: mysql
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+
+kubectl edit svc mysql-service -n beta
+
+
+controlplane ~ ➜  kubectl edit svc mysql-service -n beta
+service/mysql-service edited
+
+controlplane ~ ➜  kubectl get svc mysql-service -n beta -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-19T17:02:37Z"
+  name: mysql-service
+  namespace: beta
+  resourceVersion: "1184"
+  uid: cecef3d1-2d80-41b7-b152-b2764e2d1b23
+spec:
+  clusterIP: 10.43.33.136
+  clusterIPs:
+  - 10.43.33.136
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    name: mysql
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+- SOLUÇÃO2
+Foi ajuste na targetPort do mysql, para 3306
+
+
+
+
+
+
+
+
+Troubleshooting Test 3: The same 2 tier application is deployed in the gamma namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed or unresponsive. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+kubectl get all -n gamma
+
+controlplane ~ ➜  kubectl get all -n gamma
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/webapp-mysql-b68bb6bc8-7w9wm   1/1     Running   0          86s
+pod/mysql                          1/1     Running   0          87s
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/mysql-service   ClusterIP   10.43.100.245   <none>        3306/TCP         86s
+service/web-service     NodePort    10.43.70.126    <none>        8080:30081/TCP   86s
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/webapp-mysql   1/1     1            1           86s
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/webapp-mysql-b68bb6bc8   1         1         1       86s
+
+controlplane ~ ➜  
+
+kubectl get svc mysql-service -o yaml -n gamma
+
+controlplane ~ ✖ kubectl get svc mysql-service -o yaml -n gamma
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-19T17:06:10Z"
+  name: mysql-service
+  namespace: gamma
+  resourceVersion: "1245"
+  uid: 01a55d93-977a-4acf-bdb9-dc48a83c7ce2
+spec:
+  clusterIP: 10.43.100.245
+  clusterIPs:
+  - 10.43.100.245
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    name: sql00001
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+kubectl edit svc mysql-service -n gamma
+
+kubectl get svc mysql-service -o yaml -n gamma
+
+
+controlplane ~ ➜  kubectl edit svc mysql-service -n gamma
+service/mysql-service edited
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get svc mysql-service -o yaml -n gamma
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-05-19T17:06:10Z"
+  name: mysql-service
+  namespace: gamma
+  resourceVersion: "1466"
+  uid: 01a55d93-977a-4acf-bdb9-dc48a83c7ce2
+spec:
+  clusterIP: 10.43.100.245
+  clusterIPs:
+  - 10.43.100.245
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    name: mysql
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  
+
+- SOLUÇÃO3:
+ajustar o selector
+então o service conseguiu gerar os devidos endpoints
+
+
+
+
+
+
+
+
+Troubleshooting Test 4: The same 2 tier application is deployed in the delta namespace. It must display a green web page on success. Click on the App tab at the top of your terminal to view your application. It is currently failed. Troubleshoot and fix the issue.
+
+Stick to the given architecture. Use the same names and port numbers as given in the below architecture diagram. Feel free to edit, delete or recreate objects as necessary.
+
+Fix Issue
+
+- SOLUÇÃO4
+Editar variável via edição do Deployment:
+DE:
+DB_User=sql-user
+PARA:
+DB_User=root
