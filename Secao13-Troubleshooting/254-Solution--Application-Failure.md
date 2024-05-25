@@ -458,6 +458,7 @@ Comandos utilizados na solução do Mumshad
 kubectl get pod -n epsilon mysql -o yaml > mysql.yaml
 vi mysql.yaml
 
+~~~~YAML
 apiVersion: v1
 kind: Pod
 metadata:
@@ -477,12 +478,68 @@ spec:
     imagePullPolicy: IfNotPresent
     name: mysql
     ports:
-
+~~~~
 
 kubectl replace --force -f mysql.yaml
 
 
 
+
+
+- PROBLEMA6
+We get a 502 Bad Gateway error.
+
+This is indicative that the lab display infrastructure cannot connect to the service it's supposed to. Examine the URL in the browser address bar
+
+30081-port-1795f98fde814933.labs.kodekloud.com/
+
+On KodeKloud labs, the 30081-port part indicates a node port it's trying to connect to. Note also that the infrastructure diagram states that 30081 should be the web-service nodeport.
+
+- SOLUÇÃO6
+pt1
+ajustando variável DB_User
+COLOCAR USUARIO root
+vi deployment-editado-3.yaml
+kubectl delete -f deployment-editado-3.yaml
+kubectl apply -f deployment-editado-3.yaml
+pt2
+possível solução, utilizar o nodeport 30081 no Service do 
+web-service
+kubectl edit service mysql-service -n zeta
+pt3
+Variável do password também precisa de ajuste.
+
+- EXTRA
+kubectl edit service -n zeta web-service
+
+~~~~YAML
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2023-10-14T13:27:26Z"
+  name: web-service
+  namespace: zeta
+  resourceVersion: "1530"
+  uid: 9b655dda-675a-43ae-80e4-deadb3a38179
+spec:
+  clusterIP: 10.43.48.98
+  clusterIPs:
+  - 10.43.48.98
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 30088  # <- Edit this
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    name: webapp-mysql
+  sessionAffinity: None
+  type: NodePort
+~~~~
 
 
 
