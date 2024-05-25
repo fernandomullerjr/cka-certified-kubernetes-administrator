@@ -370,3 +370,59 @@ git status
         We have also seen this message before! Fix it as per above, using namesapce `zeta`.
 
     </details>
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## COMANDOS  ÚTEIS
+
+
+curl http://localhost:30081
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## solução v2
+
+- PROBLEMA1
+Variáveis no app estão corretas.
+Nome do serviço MYSQL não está como mysql-service, está como mysql apenas, então o app não consegue acessar o banco.
+
+- SOLUÇÃO1:
+Deletar o service mysql
+kubectl delete service mysql -n alpha
+Editar e aplicar o novo
+kubectl apply -f service-editado.yaml 
+
+
+
+
+- PROBLEMA2
+mysql-service com targetPort na porta 8080, que é incorreto, conforme diagrama.
+
+- SOLUÇÃO2
+Foi ajuste na targetPort do mysql, para 3306
+kubectl edit service mysql-service -n beta 
+
+
+
+
+
+- PROBLEMA3
+Service mysql-service sem Endpoints.
+Endpoints:         <none>
+Identificado selector incorreto.
+Selector:          name=sql00001
+
+- SOLUÇÃO3:
+ajustar o selector
+Selector:          name=mysql
+então o service conseguiu gerar os devidos endpoints
+Endpoints:         10.42.0.13:3306
