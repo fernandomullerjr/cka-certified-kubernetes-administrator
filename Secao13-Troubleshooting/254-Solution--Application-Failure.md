@@ -376,15 +376,6 @@ git status
 
 
 
-# ###################################################################################################################### 
-# ###################################################################################################################### 
-## COMANDOS  ÚTEIS
-
-
-curl http://localhost:30081
-
-
-
 
 
 # ###################################################################################################################### 
@@ -447,7 +438,8 @@ DB_User=root
 
 
 
-
+- PROBLEMA5
+Access denied for user 'sql-user'@'10.42.0.16'
 
 - SOLUÇÃO5
 pt1
@@ -460,3 +452,45 @@ ajustada a variável DB_User
 DB_User=root
 kubectl delete -f deployment-editado-2.yaml
 kubectl apply -f deployment-editado-2.yaml
+
+- EXTRA
+Comandos utilizados na solução do Mumshad
+kubectl get pod -n epsilon mysql -o yaml > mysql.yaml
+vi mysql.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-10-14T12:21:51Z"
+  labels:
+    name: mysql
+  name: mysql
+  namespace: epsilon
+  resourceVersion: "2002"
+  uid: f369770b-be24-43c1-b754-d7e1396d6952
+spec:
+  containers:
+  - env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: passwooooorrddd    # <- Fix this
+    image: mysql:5.6
+    imagePullPolicy: IfNotPresent
+    name: mysql
+    ports:
+
+
+kubectl replace --force -f mysql.yaml
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## COMANDOS  ÚTEIS
+
+curl http://localhost:30081
+
+kubectl replace --force -f mysql.yaml
