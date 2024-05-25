@@ -426,3 +426,37 @@ ajustar o selector
 Selector:          name=mysql
 então o service conseguiu gerar os devidos endpoints
 Endpoints:         10.42.0.13:3306
+
+
+
+
+
+
+- PROBLEMA4
+Variável DB_USER incorreta.
+
+- SOLUÇÃO4
+Editar variável via edição do Deployment:
+    kubectl edit deployment webapp-mysql -n delta
+DE:
+DB_User=sql-user
+PARA:
+DB_User=root
+
+
+
+
+
+
+
+- SOLUÇÃO5
+pt1
+kubectl delete pod/mysql -n epsilon
+ajustar password na variável MYSQL_ROOT_PASSWORD
+kubectl apply -f pod-editado-mysql.yaml
+pt2
+vi deployment-editado-2.yaml
+ajustada a variável DB_User
+DB_User=root
+kubectl delete -f deployment-editado-2.yaml
+kubectl apply -f deployment-editado-2.yaml
