@@ -465,3 +465,855 @@ kube-system    kube-scheduler-controlplane            1/1     Running           
 controlplane ~ ➜  
 
 controlplane ~ ➜  
+
+kubectl describe pod -n kube-system    kube-controller-manager-controlplane
+
+
+controlplane ~ ➜  kubectl describe pod -n kube-system    kube-controller-manager-controlplane
+Name:                 kube-controller-manager-controlplane
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 controlplane/192.2.239.6
+Start Time:           Thu, 30 May 2024 01:14:43 +0000
+Labels:               component=kube-controller-manager
+                      tier=control-plane
+Annotations:          kubernetes.io/config.hash: bdb1c9251d08619760167697af010d5c
+                      kubernetes.io/config.mirror: bdb1c9251d08619760167697af010d5c
+                      kubernetes.io/config.seen: 2024-05-30T01:34:16.732959733Z
+                      kubernetes.io/config.source: file
+Status:               Running
+SeccompProfile:       RuntimeDefault
+IP:                   192.2.239.6
+IPs:
+  IP:           192.2.239.6
+Controlled By:  Node/controlplane
+Containers:
+  kube-controller-manager:
+    Container ID:  containerd://86bcf199c1c4f376f78212c6da94eef358d6033ca6de9143a0c94463a9495d06
+    Image:         registry.k8s.io/kube-controller-manager:v1.29.0
+    Image ID:      registry.k8s.io/kube-controller-manager@sha256:d1e38ea25b27e57b41995ef59ad76dd33481853a5b8d1a91abb7a8be32b7e7da
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      kube-controller-manager
+      --allocate-node-cidrs=true
+      --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+      --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+      --bind-address=127.0.0.1
+      --client-ca-file=/etc/kubernetes/pki/ca.crt
+      --cluster-cidr=10.244.0.0/16
+      --cluster-name=kubernetes
+      --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+      --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+      --controllers=*,bootstrapsigner,tokencleaner
+      --kubeconfig=/etc/kubernetes/controller-manager-XXXX.conf
+      --leader-elect=true
+      --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+      --root-ca-file=/etc/kubernetes/pki/ca.crt
+      --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+      --service-cluster-ip-range=10.96.0.0/12
+      --use-service-account-credentials=true
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 30 May 2024 01:37:22 +0000
+      Finished:     Thu, 30 May 2024 01:37:23 +0000
+    Ready:          False
+    Restart Count:  5
+    Requests:
+      cpu:        200m
+    Liveness:     http-get https://127.0.0.1:10257/healthz delay=10s timeout=15s period=10s #success=1 #failure=8
+    Startup:      http-get https://127.0.0.1:10257/healthz delay=10s timeout=15s period=10s #success=1 #failure=24
+    Environment:  <none>
+    Mounts:
+      /etc/ca-certificates from etc-ca-certificates (ro)
+      /etc/kubernetes/controller-manager.conf from kubeconfig (ro)
+      /etc/kubernetes/pki from k8s-certs (ro)
+      /etc/ssl/certs from ca-certs (ro)
+      /usr/libexec/kubernetes/kubelet-plugins/volume/exec from flexvolume-dir (rw)
+      /usr/local/share/ca-certificates from usr-local-share-ca-certificates (ro)
+      /usr/share/ca-certificates from usr-share-ca-certificates (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  ca-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/ssl/certs
+    HostPathType:  DirectoryOrCreate
+  etc-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/ca-certificates
+    HostPathType:  DirectoryOrCreate
+  flexvolume-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+    HostPathType:  DirectoryOrCreate
+  k8s-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/pki
+    HostPathType:  DirectoryOrCreate
+  kubeconfig:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/controller-manager.conf
+    HostPathType:  FileOrCreate
+  usr-local-share-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/local/share/ca-certificates
+    HostPathType:  DirectoryOrCreate
+  usr-share-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/share/ca-certificates
+    HostPathType:  DirectoryOrCreate
+QoS Class:         Burstable
+Node-Selectors:    <none>
+Tolerations:       :NoExecute op=Exists
+Events:
+  Type     Reason   Age                     From     Message
+  ----     ------   ----                    ----     -------
+  Warning  BackOff  2m39s (x10 over 3m51s)  kubelet  Back-off restarting failed container kube-controller-manager in pod kube-controller-manager-controlplane_kube-system(bdb1c9251d08619760167697af010d5c)
+  Normal   Pulled   2m25s (x5 over 3m53s)   kubelet  Container image "registry.k8s.io/kube-controller-manager:v1.29.0" already present on machine
+  Normal   Created  2m25s (x5 over 3m53s)   kubelet  Created container kube-controller-manager
+  Normal   Started  2m25s (x5 over 3m52s)   kubelet  Started container kube-controller-manager
+
+controlplane ~ ➜  
+
+
+kubectl logs -n kube-system    kube-controller-manager-controlplane
+
+controlplane ~ ➜  kubectl logs -n kube-system    kube-controller-manager-controlplane
+I0530 01:37:23.124739       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:37:23.124865       1 run.go:74] "command failed" err="stat /etc/kubernetes/controller-manager-XXXX.conf: no such file or directory"
+
+controlplane ~ ➜  
+
+
+
+kubectl logs -n kube-system    kube-controller-manager-controlplane
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-
+kube-apiserver.yaml           kube-controller-manager.yaml  kube-scheduler.yaml           
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-controller-manager
+    tier: control-plane
+  name: kube-controller-manager
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-controller-manager
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-cidr=10.244.0.0/16
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --kubeconfig=/etc/kubernetes/controller-manager-XXXX.conf
+    - --leader-elect=true
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-controller-manager:v1.29.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-controller-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane ~ ➜  
+
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+controlplane ~ ➜  vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+controlplane ~ ➜  kubectl delete -f /etc/kubernetes/manifests/kube-controller-manager.yaml 
+Error from server (NotFound): error when deleting "/etc/kubernetes/manifests/kube-controller-manager.yaml": pods "kube-controller-manager" not found
+
+controlplane ~ ✖ kubectl apply -f /etc/kubernetes/manifests/kube-controller-manager.yaml 
+pod/kube-controller-manager created
+
+controlplane ~ ➜  
+
+controlplane ~ ✖ kubectl apply -f /etc/kubernetes/manifests/kube-controller-manager.yaml 
+pod/kube-controller-manager created
+
+controlplane ~ ➜  kubectl get all -n kube-system
+NAME                                       READY   STATUS             RESTARTS      AGE
+pod/coredns-69f9c977-8nbbx                 1/1     Running            0             26m
+pod/coredns-69f9c977-xtj2l                 1/1     Running            0             26m
+pod/etcd-controlplane                      1/1     Running            0             27m
+pod/kube-apiserver-controlplane            1/1     Running            0             27m
+pod/kube-controller-manager                0/1     CrashLoopBackOff   2 (14s ago)   37s
+pod/kube-controller-manager-controlplane   1/1     Running            0             48s
+pod/kube-proxy-kt6cb                       1/1     Running            0             26m
+pod/kube-scheduler-controlplane            1/1     Running            0             9m8s
+
+NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
+service/kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   27m
+
+NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+daemonset.apps/kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   27m
+
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/coredns   2/2     2            2           27m
+
+NAME                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/coredns-69f9c977   2         2         2       26m
+
+controlplane ~ ➜  
+
+- SOLUÇÃO3
+Ajustar
+DE:
+
+    - --kubeconfig=/etc/kubernetes/controller-manager-XXXX.conf
+PARA:
+
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    
+
+
+
+
+
+
+
+
+
+Something is wrong with scaling again. We just tried scaling the deployment to 3 replicas. But it's not happening.
+
+Investigate and fix the issue.
+
+Fix Issue
+
+Wait for deployment to actually scale
+
+controlplane ~ ➜  kubectl get all -n kube-system
+NAME                                       READY   STATUS             RESTARTS      AGE
+pod/coredns-69f9c977-8nbbx                 1/1     Running            0             27m
+pod/coredns-69f9c977-xtj2l                 1/1     Running            0             27m
+pod/etcd-controlplane                      1/1     Running            0             28m
+pod/kube-apiserver-controlplane            1/1     Running            0             27m
+pod/kube-controller-manager                0/1     CrashLoopBackOff   3 (41s ago)   88s
+pod/kube-controller-manager-controlplane   0/1     CrashLoopBackOff   1 (21s ago)   24s
+pod/kube-proxy-kt6cb                       1/1     Running            0             27m
+pod/kube-scheduler-controlplane            1/1     Running            0             9m59s
+
+NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
+service/kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   27m
+
+NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+daemonset.apps/kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   27m
+
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/coredns   2/2     2            2           27m
+
+NAME                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/coredns-69f9c977   2         2         2       27m
+
+controlplane ~ ➜  
+controlplane ~ ✖ kubectl get pods
+NAME                   READY   STATUS    RESTARTS   AGE
+app-5646649cc9-cvmnm   1/1     Running   0          19m
+app-5646649cc9-p8kpk   1/1     Running   0          91s
+
+controlplane ~ ➜  
+controlplane ~ ➜  kubectl get deploy
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+app    3/3     3            3           19m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe pod/kube-controller-manager-controlplane -n kube-system
+Name:                 kube-controller-manager-controlplane
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 controlplane/192.2.239.6
+Start Time:           Thu, 30 May 2024 01:41:00 +0000
+Labels:               component=kube-controller-manager
+                      tier=control-plane
+Annotations:          kubernetes.io/config.hash: f3acd5d8bac629a5bb29ac545fabcc86
+                      kubernetes.io/config.mirror: f3acd5d8bac629a5bb29ac545fabcc86
+                      kubernetes.io/config.seen: 2024-05-30T01:42:00.892610556Z
+                      kubernetes.io/config.source: file
+Status:               Running
+SeccompProfile:       RuntimeDefault
+IP:                   192.2.239.6
+IPs:
+  IP:           192.2.239.6
+Controlled By:  Node/controlplane
+Containers:
+  kube-controller-manager:
+    Container ID:  containerd://a53de020bf20b3a7713a5e1c6edd3058216c5cba44e6d9d3a7e1b702536ac7cf
+    Image:         registry.k8s.io/kube-controller-manager:v1.29.0
+    Image ID:      registry.k8s.io/kube-controller-manager@sha256:d1e38ea25b27e57b41995ef59ad76dd33481853a5b8d1a91abb7a8be32b7e7da
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      kube-controller-manager
+      --allocate-node-cidrs=true
+      --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+      --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+      --bind-address=127.0.0.1
+      --client-ca-file=/etc/kubernetes/pki/ca.crt
+      --cluster-cidr=10.244.0.0/16
+      --cluster-name=kubernetes
+      --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+      --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+      --controllers=*,bootstrapsigner,tokencleaner
+      --kubeconfig=/etc/kubernetes/controller-manager.conf
+      --leader-elect=true
+      --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+      --root-ca-file=/etc/kubernetes/pki/ca.crt
+      --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+      --service-cluster-ip-range=10.96.0.0/12
+      --use-service-account-credentials=true
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 30 May 2024 01:43:13 +0000
+      Finished:     Thu, 30 May 2024 01:43:14 +0000
+    Ready:          False
+    Restart Count:  3
+    Requests:
+      cpu:        200m
+    Liveness:     http-get https://127.0.0.1:10257/healthz delay=10s timeout=15s period=10s #success=1 #failure=8
+    Startup:      http-get https://127.0.0.1:10257/healthz delay=10s timeout=15s period=10s #success=1 #failure=24
+    Environment:  <none>
+    Mounts:
+      /etc/ca-certificates from etc-ca-certificates (ro)
+      /etc/kubernetes/controller-manager.conf from kubeconfig (ro)
+      /etc/kubernetes/pki from k8s-certs (ro)
+      /etc/ssl/certs from ca-certs (ro)
+      /usr/libexec/kubernetes/kubelet-plugins/volume/exec from flexvolume-dir (rw)
+      /usr/local/share/ca-certificates from usr-local-share-ca-certificates (ro)
+      /usr/share/ca-certificates from usr-share-ca-certificates (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  ca-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/ssl/certs
+    HostPathType:  DirectoryOrCreate
+  etc-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/ca-certificates
+    HostPathType:  DirectoryOrCreate
+  flexvolume-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+    HostPathType:  DirectoryOrCreate
+  k8s-certs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/WRONG-PKI-DIRECTORY
+    HostPathType:  DirectoryOrCreate
+  kubeconfig:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/kubernetes/controller-manager.conf
+    HostPathType:  FileOrCreate
+  usr-local-share-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/local/share/ca-certificates
+    HostPathType:  DirectoryOrCreate
+  usr-share-ca-certificates:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/share/ca-certificates
+    HostPathType:  DirectoryOrCreate
+QoS Class:         Burstable
+Node-Selectors:    <none>
+Tolerations:       :NoExecute op=Exists
+Events:
+  Type     Reason   Age                From     Message
+  ----     ------   ----               ----     -------
+  Normal   Pulled   20s (x4 over 78s)  kubelet  Container image "registry.k8s.io/kube-controller-manager:v1.29.0" already present on machine
+  Normal   Created  20s (x4 over 78s)  kubelet  Created container kube-controller-manager
+  Normal   Started  20s (x4 over 77s)  kubelet  Started container kube-controller-manager
+  Warning  BackOff  4s (x10 over 74s)  kubelet  Back-off restarting failed container kube-controller-manager in pod kube-controller-manager-controlplane_kube-system(f3acd5d8bac629a5bb29ac545fabcc86)
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl logs pod/kube-controller-manager-controlplane -n kube-system
+I0530 01:44:00.283970       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:44:00.286285       1 run.go:74] "command failed" err="failed to create listener: failed to listen on 127.0.0.1:10257: listen tcp 127.0.0.1:10257: bind: address already in use"
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-controller-manager
+    tier: control-plane
+  name: kube-controller-manager
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-controller-manager
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-cidr=10.244.0.0/16
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --leader-elect=true
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-controller-manager:v1.29.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-controller-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/WRONG-PKI-DIRECTORY
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  ss -tulp
+Netid   State    Recv-Q   Send-Q     Local Address:Port         Peer Address:Port  Process                                      
+udp     UNCONN   0        0          127.0.0.53%lo:domain            0.0.0.0:*      users:(("systemd-resolve",pid=576,fd=13))   
+udp     UNCONN   0        0                0.0.0.0:8472              0.0.0.0:*                                                  
+udp     UNCONN   0        0             127.0.0.11:43419             0.0.0.0:*                                                  
+tcp     LISTEN   0        4096           127.0.0.1:10248             0.0.0.0:*      users:(("kubelet",pid=4280,fd=12))          
+tcp     LISTEN   0        4096           127.0.0.1:10249             0.0.0.0:*      users:(("kube-proxy",pid=4867,fd=8))        
+tcp     LISTEN   0        4096         192.2.239.6:2379              0.0.0.0:*      users:(("etcd",pid=3719,fd=9))              
+tcp     LISTEN   0        4096           127.0.0.1:2379              0.0.0.0:*      users:(("etcd",pid=3719,fd=8))              
+tcp     LISTEN   0        4096         192.2.239.6:2380              0.0.0.0:*      users:(("etcd",pid=3719,fd=7))              
+tcp     LISTEN   0        4096           127.0.0.1:2381              0.0.0.0:*      users:(("etcd",pid=3719,fd=16))             
+tcp     LISTEN   0        128              0.0.0.0:http-alt          0.0.0.0:*      users:(("ttyd",pid=1246,fd=12))             
+tcp     LISTEN   0        4096           127.0.0.1:10257             0.0.0.0:*      users:(("kube-controller",pid=26196,fd=3))  
+tcp     LISTEN   0        4096           127.0.0.1:10259             0.0.0.0:*      users:(("kube-scheduler",pid=16145,fd=3))   
+tcp     LISTEN   0        4096           127.0.0.1:45203             0.0.0.0:*      users:(("containerd",pid=1252,fd=16))       
+tcp     LISTEN   0        4096       127.0.0.53%lo:domain            0.0.0.0:*      users:(("systemd-resolve",pid=576,fd=14))   
+tcp     LISTEN   0        4096          127.0.0.11:37045             0.0.0.0:*                                                  
+tcp     LISTEN   0        128              0.0.0.0:ssh               0.0.0.0:*      users:(("sshd",pid=1266,fd=3))              
+tcp     LISTEN   0        4096                   *:10250                   *:*      users:(("kubelet",pid=4280,fd=20))          
+tcp     LISTEN   0        4096                   *:6443                    *:*      users:(("kube-apiserver",pid=3716,fd=3))    
+tcp     LISTEN   0        4096                   *:10256                   *:*      users:(("kube-proxy",pid=4867,fd=16))       
+tcp     LISTEN   0        128                 [::]:ssh                  [::]:*      users:(("sshd",pid=1266,fd=4))              
+tcp     LISTEN   0        4096                   *:8888                    *:*      users:(("kubectl",pid=4524,fd=3))           
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl logs pod/kube-controller-manager-controlplane -n kube-system
+I0530 01:44:00.283970       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:44:00.286285       1 run.go:74] "command failed" err="failed to create listener: failed to listen on 127.0.0.1:10257: listen tcp 127.0.0.1:10257: bind: address already in use"
+
+
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                   READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
+app-5646649cc9-cvmnm   1/1     Running   0          24m     10.244.0.4   controlplane   <none>           <none>
+app-5646649cc9-p8kpk   1/1     Running   0          7m12s   10.244.0.5   controlplane   <none>           <none>
+app-5646649cc9-t7qt6   1/1     Running   0          5m29s   10.244.0.6   controlplane   <none>           <none>
+
+controlplane ~ ➜  kubectl get pods -o wide -A
+NAMESPACE      NAME                                   READY   STATUS             RESTARTS        AGE     IP            NODE           NOMINATED NODE   READINESS GATES
+default        app-5646649cc9-cvmnm                   1/1     Running            0               24m     10.244.0.4    controlplane   <none>           <none>
+default        app-5646649cc9-p8kpk                   1/1     Running            0               7m16s   10.244.0.5    controlplane   <none>           <none>
+default        app-5646649cc9-t7qt6                   1/1     Running            0               5m33s   10.244.0.6    controlplane   <none>           <none>
+kube-flannel   kube-flannel-ds-2rpsp                  1/1     Running            0               33m     192.2.239.6   controlplane   <none>           <none>
+kube-system    coredns-69f9c977-8nbbx                 1/1     Running            0               33m     10.244.0.2    controlplane   <none>           <none>
+kube-system    coredns-69f9c977-xtj2l                 1/1     Running            0               33m     10.244.0.3    controlplane   <none>           <none>
+kube-system    etcd-controlplane                      1/1     Running            0               34m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-apiserver-controlplane            1/1     Running            0               34m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-controller-manager                1/1     Running            4 (6m46s ago)   7m33s   192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-controller-manager-controlplane   0/1     CrashLoopBackOff   6 (32s ago)     6m29s   192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-proxy-kt6cb                       1/1     Running            0               33m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-scheduler-controlplane            1/1     Running            0               16m     192.2.239.6   controlplane   <none>           <none>
+
+controlplane ~ ➜  
+
+
+kubectl delete pod -nkube-system    kube-controller-manager
+
+
+
+controlplane ~ ➜  kubectl delete pod -nkube-system    kube-controller-manager
+pod "kube-controller-manager" deleted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  ss -tulp
+Netid   State    Recv-Q   Send-Q     Local Address:Port         Peer Address:Port  Process                                      
+udp     UNCONN   0        0          127.0.0.53%lo:domain            0.0.0.0:*      users:(("systemd-resolve",pid=576,fd=13))   
+udp     UNCONN   0        0                0.0.0.0:8472              0.0.0.0:*                                                  
+udp     UNCONN   0        0             127.0.0.11:43419             0.0.0.0:*                                                  
+tcp     LISTEN   0        4096           127.0.0.1:10248             0.0.0.0:*      users:(("kubelet",pid=4280,fd=12))          
+tcp     LISTEN   0        4096           127.0.0.1:10249             0.0.0.0:*      users:(("kube-proxy",pid=4867,fd=8))        
+tcp     LISTEN   0        4096         192.2.239.6:2379              0.0.0.0:*      users:(("etcd",pid=3719,fd=9))              
+tcp     LISTEN   0        4096           127.0.0.1:2379              0.0.0.0:*      users:(("etcd",pid=3719,fd=8))              
+tcp     LISTEN   0        4096         192.2.239.6:2380              0.0.0.0:*      users:(("etcd",pid=3719,fd=7))              
+tcp     LISTEN   0        4096           127.0.0.1:2381              0.0.0.0:*      users:(("etcd",pid=3719,fd=16))             
+tcp     LISTEN   0        128              0.0.0.0:http-alt          0.0.0.0:*      users:(("ttyd",pid=1246,fd=12))             
+tcp     LISTEN   0        4096           127.0.0.1:10259             0.0.0.0:*      users:(("kube-scheduler",pid=16145,fd=3))   
+tcp     LISTEN   0        4096           127.0.0.1:45203             0.0.0.0:*      users:(("containerd",pid=1252,fd=16))       
+tcp     LISTEN   0        4096       127.0.0.53%lo:domain            0.0.0.0:*      users:(("systemd-resolve",pid=576,fd=14))   
+tcp     LISTEN   0        4096          127.0.0.11:37045             0.0.0.0:*                                                  
+tcp     LISTEN   0        128              0.0.0.0:ssh               0.0.0.0:*      users:(("sshd",pid=1266,fd=3))              
+tcp     LISTEN   0        4096                   *:10250                   *:*      users:(("kubelet",pid=4280,fd=20))          
+tcp     LISTEN   0        4096                   *:6443                    *:*      users:(("kube-apiserver",pid=3716,fd=3))    
+tcp     LISTEN   0        4096                   *:10256                   *:*      users:(("kube-proxy",pid=4867,fd=16))       
+tcp     LISTEN   0        128                 [::]:ssh                  [::]:*      users:(("sshd",pid=1266,fd=4))              
+tcp     LISTEN   0        4096                   *:8888                    *:*      users:(("kubectl",pid=4524,fd=3))           
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl delete pod -nkube-system   kube-controller-manager-controlplane
+pod "kube-controller-manager-controlplane" deleted
+
+controlplane ~ ➜  kubectl delete -f /etc/kubernetes/manifests/kube-controller-manager.yaml 
+Error from server (NotFound): error when deleting "/etc/kubernetes/manifests/kube-controller-manager.yaml": pods "kube-controller-manager" not found
+
+controlplane ~ ✖ kubectl apply -f /etc/kubernetes/manifests/kube-controller-manager.yaml 
+pod/kube-controller-manager created
+
+controlplane ~ ➜  kubectl get pods -o wide -A
+NAMESPACE      NAME                                   READY   STATUS             RESTARTS        AGE     IP            NODE           NOMINATED NODE   READINESS GATES
+default        app-5646649cc9-cvmnm                   1/1     Running            0               26m     10.244.0.4    controlplane   <none>           <none>
+default        app-5646649cc9-p8kpk                   1/1     Running            0               8m58s   10.244.0.5    controlplane   <none>           <none>
+default        app-5646649cc9-t7qt6                   1/1     Running            0               7m15s   10.244.0.6    controlplane   <none>           <none>
+kube-flannel   kube-flannel-ds-2rpsp                  1/1     Running            0               35m     192.2.239.6   controlplane   <none>           <none>
+kube-system    coredns-69f9c977-8nbbx                 1/1     Running            0               35m     10.244.0.2    controlplane   <none>           <none>
+kube-system    coredns-69f9c977-xtj2l                 1/1     Running            0               35m     10.244.0.3    controlplane   <none>           <none>
+kube-system    etcd-controlplane                      1/1     Running            0               35m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-apiserver-controlplane            1/1     Running            0               35m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-controller-manager                0/1     Error              0               4s      192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-controller-manager-controlplane   0/1     CrashLoopBackOff   6 (2m14s ago)   20s     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-proxy-kt6cb                       1/1     Running            0               35m     192.2.239.6   controlplane   <none>           <none>
+kube-system    kube-scheduler-controlplane            1/1     Running            0               17m     192.2.239.6   controlplane   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS             RESTARTS      AGE
+coredns-69f9c977-8nbbx                 1/1     Running            0             38m
+coredns-69f9c977-xtj2l                 1/1     Running            0             38m
+etcd-controlplane                      1/1     Running            0             38m
+kube-apiserver-controlplane            1/1     Running            0             38m
+kube-controller-manager                0/1     CrashLoopBackOff   4 (69s ago)   2m50s
+kube-controller-manager-controlplane   0/1     CrashLoopBackOff   6 (5m ago)    3m6s
+kube-proxy-kt6cb                       1/1     Running            0             38m
+kube-scheduler-controlplane            1/1     Running            0             20m
+
+controlplane ~ ➜  kubectl logs kube-controller-manager -n kube-system
+I0530 01:52:02.082789       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:52:03.046036       1 run.go:74] "command failed" err="unable to load client CA provider: open /etc/kubernetes/pki/ca.crt: no such file or directory"
+
+
+controlplane ~ ➜  kubectl logs -n kube-system kube-controller-manager-controlplane
+I0530 01:53:24.673559       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:53:25.262415       1 run.go:74] "command failed" err="unable to load client CA provider: open /etc/kubernetes/pki/ca.crt: no such file or directory"
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  ls /etc/kubernetes/pki
+apiserver.crt              apiserver.key                 ca.crt  front-proxy-ca.crt      front-proxy-client.key
+apiserver-etcd-client.crt  apiserver-kubelet-client.crt  ca.key  front-proxy-ca.key      sa.key
+apiserver-etcd-client.key  apiserver-kubelet-client.key  etcd    front-proxy-client.crt  sa.pub
+
+controlplane ~ ➜  
+
+
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml | grep ca
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml | grep ca
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+      name: ca-certs
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+  priorityClassName: system-node-critical
+    name: ca-certs
+      path: /etc/ca-certificates
+    name: etc-ca-certificates
+      path: /usr/local/share/ca-certificates
+    name: usr-local-share-ca-certificates
+      path: /usr/share/ca-certificates
+    name: usr-share-ca-certificates
+
+controlplane ~ ➜  kubectl delete pod  -n kube-system kube-controller-manager-controlplane
+pod "kube-controller-manager-controlplane" deleted
+
+controlplane ~ ➜  kubectl delete pod  -n kube-system kube-controller-manage
+Error from server (NotFound): pods "kube-controller-manage" not found
+
+controlplane ~ ✖ kubectl delete pod  -n kube-system kube-controller-manager
+pod "kube-controller-manager" deleted
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS             RESTARTS     AGE
+coredns-69f9c977-8nbbx                 1/1     Running            0            41m
+coredns-69f9c977-xtj2l                 1/1     Running            0            41m
+etcd-controlplane                      1/1     Running            0            41m
+kube-apiserver-controlplane            1/1     Running            0            41m
+kube-controller-manager-controlplane   0/1     CrashLoopBackOff   7 (3m ago)   12s
+kube-proxy-kt6cb                       1/1     Running            0            41m
+kube-scheduler-controlplane            1/1     Running            0            23m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl logs -n kube-system kube-controller-manager-controlplane
+I0530 01:53:24.673559       1 serving.go:380] Generated self-signed cert in-memory
+E0530 01:53:25.262415       1 run.go:74] "command failed" err="unable to load client CA provider: open /etc/kubernetes/pki/ca.crt: no such file or directory"
+
+controlplane ~ ➜  
+
+re visar
+
+
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/WRONG-PKI-DIRECTORY
+      type: DirectoryOrCreate
+
+
+
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml | grep ca
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+controlplane ~ ➜  vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml | grep pki
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - mountPath: /etc/kubernetes/pki
+      path: /etc/kubernetes/pki
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get pod  -n kube-system kube-controller-manager-controlplane
+NAME                                   READY   STATUS    RESTARTS   AGE
+kube-controller-manager-controlplane   0/1     Running   0          15s
+
+controlplane ~ ➜  date
+Thu May 30 01:59:17 AM UTC 2024
+
+controlplane ~ ➜  
+
+- SOLUÇÃO4
+AJUSTAR O path
+path: /etc/kubernetes/WRONG-PKI-DIRECTORY
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
