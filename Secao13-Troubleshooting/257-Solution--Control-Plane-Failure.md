@@ -162,7 +162,6 @@ via KodeKloud:
 
 
 
-
 - QUESTÃO4:
 
 Something is wrong with scaling again. We just tried scaling the deployment to 3 replicas. But it's not happening.
@@ -174,12 +173,24 @@ Wait for deployment to actually scale
 - SOLUÇÃO4
 
 Verificado problema no kube-controller-manager.
+Volume com path incorreto.
 
 via solução do Fernando:
 
 AJUSTAR O path
 path: /etc/kubernetes/WRONG-PKI-DIRECTORY
 vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+via KodeKloud:
+
+        ```
+        sed -i 's/WRONG-PKI-DIRECTORY/pki/' /etc/kubernetes/manifests/kube-controller-manager.yaml
+        ```
+
+
+
+
+
 
 
 
