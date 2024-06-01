@@ -138,6 +138,48 @@ Even though the deployment was scaled to 2, the number of PODs does not seem to 
 Inspect the component responsible for managing deployments and replicasets.
 Fix issue
 
+- SOLUÇÃO3:
+
+via solução do Fernando:
+
+Ajustar o arquivo "/etc/kubernetes/manifests/kube-controller-manager.yaml"
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml
+DE:
+    - --kubeconfig=/etc/kubernetes/controller-manager-XXXX.conf
+PARA:
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+
+
+via KodeKloud:
+
+```bash
+        sed -i 's/controller-manager-XXXX.conf/controller-manager.conf/' /etc/kubernetes/manifests/kube-controller-manager.yaml
+```
+
+
+
+
+
+
+
+
+- QUESTÃO4:
+
+Something is wrong with scaling again. We just tried scaling the deployment to 3 replicas. But it's not happening.
+Investigate and fix the issue.
+Fix Issue
+Wait for deployment to actually scale
+
+
+- SOLUÇÃO4
+
+Verificado problema no kube-controller-manager.
+
+via solução do Fernando:
+
+AJUSTAR O path
+path: /etc/kubernetes/WRONG-PKI-DIRECTORY
+vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
 
 
 
