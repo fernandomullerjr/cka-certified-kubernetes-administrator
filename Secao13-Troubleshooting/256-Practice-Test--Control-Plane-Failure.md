@@ -1317,3 +1317,7 @@ controlplane ~ ➜
 AJUSTAR O path
 path: /etc/kubernetes/WRONG-PKI-DIRECTORY
 vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+
+
+
