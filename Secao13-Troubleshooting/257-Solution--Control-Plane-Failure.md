@@ -90,12 +90,54 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc # para adicionar o autocom
 
 
 
-- Questão1
+- Questão1:
 
+Quando um Pod não provisiona os Containers, avaliar via describe se ele tem um Node atribuido.
+Neste caso, havia um problema no kube-scheduler.
+Outra questão é que o Pod do Scheduler é um Pod Estático, pois está no diretório /etc/kubernetes/manifests e tem o sufixo -controlplane.
+Verificando via ls /etc/kubernetes/manifests.
+
+
+- SOLUÇÃO1:
+
+via solução do Fernando:
+pt1, ajustar o manifesto /etc/kubernetes/manifests/kube-scheduler.yaml
+pt2, deletar o pod com erro.
+pt3, aplicar kubectl apply -f /etc/kubernetes/manifests/kube-scheduler.yaml
+
+via material do KodeKloud:
 ~~~~BASH
 kubectl get pods -n kube-system
 sed -i 's/kube-schedulerrrr/kube-scheduler/g' /etc/kubernetes/manifests/kube-scheduler.yaml
 ~~~~
+
+
+
+
+
+- QUESTÃO2:
+
+Scale the deployment app to 2 pods.
+Scale Deployment to 2 PODs
+kubectl scale --replicas=2 deployment.apps/app
+
+
+- SOLUÇÃO2
+
+~~~~BASH
+kubectl scale --replicas=2 deployment.apps/app
+~~~~
+
+
+
+
+
+- QUESTÃO3:
+
+Even though the deployment was scaled to 2, the number of PODs does not seem to increase. Investigate and fix the issue.
+Inspect the component responsible for managing deployments and replicasets.
+Fix issue
+
 
 
 
@@ -108,4 +150,19 @@ sed -i 's/kube-schedulerrrr/kube-scheduler/g' /etc/kubernetes/manifests/kube-sch
 
 ~~~~BASH
 source <(kubectl completion bash) # configuração de autocomplete no bash do shell atual, o pacote bash-completion precisa ter sido instalado primeiro.
+~~~~
+
+
+- Quando um Pod não provisiona os Containers, avaliar via describe se ele tem um Node atribuido.
+
+
+- Verificar por Pods Estáticos:
+ls /etc/kubernetes/manifests
+
+
+- Utilizar o sed para os casos onde precisam ser ajustada uma palavra, que precisa ser substituida:
+
+~~~~BASH
+kubectl get pods -n kube-system
+sed -i 's/kube-schedulerrrr/kube-scheduler/g' /etc/kubernetes/manifests/kube-scheduler.yaml
 ~~~~
