@@ -1150,6 +1150,7 @@ node01 ~ ➜
 
 
 
+~~~~bash
 controlplane ~ ➜  kubectl get nodes
 NAME           STATUS   ROLES           AGE   VERSION
 controlplane   Ready    control-plane   45m   v1.29.0
@@ -1159,3 +1160,7 @@ controlplane ~ ➜  date
 Thu Jun 13 01:56:49 AM UTC 2024
 
 controlplane ~ ➜  
+~~~~
+
+
+
