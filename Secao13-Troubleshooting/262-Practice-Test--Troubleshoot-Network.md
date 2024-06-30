@@ -874,7 +874,10 @@ root@controlplane ~ ➜
 ~~~~
 
 
+- Criando a v3:
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao13-Troubleshooting/262-kube-proxy-daemon-set-v3.yaml
 
+~~~~bash
 root@controlplane ~ ➜  vi ds.yaml 
 
 root@controlplane ~ ➜  kubectl delete -f ds.yaml
@@ -915,12 +918,36 @@ triton        mysql                                  1/1     Running   0        
 triton        webapp-mysql-6b5cd9ff5c-bp88f          1/1     Running   0          53m
 
 root@controlplane ~ ➜  
+~~~~
 
 
 - Testando
 <https://30081-port-6f9df926b4604ddc.labs.kodekloud.com/>
 
-
 Environment Variables: DB_Host=mysql; DB_Database=Not Set; DB_User=root; DB_Password=paswrd;
 
 From webapp-mysql-6b5cd9ff5c-bp88f!
+
+
+- OK, normalizado após ajuste no path do config do kube-proxy!
+
+- OK, normalizado após ajuste no path do config do kube-proxy!
+- OK, normalizado após ajuste no path do config do kube-proxy!
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Analisar eventos dos Pods.
+
+- Analisar addons de network, como o Weave, por exemplo
+instalar ele, se for o caso:
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+
+
+- Componentes do Kubernetes, como o Kube-proxy, utilizam configurações do serviço e kubeconfig com base no Configmap.
+- Algum problema com o path da configuração do kube-proxy, pode ser necessário ajustar o seu Daemon Set e/ou ajustar o Configmap referente ao kube-proxy.
+- Revisar volumes, montagem do Configmap, nome do config no Configmap, avaliar Yaml do Daemon Set, etc.
