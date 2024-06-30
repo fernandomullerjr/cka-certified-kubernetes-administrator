@@ -576,3 +576,351 @@ root@controlplane ~ ➜
 ~~~~
 
 kubectl edit cm -n kube-system kube-proxy
+
+
+<https://discuss.kubernetes.io/t/kubeadm-join-is-failing-while-performing-tls-bootstrap/4037/3>
+
+exemplo
+
+~~~~conf
+worker-1$ cat <<EOF | sudo tee /etc/systemd/system/kube-proxy.service
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-proxy \\
+  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+~~~~
+
+
+kubectl get ds kube-proxy -n kube-system -o yaml
+
+kubectl get ds kube-proxy -n kube-system -o yaml
+
+- Criando a v2
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao13-Troubleshooting/262-kube-proxy-daemon-set-v2.yaml
+
+~~~~bash
+
+
+root@controlplane ~ ➜  vi ds.yaml
+
+root@controlplane ~ ➜  kubectl delete -f ds.yaml
+daemonset.apps "kube-proxy" deleted
+
+root@controlplane ~ ➜  kubectl apply -f ds.yaml
+daemonset.apps/kube-proxy created
+
+root@controlplane ~ ➜  date
+Sun Jun 30 08:53:56 PM UTC 2024
+
+root@controlplane ~ ➜  
+
+root@controlplane ~ ➜  
+
+root@controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS     AGE
+coredns-7db6d8ff4d-8677r               1/1     Running   0            75m
+coredns-7db6d8ff4d-rdgcc               1/1     Running   0            75m
+etcd-controlplane                      1/1     Running   0            75m
+kube-apiserver-controlplane            1/1     Running   0            75m
+kube-controller-manager-controlplane   1/1     Running   0            75m
+kube-proxy-wkm9x                       0/1     Error     1 (7s ago)   8s
+kube-scheduler-controlplane            1/1     Running   0            75m
+weave-net-gk4pt                        2/2     Running   0            45m
+
+root@controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-7db6d8ff4d-8677r               1/1     Running   0             75m
+coredns-7db6d8ff4d-rdgcc               1/1     Running   0             75m
+etcd-controlplane                      1/1     Running   0             75m
+kube-apiserver-controlplane            1/1     Running   0             75m
+kube-controller-manager-controlplane   1/1     Running   0             75m
+kube-proxy-wkm9x                       0/1     Error     1 (12s ago)   13s
+kube-scheduler-controlplane            1/1     Running   0             75m
+weave-net-gk4pt                        2/2     Running   0             45m
+
+root@controlplane ~ ➜  date
+Sun Jun 30 08:54:09 PM UTC 2024
+
+root@controlplane ~ ➜  
+
+
+root@controlplane ~ ➜  kubectl describe pod kube-proxy-wkm9x -n kube-system
+Name:                 kube-proxy-wkm9x
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Service Account:      kube-proxy
+Node:                 controlplane/192.168.121.70
+Start Time:           Sun, 30 Jun 2024 20:53:55 +0000
+Labels:               controller-revision-hash=6c99f56b44
+                      k8s-app=kube-proxy
+                      pod-template-generation=1
+Annotations:          <none>
+Status:               Running
+IP:                   192.168.121.70
+IPs:
+  IP:           192.168.121.70
+Controlled By:  DaemonSet/kube-proxy
+Containers:
+  kube-proxy:
+    Container ID:  containerd://c04d3a14c3a69bfa0a30c0bb18e308d0fb5a04749d9d59b4a083f12e7c1cfd2e
+    Image:         registry.k8s.io/kube-proxy:v1.26.0
+    Image ID:      registry.k8s.io/kube-proxy@sha256:1e9bbe429e4e2b2ad32681c91deb98a334f1bf4135137df5f84f9d03689060fe
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /usr/local/bin/kube-proxy
+      --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+      --hostname-override=$(NODE_NAME)
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Sun, 30 Jun 2024 20:54:36 +0000
+      Finished:     Sun, 30 Jun 2024 20:54:36 +0000
+    Ready:          False
+    Restart Count:  3
+    Environment:
+      NODE_NAME:   (v1:spec.nodeName)
+    Mounts:
+      /lib/modules from lib-modules (ro)
+      /run/xtables.lock from xtables-lock (rw)
+      /var/lib/kube-proxy from kube-proxy (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-fwk7q (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-proxy:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      kube-proxy
+    Optional:  false
+  xtables-lock:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/xtables.lock
+    HostPathType:  FileOrCreate
+  lib-modules:
+    Type:          HostPath (bare host directory volume)
+    Path:          /lib/modules
+    HostPathType:  
+  kube-api-access-fwk7q:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/os=linux
+Tolerations:                 op=Exists
+                             node.kubernetes.io/disk-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/memory-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/network-unavailable:NoSchedule op=Exists
+                             node.kubernetes.io/not-ready:NoExecute op=Exists
+                             node.kubernetes.io/pid-pressure:NoSchedule op=Exists
+                             node.kubernetes.io/unreachable:NoExecute op=Exists
+                             node.kubernetes.io/unschedulable:NoSchedule op=Exists
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  57s                default-scheduler  Successfully assigned kube-system/kube-proxy-wkm9x to controlplane
+  Normal   Pulled     16s (x4 over 56s)  kubelet            Container image "registry.k8s.io/kube-proxy:v1.26.0" already present on machine
+  Normal   Created    16s (x4 over 56s)  kubelet            Created container kube-proxy
+  Normal   Started    16s (x4 over 56s)  kubelet            Started container kube-proxy
+  Warning  BackOff    1s (x5 over 55s)   kubelet            Back-off restarting failed container kube-proxy in pod kube-proxy-wkm9x_kube-system(a208dddf-c239-4580-8efb-c06cb81175d7)
+
+root@controlplane ~ ➜  
+~~~~
+
+
+
+kubectl describe pod kube-proxy-wkm9x -n kube-system
+
+kubectl logs kube-proxy-wkm9x -n kube-system
+
+~~~~bash
+
+root@controlplane ~ ➜  kubectl logs kube-proxy-wkm9x -n kube-system
+E0630 20:55:17.469702       1 run.go:74] "command failed" err="failed complete: open /var/lib/kube-proxy/kube-proxy-config.yaml: no such file or directory"
+
+root@controlplane ~ ➜  
+~~~~
+
+
+- Revisando configmap
+
+~~~~yaml
+
+root@controlplane ~ ✖ kubectl get cm -n kube-system kube-proxy
+NAME         DATA   AGE
+kube-proxy   2      81m
+
+root@controlplane ~ ➜  kubectl get cm -n kube-system kube-proxy -o yaml
+apiVersion: v1
+data:
+  config.conf: |-
+    apiVersion: kubeproxy.config.k8s.io/v1alpha1
+    bindAddress: 0.0.0.0
+    bindAddressHardFail: false
+    clientConnection:
+      acceptContentTypes: ""
+      burst: 0
+      contentType: ""
+      kubeconfig: /var/lib/kube-proxy/kubeconfig.conf
+      qps: 0
+    clusterCIDR: 10.244.0.0/16
+    configSyncPeriod: 0s
+    conntrack:
+      maxPerCore: null
+      min: null
+      tcpBeLiberal: false
+      tcpCloseWaitTimeout: null
+      tcpEstablishedTimeout: null
+      udpStreamTimeout: 0s
+      udpTimeout: 0s
+    detectLocal:
+      bridgeInterface: ""
+      interfaceNamePrefix: ""
+    detectLocalMode: ""
+    enableProfiling: false
+    healthzBindAddress: ""
+    hostnameOverride: ""
+    iptables:
+      localhostNodePorts: null
+      masqueradeAll: false
+      masqueradeBit: null
+      minSyncPeriod: 0s
+      syncPeriod: 0s
+    ipvs:
+      excludeCIDRs: null
+      minSyncPeriod: 0s
+      scheduler: ""
+      strictARP: false
+      syncPeriod: 0s
+      tcpFinTimeout: 0s
+      tcpTimeout: 0s
+      udpTimeout: 0s
+    kind: KubeProxyConfiguration
+    logging:
+      flushFrequency: 0
+      options:
+        json:
+          infoBufferSize: "0"
+        text:
+          infoBufferSize: "0"
+      verbosity: 0
+    metricsBindAddress: ""
+    mode: ""
+    nftables:
+      masqueradeAll: false
+      masqueradeBit: null
+      minSyncPeriod: 0s
+      syncPeriod: 0s
+    nodePortAddresses: null
+    oomScoreAdj: null
+    portRange: ""
+    showHiddenMetricsForVersion: ""
+    winkernel:
+      enableDSR: false
+      forwardHealthCheckVip: false
+      networkName: ""
+      rootHnsEndpointName: ""
+      sourceVip: ""
+  kubeconfig.conf: |-
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server: https://controlplane:6443
+      name: default
+    contexts:
+    - context:
+        cluster: default
+        namespace: default
+        user: default
+      name: default
+    current-context: default
+    users:
+    - name: default
+      user:
+        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+kind: ConfigMap
+metadata:
+  annotations:
+    kubeadm.kubernetes.io/component-config.hash: sha256:906b8697200819e8263843f43965bb3614545800b82206dcee8ef93a08bc4f4b
+  creationTimestamp: "2024-06-30T19:38:27Z"
+  labels:
+    app: kube-proxy
+  name: kube-proxy
+  namespace: kube-system
+  resourceVersion: "260"
+  uid: 0262201c-67e6-4403-9a2c-4ef667f45627
+
+root@controlplane ~ ➜  
+~~~~
+
+
+
+root@controlplane ~ ➜  vi ds.yaml 
+
+root@controlplane ~ ➜  kubectl delete -f ds.yaml
+daemonset.apps "kube-proxy" deleted
+
+root@controlplane ~ ➜  kubectl apply -f ds.yaml
+daemonset.apps/kube-proxy created
+
+root@controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-7db6d8ff4d-8677r               1/1     Running   0          83m
+coredns-7db6d8ff4d-rdgcc               1/1     Running   0          83m
+etcd-controlplane                      1/1     Running   0          83m
+kube-apiserver-controlplane            1/1     Running   0          83m
+kube-controller-manager-controlplane   1/1     Running   0          83m
+kube-proxy-gbljd                       1/1     Running   0          6s
+kube-scheduler-controlplane            1/1     Running   0          83m
+weave-net-gk4pt                        2/2     Running   0          53m
+
+root@controlplane ~ ➜  date
+Sun Jun 30 09:02:17 PM UTC 2024
+
+root@controlplane ~ ➜  
+
+
+
+root@controlplane ~ ➜  kubectl get pods -A
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE
+kube-system   coredns-7db6d8ff4d-8677r               1/1     Running   0          83m
+kube-system   coredns-7db6d8ff4d-rdgcc               1/1     Running   0          83m
+kube-system   etcd-controlplane                      1/1     Running   0          84m
+kube-system   kube-apiserver-controlplane            1/1     Running   0          84m
+kube-system   kube-controller-manager-controlplane   1/1     Running   0          84m
+kube-system   kube-proxy-gbljd                       1/1     Running   0          23s
+kube-system   kube-scheduler-controlplane            1/1     Running   0          84m
+kube-system   weave-net-gk4pt                        2/2     Running   0          53m
+triton        mysql                                  1/1     Running   0          53m
+triton        webapp-mysql-6b5cd9ff5c-bp88f          1/1     Running   0          53m
+
+root@controlplane ~ ➜  
+
+
+- Testando
+<https://30081-port-6f9df926b4604ddc.labs.kodekloud.com/>
+
+
+Environment Variables: DB_Host=mysql; DB_Database=Not Set; DB_User=root; DB_Password=paswrd;
+
+From webapp-mysql-6b5cd9ff5c-bp88f!
