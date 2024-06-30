@@ -106,13 +106,13 @@ While analyzing the coreDNS deployment you can see that the the Corefile plugin 
 
 Port 53 is used for for DNS resolution.
 
-
+~~~~conf
         kubernetes cluster.local in-addr.arpa ip6.arpa {
            pods insecure
            fallthrough in-addr.arpa ip6.arpa
            ttl 30
         }
-
+~~~~
 
 This is the backend to k8s for cluster.local and reverse domains.
 
