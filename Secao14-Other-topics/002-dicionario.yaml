@@ -1,0 +1,8 @@
+pessoa:
+  nome: João
+  idade: 30
+  endereco:
+    rua: Rua dos Bobos
+    numero: 0
+    cidade: São Paulo
+    estado: SP
