@@ -888,7 +888,11 @@ JSONPath fornece uma maneira robusta de filtrar dados em documentos JSON com bas
 # ###################################################################################################################### 
 ## resumo
 
-- Inserir o $ no começo, para indicar o root
+- Inserir o $ no começo, para indicar o root.
+
+- **JSONPath:** `$`
+Retorna o documento JSON inteiro.
+
 
 - Use a notação de colchetes `[]` para acessar elementos em um array. Os índices são baseados em zero
 começa em 0
@@ -904,3 +908,7 @@ $.pessoas[?(@.idade > 40)]
 
 - JSONPath com base em critérios específicos
 $.[?(@.campo == 'valor')]
+
+
+- Jeito bom para filtrar sem saber a posição, filtrando por um critério:
+$.pessoas[?(@.cidade == 'São Paulo')]
