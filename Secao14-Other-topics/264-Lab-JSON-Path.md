@@ -506,3 +506,301 @@ alpine-host ~ ➜
 
 acusou incorreta, mesmo assim
 
+
+- Verificando a solução
+
+cat q6.json | jpath $.car.wheels[2]
+[
+  {
+    "model": "KCMDD3435K",
+    "location": "rear-right"
+  }
+]
+
+So you need to write the cat q6.json | jpath $.car.wheels[2] into file answer6.sh.
+
+
+- Na solução não é usada a condicional
+é acessado via posição, index, etc
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## Practice Test - JSON PATH
+
+
+### 1
+Develop a JSON PATH query to extract the kind of object. A file named q1.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  "value1"
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q1.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer1.sh in the /root directory.
+
+Is the answer1.sh contains the correct command?
+
+vi answer1.sh
+cat q1.json | jpath $.property1
+
+
+alpine-host ~ ➜  ./answer1.sh
+-bash: ./answer1.sh: Permission denied
+
+alpine-host ~ ✖ chmod +x answer1.sh
+
+alpine-host ~ ➜  ./answer1.sh
+[
+  "value1"
+]
+alpine-host ~ ➜  date
+Fri Sep 13 00:34:55 UTC 2024
+
+alpine-host ~ ➜  
+
+
+
+
+
+
+### 2
+Develop a JSON PATH query to extract the kind of object. A file named q2.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  {
+    "color": "white",
+    "price": "$120,000"
+  }
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q2.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer2.sh in the /root directory.
+
+Is the answer2.sh contains the correct command?
+
+
+vi answer2.sh
+chmod +x answer2.sh
+cat q2.json | jpath $.bus
+
+
+alpine-host ~ ➜  chmod +x answer2.sh
+
+alpine-host ~ ➜  ./answer2.sh 
+[
+  {
+    "color": "white",
+    "price": "$120,000"
+  }
+]
+alpine-host ~ ➜  
+
+
+
+
+
+
+
+### 3
+Develop a JSON PATH query to extract the kind of object. A file named q3.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  "$120,000"
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q3.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer3.sh in the /root directory.
+
+Is the answer3.sh contains the correct command?
+
+
+
+### 3
+
+
+Develop a JSON PATH query to extract the kind of object. A file named q3.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  "$120,000"
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q3.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer3.sh in the /root directory.
+
+Is the answer3.sh contains the correct command?
+
+
+
+vi answer3.sh
+chmod +x answer3.sh
+cat q3.json | jpath $.bus.price
+
+
+
+
+
+
+
+### 4
+Develop a JSON PATH query to extract the kind of object. A file named q4.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  "$20,000"
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q4.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer4.sh in the /root directory.
+
+Is the answer4.sh contains the correct command?
+
+
+vi answer4.sh
+chmod +x answer4.sh
+cat q4.json | jpath $.vehicles.car.price
+
+
+
+
+
+
+### 5
+
+Develop a JSON PATH query to extract the kind of object. A file named q5.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+    [
+        {
+            "model": "KDJ39848T",
+            "location": "front-right"
+        },
+        {
+            "model": "MDJ39485DK",
+            "location": "front-left"
+        },
+        {
+            "model": "KCMDD3435K",
+            "location": "rear-right"
+        },
+        {
+            "model": "JJDH34234KK",
+            "location": "rear-left"
+        }
+    ]
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q5.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer5.sh in the /root directory.
+
+Is the answer5.sh contains the correct command?
+
+alpine-host ~ ➜  cat q5.json 
+{
+    "car": {
+        "color": "blue",
+        "price": "$20,000",
+        "wheels": [
+            {
+                "model": "KDJ39848T",
+                "location": "front-right"
+            },
+            {
+                "model": "MDJ39485DK",
+                "location": "front-left"
+            },
+            {
+                "model": "KCMDD3435K",
+                "location": "rear-right"
+            },
+            {
+                "model": "JJDH34234KK",
+                "location": "rear-left"
+            }
+        ]
+    }
+}
+alpine-host ~ ➜  
+
+vi answer5.sh
+chmod +x answer5.sh
+cat q5.json | jpath $.car.wheels
+
+
+
+
+
+
+
+### 6
+Develop a JSON PATH query to extract the kind of object. A file named q6.json is provided in the terminal. Your task is to develop a JSON path query to extract the expected output from the Source Data.
+
+Expected output should be like this
+
+[
+  {
+    "model": "KCMDD3435K",
+    "location": "rear-right"
+  }
+]
+
+You can test the JSON PATH query as below (noted that the query below is just sample, not a solution).
+
+cat q6.json | jpath $.property1
+[
+  "value1"
+]
+
+If the output matched the expectation then write the whole command into a file named answer6.sh in the /root directory.
+
+Is the answer6.sh contains the correct command?
