@@ -1622,3 +1622,111 @@ Com base na estrutura JSON que você forneceu, para acessar o primeiro (`0`) e o
    ```
 
 Se você estiver restrito a usar `jpath`, recomendo verificar a documentação ou suporte da ferramenta para múltiplos índices, mas se possível, `jq` pode resolver seu problema de forma eficaz.
+
+
+
+alpine-host ~ ➜  cat q13.json | jpath $[1,3]
+[
+  "bike"
+]
+alpine-host ~ ➜  cat q13.json | jq '.[0, 3]'
+"car"
+"bike"
+
+alpine-host ~ ➜  touch answer13.sh
+chmod +x answer13.sh
+vi answer13.sh
+
+alpine-host ~ ➜  
+
+alpine-host ~ ➜  
+
+alpine-host ~ ➜  ./answer13.sh
+"car"
+"bike"
+
+alpine-host ~ ➜  date
+Fri Sep 13 01:23:26 UTC 2024
+
+alpine-host ~ ➜  
+
+
+
+Com JSONPath, o comportamento esperado para selecionar múltiplos índices de um array deve ser similar ao que descrevi inicialmente. No entanto, dependendo da implementação da ferramenta que você está utilizando (como `jpath` ou uma outra implementação de JSONPath), a sintaxe pode variar ligeiramente.
+
+Para acessar os valores de um array nas posições 0 e 3 usando JSONPath, a sintaxe correta seria:
+
+```jsonpath
+$[0,3]
+```
+
+Mas, se o seu comando `jpath` não está funcionando corretamente, é possível que haja uma limitação na ferramenta. Algumas implementações podem se comportar de forma diferente ao lidar com índices múltiplos.
+
+### Exemplo com JSONPath correto:
+Para o JSON:
+
+```json
+[
+    "car",
+    "bus",
+    "truck",
+    "bike"
+]
+```
+
+Usando JSONPath, a consulta correta seria:
+
+```jsonpath
+$[0,3]
+```
+
+### O resultado esperado seria:
+```json
+[
+  "car",
+  "bike"
+]
+```
+
+### Considerações:
+- Certifique-se de que a ferramenta que está usando (`jpath`) está corretamente interpretando a sintaxe JSONPath. 
+- Verifique se ela suporta a seleção de múltiplos índices no array, como mostrado.
+  
+Se o comportamento estiver incorreto ou a ferramenta não suportar múltiplos índices, talvez seja melhor verificar outras implementações de JSONPath que possam fornecer o resultado esperado.
+
+
+
+
+- Pegando a solução:
+
+cat q13.json | jpath '$[0,3]'
+[
+  "car",
+  "bike"
+]
+
+So you need to write the cat q13.json | jpath $[0,3] into file answer13.sh.
+
+
+alpine-host ~ ➜  man jpath
+-bash: man: command not found
+
+alpine-host ~ ✖ jpath --help
+^C
+
+alpine-host ~ ✖ cat q13.json | jpath '$[0,3]'
+[
+  "car",
+  "bike"
+]
+alpine-host ~ ➜  vi answer13.sh
+
+alpine-host ~ ➜  ./answer13.sh
+[
+  "car",
+  "bike"
+]
+alpine-host ~ ➜  date
+Fri Sep 13 01:25:49 UTC 2024
+
+alpine-host ~ ➜  
