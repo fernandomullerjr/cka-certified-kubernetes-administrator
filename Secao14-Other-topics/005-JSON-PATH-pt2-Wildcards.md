@@ -418,3 +418,149 @@ Lastly, I noticed the date output shows September 14, 2024. As an AI language mo
 
 
 
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+##  JSON PATH - Wildcards
+
+Aqui estão alguns exemplos de uso de **JSONPath** com curingas (wildcards) e dicas úteis para consulta em objetos JSON. Essas consultas permitem selecionar dinamicamente elementos sem precisar especificar diretamente o nome ou o índice de cada nó.
+
+### 1. **Exemplo de Estrutura JSON**
+Vamos usar o seguinte exemplo de JSON para ilustrar as consultas:
+
+```json
+{
+  "car": {
+    "brand": "Toyota",
+    "wheels": [
+      { "position": "front-left", "model": "Goodyear" },
+      { "position": "front-right", "model": "Michelin" }
+    ]
+  },
+  "bike": {
+    "brand": "Yamaha",
+    "wheels": [
+      { "position": "front", "model": "Dunlop" },
+      { "position": "rear", "model": "Bridgestone" }
+    ]
+  }
+}
+```
+
+### 2. **Usando Wildcards (`*` e `[*]`)**
+
+#### Consulta: **Obter todos os modelos de rodas para todos os veículos**
+```jsonpath
+$.*.wheels[*].model
+```
+- **Descrição**: 
+  - `$.*`: O curinga `*` seleciona todas as chaves no nível raiz (`car` e `bike`).
+  - `.wheels[*]`: Seleciona todas as rodas para cada veículo, já que `wheels` é uma lista.
+  - `.model`: Retorna o valor da chave `model` para cada roda.
+
+- **Resultado**:
+  ```json
+  ["Goodyear", "Michelin", "Dunlop", "Bridgestone"]
+  ```
+
+#### Consulta: **Obter todas as rodas, independente do veículo**
+```jsonpath
+$..wheels[*]
+```
+- **Descrição**: 
+  - `$..wheels[*]`: O `..` (deep scan) busca todas as ocorrências de `wheels` no JSON, e o `[*]` seleciona todos os elementos dentro dessas listas.
+
+- **Resultado**:
+  ```json
+  [
+    { "position": "front-left", "model": "Goodyear" },
+    { "position": "front-right", "model": "Michelin" },
+    { "position": "front", "model": "Dunlop" },
+    { "position": "rear", "model": "Bridgestone" }
+  ]
+  ```
+
+#### Consulta: **Obter todas as marcas de veículos**
+```jsonpath
+$.*.brand
+```
+- **Descrição**:
+  - `$.*`: Seleciona todas as chaves no nível raiz (`car` e `bike`).
+  - `.brand`: Seleciona a chave `brand` de cada veículo.
+
+- **Resultado**:
+  ```json
+  ["Toyota", "Yamaha"]
+  ```
+
+### 3. **Usando Índices e Filtros**
+
+#### Consulta: **Obter o modelo da primeira roda de cada veículo**
+```jsonpath
+$.*.wheels[0].model
+```
+- **Descrição**:
+  - `$.*`: Seleciona todos os veículos (`car` e `bike`).
+  - `.wheels[0]`: Seleciona a primeira roda de cada lista `wheels`.
+  - `.model`: Retorna o valor da chave `model` dessa roda.
+
+- **Resultado**:
+  ```json
+  ["Goodyear", "Dunlop"]
+  ```
+
+#### Consulta: **Obter o modelo das rodas da posição 'rear'**
+```jsonpath
+$..wheels[?(@.position == 'rear')].model
+```
+- **Descrição**:
+  - `$..wheels`: O `..` (deep scan) procura todas as ocorrências de `wheels`.
+  - `[?(@.position == 'rear')]`: Filtra as rodas onde a chave `position` é igual a `rear`.
+  - `.model`: Retorna o valor da chave `model` das rodas filtradas.
+
+- **Resultado**:
+  ```json
+  ["Bridgestone"]
+  ```
+
+### 4. **Dicas ao usar JSONPath**
+
+- **Curinga `*`**: O `*` pode ser usado em qualquer nível de objetos ou arrays para selecionar todos os elementos. Em objetos, ele seleciona todas as chaves; em arrays, seleciona todos os itens.
+- **Deep Scan (`..`)**: O operador `..` busca em qualquer nível da árvore de objetos. Muito útil quando você não sabe a profundidade ou a localização exata do nó que deseja acessar.
+- **Filtros (`?()`)**: Filtros dentro de colchetes (`[?()]`) permitem que você aplique expressões lógicas para selecionar elementos com base em suas propriedades, como exemplificado com `@.position == 'rear'`.
+- **Índices**: Ao trabalhar com arrays, você pode usar índices (`[0]`, `[1]`, etc.) para acessar elementos específicos.
+- **Concatenar Operadores**: Combine operadores (`*`, `..`, filtros) para criar consultas poderosas que extraem dados de qualquer parte do JSON.
+
+### 5. **Recursos Úteis**
+- **Ferramentas para testar JSONPath**:
+  - [jsonpath.com](http://jsonpath.com/): Ferramenta online onde você pode testar suas consultas JSONPath.
+  
+Esses exemplos e dicas devem ajudar você a navegar pela estrutura JSON de forma eficiente usando JSONPath!
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESUMO
+
+- Consulta: **Obter todos os modelos de rodas para todos os veículos**
+```jsonpath
+$.*.wheels[*].model
+```
+
+
+- Consulta: **Obter todas as marcas de veículos**
+neste caso, o wildcard percorre todas as chaves:
+```jsonpath
+$.*.brand
+```
+
+
+- **Ferramentas para testar JSONPath**:
+  - [jsonpath.com](http://jsonpath.com/): Ferramenta online onde você pode testar suas consultas JSONPath.
+  
