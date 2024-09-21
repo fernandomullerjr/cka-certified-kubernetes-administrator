@@ -1395,6 +1395,8 @@ alpine-host ~ ➜  cat q9.json | jpath '$.prizes[?(@.year == 2014)].laureates[*]
   "Malala"
 ]
 alpine-host ~ ➜  
+
+
 touch answer9.sh
 chmod +x answer9.sh
 vi answer9.sh
