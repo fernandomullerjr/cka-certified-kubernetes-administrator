@@ -89,3 +89,57 @@ Espero que esses exemplos te ajudem a entender melhor como utilizar JSONPath par
 
 
 devopsmind.com.br
+
+
+
+
+Para pular 2 itens de uma lista em JSONPath, você pode utilizar a sintaxe `$[start:end:step]`, onde `start` é o índice inicial, `end` é o índice final (opcional), e `step` é o tamanho do passo.
+
+Por exemplo, para pular 2 itens a cada seleção em uma lista, você pode utilizar a seguinte consulta:
+```jsonpath
+$.[2::2]
+```
+Isso selecionará o terceiro item (índice 2), quinto item (índice 4), sétimo item (índice 6), etc. da lista, pulando dois itens a cada seleção.
+
+
+
+
+Sim, é possível que você precise usar `:0` junto com `-1` em alguns casos.
+
+Quando você usa `[-1]` em JSONPath, ele acessa o último elemento da lista. No entanto, se a lista estiver vazia, `[-1]` retornará `null`.
+
+Se você quiser acessar o último elemento de uma lista que pode estar vazia, você pode usar `:0` junto com `-1`. Isso é conhecido como "segurança de nulo" em JSONPath.
+
+Aqui está um exemplo:
+
+```json
+{
+  "lista": []
+}
+```
+
+Com o JSONPath `$.lista[-1]`, você acessará `null`, pois a lista está vazia.
+
+Com o JSONPath `$.lista[:0][-1]`, você acessará `null`, pois a lista está vazia e não há elementos para acessar.
+
+No entanto, se você usar `$.lista[:0][-1]` em um documento JSON que tem uma lista com elementos, você acessará o último elemento da lista.
+
+Por exemplo:
+
+```json
+{
+  "lista": [
+    {"nome": "João", "idade": 25},
+    {"nome": "Maria", "idade": 30},
+    {"nome": "Pedro", "idade": 35}
+  ]
+}
+```
+
+Com o JSONPath `$.lista[:0][-1]`, você acessará o último elemento da lista:
+
+```json
+{"nome": "Pedro", "idade": 35}
+```
+
+Então, em resumo, se você precisar acessar o último elemento de uma lista que pode estar vazia, é uma boa prática usar `:0` junto com `-1` para garantir que você não obtenha `null` quando a lista está vazia.
