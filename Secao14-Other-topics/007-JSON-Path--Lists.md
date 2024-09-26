@@ -143,3 +143,21 @@ Com o JSONPath `$.lista[:0][-1]`, você acessará o último elemento da lista:
 ```
 
 Então, em resumo, se você precisar acessar o último elemento de uma lista que pode estar vazia, é uma boa prática usar `:0` junto com `-1` para garantir que você não obtenha `null` quando a lista está vazia.
+
+
+
+
+
+Para trazer os últimos 3 elementos de uma lista em JSONPath, você pode utilizar a seguinte consulta:
+```jsonpath
+$..[-3:]
+```
+Isso seleciona os três últimos itens da lista, independentemente do tamanho da lista. A sintaxe `$..` seleciona todos os elementos do documento JSON, enquanto `[-3:]` seleciona os três últimos itens da lista.
+
+Note que a sintaxe `$[-3:]` seleciona os três últimos itens da lista, inclusive o penúltimo item. Se você quiser selecionar apenas os dois últimos itens da lista, você pode utilizar a seguinte consulta:
+```jsonpath
+$..[-2:]
+```
+Isso seleciona os dois últimos itens da lista, independentemente do tamanho da lista. 
+
+Espero que esses exemplos te ajudem a entender melhor como utilizar JSONPath para selecionar elementos de uma lista.
