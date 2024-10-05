@@ -664,3 +664,115 @@ wsl2     Ubuntu 22.04.5 LTS%
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## Loops - Range
+
+kubectl get nodes -o=jsonpath='{.items[*].metadata.name} {"\n"} {.items[*].status.capacity.cpu}'
+master node01
+4 4
+
+
+FOR EACH NODE
+PRINT NODE NAME \t PRINT CPU COUNT \n
+END FOR
+
+'{range .items[*]}
+{.metadata.name} {"\t"} {.status.capacity.cpu} {"\n"}
+{end}'
+
+
+kubectl get pods -o=jsonpath='{.items[*].metadata.name} {.items[*].status.capacity.cpu}'
+
+
+kubectl get nodes -o=jsonpath='{range .items[*].metadata.name} {"\t"}  {.items[*].status.nodeInfo.osImage} {"\n"} {end}'
+kubectl get nodes -o=jsonpath='{.items[*].metadata.name} {"\t"} {.items[*].status.nodeInfo.osImage}'
+
+- Testando
+
+~~~~bash
+
+>
+> kubectl get nodes -o=jsonpath='{range .items[*].metadata.name} {"\t"}  {.items[*].status.nodeInfo.osImage} {"\n"} {end}'
+
+ %
+
+
+~~~~
+
+
+
+- Ajustando
+
+
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name} {"\t"}  {.status.nodeInfo.osImage} {"\n"} {end}'
+
+- Testando
+
+~~~~bash
+
+
+
+~~~~
+
+
+
+
+
+
+### JSON PATH for Custom Columns
+kubectl get nodes -o=jsonpath='{.items[*].metadata.name} {.items[*].status.capacity.cpu}'
+
+kubectl get nodes -o=custom-columns=<COLUMN NAME>:<JSON PATH>
+
+kubectl get nodes -o=custom-columns=NODE:.metadata.name
+NODE
+master
+node01
+,CPU:.status.capacity.cpu
+
+
+kubectl get nodes -o=custom-columns=NODE:.metadata.name,OS:.status.nodeInfo.osImage
+
+
+- Testando
+
+~~~~bash
+
+>
+> kubectl get nodes -o=custom-columns=NODE:.metadata.name
+NODE
+wsl2
+
+
+> kubectl get nodes -o=custom-columns=NODE:.metadata.name,OS:.status.nodeInfo.osImage
+NODE   OS
+wsl2   Ubuntu 22.04.5 LTS
+~~~~
+
+
+
+
+
+
+### JSON PATH for Sort
+
+kubectl get nodes -o=custom-columns=NODE:.metadata.name
+NODE
+master
+node01
+,CPU:.status.capacity.cpu
+CPU
+4
+4
+kubectl get nodes --sort-by=kubectl get nodes --sort-by=
+NAME STATUS ROLES AGE VERSION
+master Ready master 5m v1.11.3
+node01 Ready <none> 5m v1.11.3
+.metadata.name
+kubectl get nodes --sort-by=kubectl get nodes --sort-by=
+NAME STATUS ROLES AGE VERSION
+master Ready master 5m v1.11.3
+node01 Ready <none> 5m v1.11.3
+.status.capacity.cpu
+
+
+## pendente
+- criar resumo
