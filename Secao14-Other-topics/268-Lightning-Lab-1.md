@@ -66,3 +66,588 @@ https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-u
 
 sudo apt update
 sudo apt-cache madison kubeadm
+
+
+controlplane ~ ✖ sudo apt update
+Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]                                                                  
+Get:3 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]                                                                                            
+Get:4 https://download.docker.com/linux/ubuntu jammy InRelease [48.8 kB]                                                                                   
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]                                                                                    
+Get:6 https://download.docker.com/linux/ubuntu jammy/stable amd64 Packages [48.4 kB]
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.29/deb  InRelease [1,189 B]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:8 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [2,325 kB]
+Get:9 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+Get:10 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [3,122 kB]
+Get:11 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]
+Get:12 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1,160 kB]   
+Get:13 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.29/deb  Packages [14.0 kB]
+Get:14 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]              
+Get:15 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1,792 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [3,200 kB]
+Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.8 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1,449 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2,602 kB]
+Get:21 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [33.7 kB]
+Get:22 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.4 kB]
+Fetched 34.5 MB in 3s (12.9 MB/s)                            
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+31 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+controlplane ~ ➜  sudo apt-cache madison kubeadm
+   kubeadm | 1.29.9-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.8-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.7-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.6-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.5-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.4-2.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.3-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.2-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.1-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.0-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  sudo apt update
+Hit:2 http://archive.ubuntu.com/ubuntu jammy InRelease                                                                                      
+Hit:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.29/deb  InRelease                                     
+Hit:3 https://download.docker.com/linux/ubuntu jammy InRelease      
+Hit:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease      
+Hit:5 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+31 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+controlplane ~ ➜  sudo apt-cache madison kubeadm
+   kubeadm | 1.29.9-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.8-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.7-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.6-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.5-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.4-2.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.3-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.2-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.1-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+   kubeadm | 1.29.0-1.1 | https://pkgs.k8s.io/core:/stable:/v1.29/deb  Packages
+
+controlplane ~ ➜  lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.4 LTS
+Release:        22.04
+Codename:       jammy
+
+controlplane ~ ➜  
+
+https://v1-30.docs.kubernetes.io/blog/2023/08/15/pkgs-k8s-io-introduction/
+
+How to migrate to the Kubernetes community-owned repositories?
+Debian, Ubuntu, and operating systems using apt/apt-get
+
+    Replace the apt repository definition so that apt points to the new repository instead of the Google-hosted repository. Make sure to replace the Kubernetes minor version in the command below with the minor version that you're currently using:
+
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+    Download the public signing key for the Kubernetes package repositories. The same signing key is used for all repositories, so you can disregard the version in the URL:
+
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    Update: In releases older than Debian 12 and Ubuntu 22.04, the folder /etc/apt/keyrings does not exist by default, and it should be created before the curl command.
+
+    Update the apt package index:
+
+    sudo apt-get update
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo apt-get update
+
+
+
+controlplane ~ ➜  echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list^C
+
+controlplane ~ ✖ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+File '/etc/apt/keyrings/kubernetes-apt-keyring.gpg' exists. Overwrite? (y/N) y
+
+controlplane ~ ➜  sudo apt-get update
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease [1,186 B]                           
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                                             
+Hit:3 http://archive.ubuntu.com/ubuntu jammy InRelease                                                                         
+Get:4 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  Packages [9,318 B]
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease                  
+Hit:6 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:7 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Fetched 10.5 kB in 1s (16.4 kB/s)
+Reading package lists... Done
+
+controlplane ~ ➜  
+
+
+- Agora traz 1.30
+
+controlplane ~ ➜  sudo apt-cache madison kubeadm
+   kubeadm | 1.30.5-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+   kubeadm | 1.30.4-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+   kubeadm | 1.30.3-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+   kubeadm | 1.30.2-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+   kubeadm | 1.30.1-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+   kubeadm | 1.30.0-1.1 | https://pkgs.k8s.io/core:/stable:/v1.30/deb  Packages
+
+controlplane ~ ➜  
+
+
+
+Call "kubeadm upgrade"
+
+For the first control plane node
+
+    Upgrade kubeadm:
+        Ubuntu, Debian or HypriotOS
+        CentOS, RHEL or Fedora
+
+    # replace x in 1.30.x-* with the latest patch version
+    sudo apt-mark unhold kubeadm && \
+    sudo apt-get update && sudo apt-get install -y kubeadm='1.30.x-*' && \
+    sudo apt-mark hold kubeadm
+
+    Verify that the download works and has the expected version:
+
+    kubeadm version
+
+    Verify the upgrade plan:
+
+    sudo kubeadm upgrade plan
+
+Choose a version to upgrade to, and run the appropriate command. For example:
+
+# replace x with the patch version you picked for this upgrade
+sudo kubeadm upgrade apply v1.30.x
+
+Once the command finishes you should see:
+
+[upgrade/successful] SUCCESS! Your cluster was upgraded to "v1.30.x". Enjoy!
+
+[upgrade/kubelet] Now that your control plane is upgraded, please proceed with upgrading your kubelets if you haven't already done so.
+
+
+
+- Ajustados
+kubeadm version
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.0-1.1' && \
+sudo apt-mark hold kubeadm
+
+kubeadm version
+sudo kubeadm upgrade plan
+sudo kubeadm upgrade apply v1.30.0
+
+
+
+controlplane ~ ➜  kubeadm version
+kubeadm version: &version.Info{Major:"1", Minor:"29", GitVersion:"v1.29.0", GitCommit:"3f7a50f38688eb332e2a1b013678c6435d539ae6", GitTreeState:"clean", BuildDate:"2023-12-13T08:50:10Z", GoVersion:"go1.21.5", Compiler:"gc", Platform:"linux/amd64"}
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubeadm version
+kubeadm version: &version.Info{Major:"1", Minor:"29", GitVersion:"v1.29.0", GitCommit:"3f7a50f38688eb332e2a1b013678c6435d539ae6", GitTreeState:"clean", BuildDate:"2023-12-13T08:50:10Z", GoVersion:"go1.21.5", Compiler:"gc", Platform:"linux/amd64"}
+
+controlplane ~ ➜  sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.0-1.1' && \
+sudo apt-mark hold kubeadm
+kubeadm was already not on hold.
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                                            
+Hit:3 http://archive.ubuntu.com/ubuntu jammy InRelease                                                                                                    
+Hit:4 http://security.ubuntu.com/ubuntu jammy-security InRelease                       
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease                         
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease                 
+Hit:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  cri-tools
+The following packages will be upgraded:
+  cri-tools kubeadm
+2 upgraded, 0 newly installed, 0 to remove and 31 not upgraded.
+Need to get 31.7 MB of archives.
+After this operation, 5,055 kB of additional disk space will be used.
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  cri-tools 1.30.1-1.1 [21.3 MB]
+Get:2 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubeadm 1.30.0-1.1 [10.4 MB]
+Fetched 31.7 MB in 1s (56.0 MB/s) 
+debconf: delaying package configuration, since apt-utils is not installed
+(Reading database ... 20584 files and directories currently installed.)
+Preparing to unpack .../cri-tools_1.30.1-1.1_amd64.deb ...
+Unpacking cri-tools (1.30.1-1.1) over (1.29.0-1.1) ...
+Preparing to unpack .../kubeadm_1.30.0-1.1_amd64.deb ...
+Unpacking kubeadm (1.30.0-1.1) over (1.29.0-1.1) ...
+Setting up cri-tools (1.30.1-1.1) ...
+Setting up kubeadm (1.30.0-1.1) ...
+kubeadm set on hold.
+
+controlplane ~ ➜  kubeadm version
+kubeadm version: &version.Info{Major:"1", Minor:"30", GitVersion:"v1.30.0", GitCommit:"7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a", GitTreeState:"clean", BuildDate:"2024-04-17T17:34:08Z", GoVersion:"go1.22.2", Compiler:"gc", Platform:"linux/amd64"}
+
+controlplane ~ ➜  sudo kubeadm upgrade plan
+[upgrade/config] Making sure the configuration is correct:
+[preflight] Running pre-flight checks.
+[upgrade/config] Reading configuration from the cluster...
+[upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+[upgrade] Running cluster health checks
+[upgrade] Fetching available versions to upgrade to
+[upgrade/versions] Cluster version: 1.29.0
+[upgrade/versions] kubeadm version: v1.30.0
+I1011 01:08:24.506173   15451 version.go:256] remote version is much newer: v1.31.1; falling back to: stable-1.30
+[upgrade/versions] Target version: v1.30.5
+[upgrade/versions] Latest version in the v1.29 series: v1.29.9
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   NODE           CURRENT   TARGET
+kubelet     controlplane   v1.29.0   v1.29.9
+kubelet     node01         v1.29.0   v1.29.9
+
+Upgrade to the latest version in the v1.29 series:
+
+COMPONENT                 NODE           CURRENT    TARGET
+kube-apiserver            controlplane   v1.29.0    v1.29.9
+kube-controller-manager   controlplane   v1.29.0    v1.29.9
+kube-scheduler            controlplane   v1.29.0    v1.29.9
+kube-proxy                               1.29.0     v1.29.9
+CoreDNS                                  v1.10.1    v1.11.1
+etcd                      controlplane   3.5.10-0   3.5.12-0
+
+You can now apply the upgrade by executing the following command:
+
+        kubeadm upgrade apply v1.29.9
+
+_____________________________________________________________________
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   NODE           CURRENT   TARGET
+kubelet     controlplane   v1.29.0   v1.30.5
+kubelet     node01         v1.29.0   v1.30.5
+
+Upgrade to the latest stable version:
+
+COMPONENT                 NODE           CURRENT    TARGET
+kube-apiserver            controlplane   v1.29.0    v1.30.5
+kube-controller-manager   controlplane   v1.29.0    v1.30.5
+kube-scheduler            controlplane   v1.29.0    v1.30.5
+kube-proxy                               1.29.0     v1.30.5
+CoreDNS                                  v1.10.1    v1.11.1
+etcd                      controlplane   3.5.10-0   3.5.12-0
+
+You can now apply the upgrade by executing the following command:
+
+        kubeadm upgrade apply v1.30.5
+
+Note: Before you can perform this upgrade, you have to update kubeadm to v1.30.5.
+
+_____________________________________________________________________
+
+
+The table below shows the current state of component configs as understood by this version of kubeadm.
+Configs that have a "yes" mark in the "MANUAL UPGRADE REQUIRED" column require manual config upgrade or
+resetting to kubeadm defaults before a successful upgrade can be performed. The version to manually
+upgrade to is denoted in the "PREFERRED VERSION" column.
+
+API GROUP                 CURRENT VERSION   PREFERRED VERSION   MANUAL UPGRADE REQUIRED
+kubeproxy.config.k8s.io   v1alpha1          v1alpha1            no
+kubelet.config.k8s.io     v1beta1           v1beta1             no
+_____________________________________________________________________
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  sudo kubeadm upgrade apply v1.30.0
+[upgrade/config] Making sure the configuration is correct:
+[preflight] Running pre-flight checks.
+[upgrade/config] Reading configuration from the cluster...
+[upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+[upgrade] Running cluster health checks
+[upgrade/version] You have chosen to change the cluster version to "v1.30.0"
+[upgrade/versions] Cluster version: v1.29.0
+[upgrade/versions] kubeadm version: v1.30.0
+[upgrade] Are you sure you want to proceed? [y/N]: y
+[upgrade/prepull] Pulling images required for setting up a Kubernetes cluster
+[upgrade/prepull] This might take a minute or two, depending on the speed of your internet connection
+[upgrade/prepull] You can also perform this action in beforehand using 'kubeadm config images pull'
+W1011 01:09:11.151606   15598 checks.go:844] detected that the sandbox image "registry.k8s.io/pause:3.8" of the container runtime is inconsistent with that used by kubeadm.It is recommended to use "registry.k8s.io/pause:3.9" as the CRI sandbox image.
+[upgrade/apply] Upgrading your Static Pod-hosted control plane to version "v1.30.0" (timeout: 5m0s)...
+[upgrade/etcd] Upgrading to TLS for etcd
+[upgrade/staticpods] Preparing for "etcd" upgrade
+[upgrade/staticpods] Renewing etcd-server certificate
+[upgrade/staticpods] Renewing etcd-peer certificate
+[upgrade/staticpods] Renewing etcd-healthcheck-client certificate
+[upgrade/staticpods] Moved new manifest to "/etc/kubernetes/manifests/etcd.yaml" and backed up old manifest to "/etc/kubernetes/tmp/kubeadm-backup-manifests-2024-10-11-01-09-21/etcd.yaml"
+[upgrade/staticpods] Waiting for the kubelet to restart the component
+[upgrade/staticpods] This can take up to 5m0s
+[apiclient] Found 1 Pods for label selector component=etcd
+[upgrade/staticpods] Component "etcd" upgraded successfully!
+[upgrade/etcd] Waiting for etcd to become available
+[upgrade/staticpods] Writing new Static Pod manifests to "/etc/kubernetes/tmp/kubeadm-upgraded-manifests4010477458"
+[upgrade/staticpods] Preparing for "kube-apiserver" upgrade
+[upgrade/staticpods] Renewing apiserver certificate
+[upgrade/staticpods] Renewing apiserver-kubelet-client certificate
+[upgrade/staticpods] Renewing front-proxy-client certificate
+[upgrade/staticpods] Renewing apiserver-etcd-client certificate
+[upgrade/staticpods] Moved new manifest to "/etc/kubernetes/manifests/kube-apiserver.yaml" and backed up old manifest to "/etc/kubernetes/tmp/kubeadm-backup-manifests-2024-10-11-01-09-21/kube-apiserver.yaml"
+[upgrade/staticpods] Waiting for the kubelet to restart the component
+[upgrade/staticpods] This can take up to 5m0s
+[apiclient] Found 1 Pods for label selector component=kube-apiserver
+[upgrade/staticpods] Component "kube-apiserver" upgraded successfully!
+[upgrade/staticpods] Preparing for "kube-controller-manager" upgrade
+[upgrade/staticpods] Renewing controller-manager.conf certificate
+[upgrade/staticpods] Moved new manifest to "/etc/kubernetes/manifests/kube-controller-manager.yaml" and backed up old manifest to "/etc/kubernetes/tmp/kubeadm-backup-manifests-2024-10-11-01-09-21/kube-controller-manager.yaml"
+[upgrade/staticpods] Waiting for the kubelet to restart the component
+[upgrade/staticpods] This can take up to 5m0s
+[apiclient] Found 1 Pods for label selector component=kube-controller-manager
+[upgrade/staticpods] Component "kube-controller-manager" upgraded successfully!
+[upgrade/staticpods] Preparing for "kube-scheduler" upgrade
+[upgrade/staticpods] Renewing scheduler.conf certificate
+[upgrade/staticpods] Moved new manifest to "/etc/kubernetes/manifests/kube-scheduler.yaml" and backed up old manifest to "/etc/kubernetes/tmp/kubeadm-backup-manifests-2024-10-11-01-09-21/kube-scheduler.yaml"
+[upgrade/staticpods] Waiting for the kubelet to restart the component
+[upgrade/staticpods] This can take up to 5m0s
+[apiclient] Found 1 Pods for label selector component=kube-scheduler
+[upgrade/staticpods] Component "kube-scheduler" upgraded successfully!
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config" in namespace kube-system with the configuration for the kubelets in the cluster
+[upgrade] Backing up kubelet config file to /etc/kubernetes/tmp/kubeadm-kubelet-config2855891187/config.yaml
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to get nodes
+[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+[upgrade/successful] SUCCESS! Your cluster was upgraded to "v1.30.0". Enjoy!
+
+[upgrade/kubelet] Now that your control plane is upgraded, please proceed with upgrading your kubelets if you haven't already done so.
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ kubectl get node
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   93m   v1.29.0
+node01         Ready    <none>          93m   v1.29.0
+
+controlplane ~ ➜  kubectl get node -o wide
+NAME           STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION   CONTAINER-RUNTIME
+controlplane   Ready    control-plane   93m   v1.29.0   192.0.254.6   <none>        Ubuntu 22.04.4 LTS   5.4.0-1106-gcp   containerd://1.6.26
+node01         Ready    <none>          93m   v1.29.0   192.0.254.9   <none>        Ubuntu 22.04.4 LTS   5.4.0-1106-gcp   containerd://1.6.26
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ sudo kubeadm upgrade node
+[upgrade] Reading configuration from the cluster...
+[upgrade] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+[preflight] Running pre-flight checks
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+W1011 01:15:12.637991   18747 checks.go:844] detected that the sandbox image "registry.k8s.io/pause:3.8" of the container runtime is inconsistent with that used by kubeadm.It is recommended to use "registry.k8s.io/pause:3.9" as the CRI sandbox image.
+[upgrade] Upgrading your Static Pod-hosted control plane instance to version "v1.30.0"...
+[upgrade/etcd] Upgrading to TLS for etcd
+[upgrade/staticpods] Preparing for "etcd" upgrade
+[upgrade/staticpods] Current and new manifests of etcd are equal, skipping upgrade
+[upgrade/etcd] Waiting for etcd to become available
+[upgrade/staticpods] Writing new Static Pod manifests to "/etc/kubernetes/tmp/kubeadm-upgraded-manifests2575449291"
+[upgrade/staticpods] Preparing for "kube-apiserver" upgrade
+[upgrade/staticpods] Current and new manifests of kube-apiserver are equal, skipping upgrade
+[upgrade/staticpods] Preparing for "kube-controller-manager" upgrade
+[upgrade/staticpods] Current and new manifests of kube-controller-manager are equal, skipping upgrade
+[upgrade/staticpods] Preparing for "kube-scheduler" upgrade
+[upgrade/staticpods] Current and new manifests of kube-scheduler are equal, skipping upgrade
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+[upgrade] The control plane instance for this node was successfully updated!
+[upgrade] Backing up kubelet config file to /etc/kubernetes/tmp/kubeadm-kubelet-config4136536296/config.yaml
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[upgrade] The configuration for this node was successfully updated!
+[upgrade] Now you should go ahead and upgrade the kubelet package using your package manager.
+
+controlplane ~ ➜  
+
+
+Drain the node
+
+Prepare the node for maintenance by marking it unschedulable and evicting the workloads:
+
+# replace <node-to-drain> with the name of your node you are draining
+kubectl drain <node-to-drain> --ignore-daemonsets
+
+Upgrade kubelet and kubectl
+
+    Upgrade the kubelet and kubectl:
+        Ubuntu, Debian or HypriotOS
+        CentOS, RHEL or Fedora
+
+    # replace x in 1.30.x-* with the latest patch version
+    sudo apt-mark unhold kubelet kubectl && \
+    sudo apt-get update && sudo apt-get install -y kubelet='1.30.x-*' kubectl='1.30.x-*' && \
+    sudo apt-mark hold kubelet kubectl
+
+    Restart the kubelet:
+
+    sudo systemctl daemon-reload
+    sudo systemctl restart kubelet
+
+Uncordon the node
+
+Bring the node back online by marking it schedulable:
+
+# replace <node-to-uncordon> with the name of your node
+kubectl uncordon <node-to-uncordon>
+
+
+- Ajustados:
+
+~~~~bash
+kubectl drain controlplane --ignore-daemonsets
+sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.0-1.1' kubectl='1.30.0-1.1' && \
+sudo apt-mark hold kubelet kubectl
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+kubectl uncordon controlplane
+~~~~
+
+
+controlplane ~ ➜  kubectl drain controlplane --ignore-daemonsets
+node/controlplane cordoned
+Warning: ignoring DaemonSet-managed Pods: kube-system/kube-proxy-wlrmp, kube-system/weave-net-5cxkb
+node/controlplane drained
+
+controlplane ~ ➜  sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.0-1.1' kubectl='1.30.0-1.1' && \
+sudo apt-mark hold kubelet kubectl
+kubelet was already not on hold.
+kubectl was already not on hold.
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                                             
+Hit:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease                                                    
+Hit:3 http://security.ubuntu.com/ubuntu jammy-security InRelease                                                                                           
+Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages will be upgraded:
+  kubectl kubelet
+2 upgraded, 0 newly installed, 0 to remove and 30 not upgraded.
+Need to get 28.9 MB of archives.
+After this operation, 9,959 kB disk space will be freed.
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubectl 1.30.0-1.1 [10.8 MB]
+Get:2 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubelet 1.30.0-1.1 [18.1 MB]
+Fetched 28.9 MB in 0s (67.5 MB/s) 
+debconf: delaying package configuration, since apt-utils is not installed
+(Reading database ... 20584 files and directories currently installed.)
+Preparing to unpack .../kubectl_1.30.0-1.1_amd64.deb ...
+Unpacking kubectl (1.30.0-1.1) over (1.29.0-1.1) ...
+Preparing to unpack .../kubelet_1.30.0-1.1_amd64.deb ...
+Unpacking kubelet (1.30.0-1.1) over (1.29.0-1.1) ...
+Setting up kubectl (1.30.0-1.1) ...
+Setting up kubelet (1.30.0-1.1) ...
+kubelet set on hold.
+kubectl set on hold.
+
+controlplane ~ ➜  sudo systemctl daemon-reload
+
+controlplane ~ ➜  sudo systemctl restart kubelet
+
+controlplane ~ ➜  kubectl uncordon controlplane
+Unable to connect to the server: net/http: TLS handshake timeout
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ sudo systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    Drop-In: /usr/lib/systemd/system/kubelet.service.d
+             └─10-kubeadm.conf
+     Active: active (running) since Fri 2024-10-11 01:18:03 UTC; 32s ago
+       Docs: https://kubernetes.io/docs/
+   Main PID: 20023 (kubelet)
+      Tasks: 32 (limit: 251379)
+     Memory: 46.2M
+     CGroup: /system.slice/kubelet.service
+             └─20023 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --config=/var>
+
+Oct 11 01:18:20 controlplane kubelet[20023]: I1011 01:18:20.046733   20023 kubelet.go:1913] "Deleted mirror pod because it is outdated" pod="kube-system/et>
+Oct 11 01:18:20 controlplane kubelet[20023]: I1011 01:18:20.047958   20023 kubelet.go:1913] "Deleted mirror pod because it is outdated" pod="kube-system/ku>
+Oct 11 01:18:21 controlplane kubelet[20023]: I1011 01:18:21.049707   20023 pod_startup_latency_tracker.go:104] "Observed pod startup duration" pod="kube-sy>
+Oct 11 01:18:21 controlplane kubelet[20023]: I1011 01:18:21.056145   20023 pod_startup_latency_tracker.go:104] "Observed pod startup duration" pod="kube-sy>
+Oct 11 01:18:21 controlplane kubelet[20023]: I1011 01:18:21.469047   20023 kubelet.go:1908] "Trying to delete pod" pod="kube-system/kube-controller-manager>
+Oct 11 01:18:21 controlplane kubelet[20023]: I1011 01:18:21.477078   20023 kubelet.go:1913] "Deleted mirror pod because it is outdated" pod="kube-system/ku>
+Oct 11 01:18:21 controlplane kubelet[20023]: I1011 01:18:21.478968   20023 status_manager.go:877] "Failed to update status for pod" pod="kube-system/kube-c>
+Oct 11 01:18:23 controlplane kubelet[20023]: I1011 01:18:23.547491   20023 pod_startup_latency_tracker.go:104] "Observed pod startup duration" pod="kube-sy>
+Oct 11 01:18:27 controlplane kubelet[20023]: I1011 01:18:27.383133   20023 kubelet.go:1908] "Trying to delete pod" pod="kube-system/kube-apiserver-controlp>
+Oct 11 01:18:27 controlplane kubelet[20023]: I1011 01:18:27.391502   20023 kubelet.go:1913] "Deleted mirror pod because it is outdated" pod="kube-system/ku>
+
+controlplane ~ ➜  
+
+- Agora o controlplane tá atualizado:
+
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS                     ROLES           AGE    VERSION
+controlplane   Ready,SchedulingDisabled   control-plane   100m   v1.30.0
+node01         Ready                      <none>          99m    v1.29.0
+
+controlplane ~ ➜  date
+Fri Oct 11 01:18:57 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  kubectl get pods -A -o wide
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS       AGE     IP             NODE           NOMINATED NODE   READINESS GATES
+admin2406     deploy1-67b55d4f9f-9m484               1/1     Running   0              33m     10.244.192.2   node01         <none>           <none>
+admin2406     deploy2-5d4697f587-g2gld               1/1     Running   0              33m     10.244.192.3   node01         <none>           <none>
+admin2406     deploy3-59985b7bb9-7zfns               1/1     Running   0              33m     10.244.192.4   node01         <none>           <none>
+admin2406     deploy4-c669bb985-dgddj                1/1     Running   0              33m     10.244.192.5   node01         <none>           <none>
+admin2406     deploy5-7d5f6f769b-hwsl9               1/1     Running   0              33m     10.244.192.6   node01         <none>           <none>
+alpha         alpha-mysql-5b944d484-m8t84            0/1     Pending   0              33m     <none>         <none>         <none>           <none>
+default       gold-nginx-5d9489d9cc-kgq7g            1/1     Running   0              33m     10.244.192.1   node01         <none>           <none>
+kube-system   coredns-7db6d8ff4d-6wpg5               1/1     Running   0              7m29s   10.244.192.8   node01         <none>           <none>
+kube-system   coredns-7db6d8ff4d-b9rw9               1/1     Running   0              7m29s   10.244.192.7   node01         <none>           <none>
+kube-system   etcd-controlplane                      1/1     Running   1 (85s ago)    70s     192.0.254.6    controlplane   <none>           <none>
+kube-system   kube-controller-manager-controlplane   1/1     Running   0              69s     192.0.254.6    controlplane   <none>           <none>
+kube-system   kube-proxy-795k4                       1/1     Running   0              7m27s   192.0.254.9    node01         <none>           <none>
+kube-system   kube-proxy-wlrmp                       1/1     Running   0              7m29s   192.0.254.6    controlplane   <none>           <none>
+kube-system   kube-scheduler-controlplane            1/1     Running   0              70s     192.0.254.6    controlplane   <none>           <none>
+kube-system   weave-net-5cxkb                        2/2     Running   1 (100m ago)   100m    192.0.254.6    controlplane   <none>           <none>
+kube-system   weave-net-mzb97                        2/2     Running   0              99m     192.0.254.9    node01         <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+## PENDENTE
+
+- Documentar procedimento do upgrade de controlplane, usados 2 docs:
+https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/#upgrade-kubelet-and-kubectl
+https://v1-30.docs.kubernetes.io/blog/2023/08/15/pkgs-k8s-io-introduction/
+Usar versão
+'1.30.0-1.1'
+
