@@ -643,6 +643,76 @@ controlplane ~ ➜
 
 
 
+- Passar o Pod gold-nginx para o node controlplane, antes do upgrade do node01
+https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/
+kubectl get nodes --show-labels
+
+controlplane ~ ➜  kubectl get deploy
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+gold-nginx   1/1     1            1           34m
+
+controlplane ~ ➜  kubectl get nodes --show-labels
+NAME           STATUS                     ROLES           AGE    VERSION   LABELS
+controlplane   Ready,SchedulingDisabled   control-plane   104m   v1.30.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=controlplane,kubernetes.io/os=linux,node-role.kubernetes.io/control-plane=,node.kubernetes.io/exclude-from-external-load-balancers=
+node01         Ready                      <none>          103m   v1.29.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=node01,kubernetes.io/os=linux
+
+controlplane ~ ➜  
+
+
+Create a pod that gets scheduled to your chosen node
+
+This pod configuration file describes a pod that has a node selector, disktype: ssd. This means that the pod will get scheduled on a node that has a disktype=ssd label.
+pods/pod-nginx.yaml [Copy pods/pod-nginx.yaml to clipboard]
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    kubernetes.io/hostname: controlplane
+
+
+kubectl edit deploy gold-nginx
+
+spec:
+  nodeName: controlplane
+
+
+
+
+controlplane ~ ➜  kubectl edit deploy gold-nginx
+error: deployments.apps "gold-nginx" is invalid
+error: deployments.apps "gold-nginx" is invalid
+deployment.apps/gold-nginx edited
+
+controlplane ~ ➜  date
+Fri Oct 11 01:27:00 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                          READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
+gold-nginx-65d94b4477-5m9ls   1/1     Running   0          18s   10.244.0.2   controlplane   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
 ## PENDENTE
 
 - Documentar procedimento do upgrade de controlplane, usados 2 docs:
@@ -650,4 +720,8 @@ https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-u
 https://v1-30.docs.kubernetes.io/blog/2023/08/15/pkgs-k8s-io-introduction/
 Usar versão
 '1.30.0-1.1'
+
+- Passar Pod gold-nginx para o node "controlplane"
+spec:
+  nodeName: controlplane
 
