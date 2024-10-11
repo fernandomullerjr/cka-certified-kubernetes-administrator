@@ -710,6 +710,320 @@ controlplane ~ ➜
 
 
 
+https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
+
+Upgrading worker nodes
+Upgrade kubeadm
+
+Upgrade kubeadm:
+
+    Ubuntu, Debian or HypriotOS
+    CentOS, RHEL or Fedora
+
+# replace x in 1.30.x-* with the latest patch version
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.x-*' && \
+sudo apt-mark hold kubeadm
+
+Call "kubeadm upgrade"
+
+For worker nodes this upgrades the local kubelet configuration:
+
+sudo kubeadm upgrade node
+
+Drain the node
+
+Prepare the node for maintenance by marking it unschedulable and evicting the workloads:
+
+# execute this command on a control plane node
+# replace <node-to-drain> with the name of your node you are draining
+kubectl drain <node-to-drain> --ignore-daemonsets
+
+Upgrade kubelet and kubectl
+
+    Upgrade the kubelet and kubectl:
+        Ubuntu, Debian or HypriotOS
+        CentOS, RHEL or Fedora
+
+    # replace x in 1.30.x-* with the latest patch version
+    sudo apt-mark unhold kubelet kubectl && \
+    sudo apt-get update && sudo apt-get install -y kubelet='1.30.x-*' kubectl='1.30.x-*' && \
+    sudo apt-mark hold kubelet kubectl
+
+    Restart the kubelet:
+
+    sudo systemctl daemon-reload
+    sudo systemctl restart kubelet
+
+Uncordon the node
+
+Bring the node back online by marking it schedulable:
+
+# execute this command on a control plane node
+# replace <node-to-uncordon> with the name of your node
+kubectl uncordon <node-to-uncordon>
+
+
+
+
+~~~~bash
+ssh node01
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo apt-get update
+
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.0-1.1' && \
+sudo apt-mark hold kubeadm
+
+sudo kubeadm upgrade node
+
+kubectl drain node01 --ignore-daemonsets
+
+sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.0-1.1' kubectl='1.30.0-1.1' && \
+sudo apt-mark hold kubelet kubectl
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+kubectl uncordon node01
+~~~~
+
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  ssh node01
+
+node01 ~ ➜  sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.0-1.1' && \
+sudo apt-mark hold kubeadm
+Canceled hold on kubeadm.
+Get:2 https://download.docker.com/linux/ubuntu jammy InRelease [48.8 kB]     
+Get:3 https://download.docker.com/linux/ubuntu jammy/stable amd64 Packages [48.4 kB]                                               
+Get:4 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]                                                                                  
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.29/deb  InRelease [1189 B]
+Get:5 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]                           
+Get:6 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.29/deb  Packages [14.0 kB]
+Get:7 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]           
+Get:8 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:9 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [3122 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+Get:12 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]               
+Get:14 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1160 kB]   
+Get:15 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [2325 kB]       
+Get:16 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]             
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [3200 kB]     
+Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1449 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2602 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.8 kB]
+Get:21 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [33.7 kB]
+Get:22 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.4 kB]
+Fetched 34.5 MB in 4s (9088 kB/s)                            
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Package kubeadm is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+
+E: Version '1.30.0-1.1' for 'kubeadm' was not found
+
+node01 ~ ✖ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+
+node01 ~ ➜  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+Overwrite? (y/N) y
+
+node01 ~ ➜  sudo apt-get update
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                               
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease [1186 B]                                  
+Hit:3 http://archive.ubuntu.com/ubuntu jammy InRelease                                                        
+Get:4 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  Packages [9318 B]
+Hit:5 http://security.ubuntu.com/ubuntu jammy-security InRelease              
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Hit:7 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Fetched 10.5 kB in 1s (16.0 kB/s)
+Reading package lists... Done
+
+node01 ~ ➜  sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.0-1.1' && \
+sudo apt-mark hold kubeadm
+kubeadm was already not on hold.
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                   
+Hit:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease                          
+Hit:3 http://security.ubuntu.com/ubuntu jammy-security InRelease    
+Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  cri-tools
+The following packages will be upgraded:
+  cri-tools kubeadm
+2 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
+Need to get 31.7 MB of archives.
+After this operation, 5055 kB of additional disk space will be used.
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  cri-tools 1.30.1-1.1 [21.3 MB]
+Get:2 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubeadm 1.30.0-1.1 [10.4 MB]
+Fetched 31.7 MB in 0s (66.7 MB/s) 
+debconf: delaying package configuration, since apt-utils is not installed
+(Reading database ... 16698 files and directories currently installed.)
+Preparing to unpack .../cri-tools_1.30.1-1.1_amd64.deb ...
+Unpacking cri-tools (1.30.1-1.1) over (1.29.0-1.1) ...
+Preparing to unpack .../kubeadm_1.30.0-1.1_amd64.deb ...
+Unpacking kubeadm (1.30.0-1.1) over (1.29.0-1.1) ...
+Setting up cri-tools (1.30.1-1.1) ...
+Setting up kubeadm (1.30.0-1.1) ...
+kubeadm set on hold.
+
+node01 ~ ➜  sudo kubeadm upgrade node
+[upgrade] Reading configuration from the cluster...
+[upgrade] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+[preflight] Running pre-flight checks
+[preflight] Skipping prepull. Not a control plane node.
+[upgrade] Skipping phase. Not a control plane node.
+[upgrade] Backing up kubelet config file to /etc/kubernetes/tmp/kubeadm-kubelet-config1939999691/config.yaml
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[upgrade] The configuration for this node was successfully updated!
+[upgrade] Now you should go ahead and upgrade the kubelet package using your package manager.
+
+node01 ~ ➜  kubectl drain node01 --ignore-daemonsets
+E1011 01:32:31.770792   16415 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E1011 01:32:31.771592   16415 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E1011 01:32:31.773297   16415 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+E1011 01:32:31.773764   16415 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp 127.0.0.1:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+
+node01 ~ ✖ exit
+logout
+Connection to node01 closed.
+
+controlplane ~ ✖ kubectl drain node01 --ignore-daemonsets
+node/node01 cordoned
+Warning: ignoring DaemonSet-managed Pods: kube-system/kube-proxy-795k4, kube-system/weave-net-mzb97
+evicting pod kube-system/coredns-7db6d8ff4d-b9rw9
+evicting pod admin2406/deploy3-59985b7bb9-7zfns
+evicting pod admin2406/deploy5-7d5f6f769b-hwsl9
+evicting pod admin2406/deploy4-c669bb985-dgddj
+evicting pod kube-system/coredns-7db6d8ff4d-6wpg5
+evicting pod admin2406/deploy2-5d4697f587-g2gld
+evicting pod admin2406/deploy1-67b55d4f9f-9m484
+pod/deploy3-59985b7bb9-7zfns evicted
+pod/deploy1-67b55d4f9f-9m484 evicted
+pod/deploy2-5d4697f587-g2gld evicted
+pod/deploy4-c669bb985-dgddj evicted
+pod/deploy5-7d5f6f769b-hwsl9 evicted
+pod/coredns-7db6d8ff4d-b9rw9 evicted
+pod/coredns-7db6d8ff4d-6wpg5 evicted
+node/node01 drained
+
+controlplane ~ ➜  ssh node01
+Last login: Fri Oct 11 01:30:57 2024 from 192.0.254.6
+
+node01 ~ ➜  sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.0-1.1' kubectl='1.30.0-1.1' && \
+sudo apt-mark hold kubelet kubectl
+Canceled hold on kubelet.
+Canceled hold on kubectl.
+Hit:2 https://download.docker.com/linux/ubuntu jammy InRelease                                                                                             
+Hit:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  InRelease                                                    
+Hit:3 http://security.ubuntu.com/ubuntu jammy-security InRelease                                  
+Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages will be upgraded:
+  kubectl kubelet
+2 upgraded, 0 newly installed, 0 to remove and 40 not upgraded.
+Need to get 28.9 MB of archives.
+After this operation, 9959 kB disk space will be freed.
+Get:1 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubectl 1.30.0-1.1 [10.8 MB]
+Get:2 https://prod-cdn.packages.k8s.io/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb  kubelet 1.30.0-1.1 [18.1 MB]
+Fetched 28.9 MB in 0s (66.4 MB/s) 
+debconf: delaying package configuration, since apt-utils is not installed
+(Reading database ... 16698 files and directories currently installed.)
+Preparing to unpack .../kubectl_1.30.0-1.1_amd64.deb ...
+Unpacking kubectl (1.30.0-1.1) over (1.29.0-1.1) ...
+Preparing to unpack .../kubelet_1.30.0-1.1_amd64.deb ...
+Unpacking kubelet (1.30.0-1.1) over (1.29.0-1.1) ...
+Setting up kubectl (1.30.0-1.1) ...
+Setting up kubelet (1.30.0-1.1) ...
+kubelet set on hold.
+kubectl set on hold.
+
+node01 ~ ➜  sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+node01 ~ ➜  exit
+logout
+Connection to node01 closed.
+
+controlplane ~ ➜  kubectl uncordon node01
+node/node01 uncordoned
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS                     ROLES           AGE    VERSION
+controlplane   Ready,SchedulingDisabled   control-plane   114m   v1.30.0
+node01         Ready                      <none>          113m   v1.30.0
+
+controlplane ~ ➜  date
+Fri Oct 11 01:33:13 AM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                          READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
+gold-nginx-65d94b4477-5m9ls   1/1     Running   0          6m43s   10.244.0.2   controlplane   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+
+### 2 / 7
+Weight: 15
+
+Print the names of all deployments in the admin2406 namespace in the following format:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+
+<deployment name>   <container image used>   <ready replica count>   <Namespace>
+. The data should be sorted by the increasing order of the deployment name.
+
+Example:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+deploy0   nginx:alpine   1   admin2406
+Write the result to the file /opt/admin2406_data.
+
+Task completed?
+
+
+
+
 
 
 
@@ -721,7 +1035,13 @@ https://v1-30.docs.kubernetes.io/blog/2023/08/15/pkgs-k8s-io-introduction/
 Usar versão
 '1.30.0-1.1'
 
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo apt-get update
+
 - Passar Pod gold-nginx para o node "controlplane"
 spec:
   nodeName: controlplane
 
+- Upgrade node
+https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
