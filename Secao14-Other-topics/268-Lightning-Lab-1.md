@@ -1027,6 +1027,9 @@ Task completed?
 
 
 
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 ## PENDENTE
 
 - Documentar procedimento do upgrade de controlplane, usados 2 docs:
@@ -1055,6 +1058,9 @@ https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading
 
 
 
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 ## Dia 13/10/2024
 
 
@@ -1144,3 +1150,586 @@ controlplane ~ ➜  date
 Sun Oct 13 03:37:24 PM UTC 2024
 
 controlplane ~ ➜  
+
+
+
+
+- Passar Pod gold-nginx para o node "controlplane"
+spec:
+  nodeName: controlplane
+
+
+
+controlplane ~ ➜  kubectl get deploy
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+gold-nginx   1/1     1            1           44m
+
+controlplane ~ ➜  
+
+~~~~bash
+kubectl edit deploy gold-nginx
+nodeName: controlplane
+~~~~
+
+
+controlplane ~ ➜  kubectl get deploy
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+gold-nginx   1/1     1            1           44m
+
+controlplane ~ ➜  kubectl edit deploy gold-nginx
+deployment.apps/gold-nginx edited
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get deploy
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+gold-nginx   1/1     1            1           45m
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                          READY   STATUS    RESTARTS   AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+gold-nginx-65d94b4477-w6cxc   1/1     Running   0          12s   10.244.0.10   controlplane   <none>           <none>
+
+controlplane ~ ➜  date
+Sun Oct 13 03:39:33 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+### 2 / 7
+Weight: 15
+
+Print the names of all deployments in the admin2406 namespace in the following format:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+
+<deployment name>   <container image used>   <ready replica count>   <Namespace>
+. The data should be sorted by the increasing order of the deployment name.
+
+Example:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+deploy0   nginx:alpine   1   admin2406
+Write the result to the file /opt/admin2406_data.
+
+Task completed?
+
+
+controlplane ~ ➜  kubectl get deployments -n admin2406 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+deploy1   1/1     1            1           47m
+deploy2   1/1     1            1           47m
+deploy3   1/1     1            1           47m
+deploy4   1/1     1            1           47m
+deploy5   1/1     1            1           47m
+
+controlplane ~ ➜  date
+Sun Oct 13 03:40:46 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+https://kubernetes.io/docs/reference/kubectl/jsonpath/
+
+<https://kubernetes.io/docs/reference/kubectl/jsonpath/>
+
+Examples using kubectl and JSONPath expressions:
+
+~~~~bash
+kubectl get pods -o json
+kubectl get pods -o=jsonpath='{@}'
+kubectl get pods -o=jsonpath='{.items[0]}'
+kubectl get pods -o=jsonpath='{.items[0].metadata.name}'
+kubectl get pods -o=jsonpath="{.items[*]['metadata.name', 'status.capacity']}"
+kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.startTime}{"\n"}{end}'
+kubectl get pods -o=jsonpath='{.items[0].metadata.labels.kubernetes\.io/hostname}'
+~~~~
+
+https://kubernetes.io/docs/reference/kubectl/quick-reference/
+
+~~~~bash
+# Check which nodes are ready with custom-columns
+kubectl get node -o custom-columns='NODE_NAME:.metadata.name,STATUS:.status.conditions[?(@.type=="Ready")].status'
+~~~~
+
+
+
+- Verificando estrutura do JSON dos Deployments:
+
+kubectl get deployment -o json
+kubectl get deployment -o json -n admin2406 
+
+kubectl get deployment -o json -n admin2406 
+
+~~~~json
+controlplane ~ ➜  kubectl get deployment -o json -n admin2406 
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2024-10-13T15:49:04Z",
+                "generation": 1,
+                "labels": {
+                    "app": "deploy1"
+                },
+                "name": "deploy1",
+                "namespace": "admin2406",
+                "resourceVersion": "6975",
+                "uid": "7d109c51-3b51-4c1a-bebd-d4166ad1150f"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": "deploy1"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "deploy1"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "image": "nginx",
+                                "imagePullPolicy": "Always",
+                                "name": "nginx",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2024-10-13T15:49:04Z",
+                        "lastUpdateTime": "2024-10-13T15:49:07Z",
+                        "message": "ReplicaSet \"deploy1-67b55d4f9f\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    },
+                    {
+                        "lastTransitionTime": "2024-10-13T16:05:03Z",
+                        "lastUpdateTime": "2024-10-13T16:05:03Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2024-10-13T15:49:04Z",
+                "generation": 1,
+                "labels": {
+                    "app": "deploy2"
+                },
+                "name": "deploy2",
+                "namespace": "admin2406",
+                "resourceVersion": "6902",
+                "uid": "33303845-a563-4a5a-86bf-e6487ba9a332"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": "deploy2"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "deploy2"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "image": "nginx:alpine",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "nginx",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2024-10-13T15:49:04Z",
+                        "lastUpdateTime": "2024-10-13T15:49:07Z",
+                        "message": "ReplicaSet \"deploy2-5d4697f587\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    },
+                    {
+                        "lastTransitionTime": "2024-10-13T16:04:52Z",
+                        "lastUpdateTime": "2024-10-13T16:04:52Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2024-10-13T15:49:04Z",
+                "generation": 1,
+                "labels": {
+                    "app": "deploy3"
+                },
+                "name": "deploy3",
+                "namespace": "admin2406",
+                "resourceVersion": "6972",
+                "uid": "713fdbfe-d8be-49a6-9b0d-e8bd6d804ef6"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": "deploy3"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "deploy3"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "image": "nginx:1.16",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "nginx",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2024-10-13T15:49:04Z",
+                        "lastUpdateTime": "2024-10-13T15:49:10Z",
+                        "message": "ReplicaSet \"deploy3-59985b7bb9\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    },
+                    {
+                        "lastTransitionTime": "2024-10-13T16:05:03Z",
+                        "lastUpdateTime": "2024-10-13T16:05:03Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2024-10-13T15:49:05Z",
+                "generation": 1,
+                "labels": {
+                    "app": "deploy4"
+                },
+                "name": "deploy4",
+                "namespace": "admin2406",
+                "resourceVersion": "6946",
+                "uid": "0acc1fa5-2ebb-445c-b327-2f340478305f"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": "deploy4"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "deploy4"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "image": "nginx:1.17",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "nginx",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2024-10-13T15:49:05Z",
+                        "lastUpdateTime": "2024-10-13T15:49:13Z",
+                        "message": "ReplicaSet \"deploy4-c669bb985\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    },
+                    {
+                        "lastTransitionTime": "2024-10-13T16:04:56Z",
+                        "lastUpdateTime": "2024-10-13T16:04:56Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2024-10-13T15:49:05Z",
+                "generation": 1,
+                "labels": {
+                    "app": "deploy5"
+                },
+                "name": "deploy5",
+                "namespace": "admin2406",
+                "resourceVersion": "6957",
+                "uid": "9d81853b-42fa-47e9-ba1b-c62f53327c31"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": "deploy5"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "deploy5"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "image": "nginx:latest",
+                                "imagePullPolicy": "Always",
+                                "name": "nginx",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2024-10-13T15:49:05Z",
+                        "lastUpdateTime": "2024-10-13T15:49:13Z",
+                        "message": "ReplicaSet \"deploy5-7d5f6f769b\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    },
+                    {
+                        "lastTransitionTime": "2024-10-13T16:05:00Z",
+                        "lastUpdateTime": "2024-10-13T16:05:00Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "updatedReplicas": 1
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+controlplane ~ ➜  
+
+~~~~
+
+
+- Ajustando:
+
+
+kubectl get deployment -o=jsonpath="{.items[*]['metadata.name', 'status.capacity']}" -n admin2406
+
+controlplane ~ ➜  kubectl get deployment -o=jsonpath="{.items[*]['metadata.name', 'status.capacity']}" -n admin2406
+deploy1 deploy2 deploy3 deploy4 deploy5
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name' -n admin2406
+DEPLOYMENT
+deploy1
+deploy2
+deploy3
+deploy4
+deploy5
+
+controlplane ~ ➜  
+
+
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name' -n admin2406
+~~~~
