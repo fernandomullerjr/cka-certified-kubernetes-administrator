@@ -2402,3 +2402,153 @@ Use "kubectl create <command> --help" for more information about a given command
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 
 controlplane ~/CKA ➜  
+
+
+<https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims>
+
+
+PersistentVolumeClaims
+
+Each PVC contains a spec and status, which is the specification and status of the claim. The name of a PersistentVolumeClaim object must be a valid DNS subdomain name.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: slow
+  selector:
+    matchLabels:
+      release: "stable"
+    matchExpressions:
+      - {key: environment, operator: In, values: [dev]}
+
+
+
+- Criando um PVC
+
+~~~~YAML
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: slow
+  resources:
+    requests:
+      storage: 1Gi
+~~~~
+
+
+controlplane ~/CKA ➜  vi pvc.yaml
+
+controlplane ~/CKA ➜  kubectl apply -f pvc.yaml
+persistentvolumeclaim/myclaim created
+
+controlplane ~/CKA ➜  kubectl get pvc
+NAME      STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+myclaim   Pending                                      slow           <unset>                 4s
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  kubectl get pods -n alpha
+NAME                          READY   STATUS    RESTARTS   AGE
+alpha-mysql-5b944d484-gbpr9   0/1     Pending   0          31m
+
+controlplane ~/CKA ➜  
+
+
+
+deletando o pod
+
+
+controlplane ~/CKA ➜  kubectl delete pod alpha-mysql-5b944d484-gbpr9 -n alpha
+pod "alpha-mysql-5b944d484-gbpr9" deleted
+
+controlplane ~/CKA ➜  kubectl get all -n alpha
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/alpha-mysql-5b944d484-mnkxj   0/1     Pending   0          1s
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alpha-mysql   0/1     1            0           34m
+
+NAME                                    DESIRED   CURRENT   READY   AGE
+replicaset.apps/alpha-mysql-5b944d484   1         1         0       34m
+
+controlplane ~/CKA ➜  kubectl get all -n alpha
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/alpha-mysql-5b944d484-mnkxj   0/1     Pending   0          5s
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alpha-mysql   0/1     1            0           34m
+
+NAME                                    DESIRED   CURRENT   READY   AGE
+replicaset.apps/alpha-mysql-5b944d484   1         1         0       34m
+
+controlplane ~/CKA ➜  
+
+                        node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  30s   default-scheduler  0/2 nodes are available: persistentvolumeclaim "mysql-alpha-pvc" not found. preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.
+
+controlplane ~/CKA ➜  
+
+
+controlplane ~/CKA ➜  kubectl edit deployment alpha-mysql -n alpha
+deployment.apps/alpha-mysql edited
+
+controlplane ~/CKA ➜  
+
+
+                         node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason            Age   From               Message
+  ----     ------            ----  ----               -------
+  Warning  FailedScheduling  54s   default-scheduler  0/2 nodes are available: persistentvolumeclaim "myclaim" not found. preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.
+
+controlplane ~/CKA ➜  
+
+
+- Ajustando PVC, colocando no Namespace alpha
+
+controlplane ~/CKA ➜  vi pvc.yaml 
+
+controlplane ~/CKA ➜  kubectl apply -f pvc.yaml 
+persistentvolumeclaim/myclaim created
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  kubectl get all -n alpha
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/alpha-mysql-78bfdbb566-6gkvz   1/1     Running   0          103s
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alpha-mysql   1/1     1            1           38m
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/alpha-mysql-5b944d484    0         0         0       38m
+replicaset.apps/alpha-mysql-78bfdbb566   1         1         1       103s
+
+controlplane ~/CKA ➜  date
+Sun Oct 13 08:13:22 PM UTC 2024
+
+controlplane ~/CKA ➜  
+
+
+
+
+## PENDENTE
+- Tratar questão 4
+verificar porque o Pod mysql não sobe
+porque o PVC não pega o PV
