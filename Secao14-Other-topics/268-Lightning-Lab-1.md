@@ -1729,6 +1729,28 @@ deploy5
 controlplane ~ ➜  
 
 
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name' -n admin2406
+template
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.image' -n admin2406
+~~~~
+
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.image' -n admin2406
+DEPLOYMENT   CONTAINER_IMAGE
+deploy1      <none>
+deploy2      <none>
+deploy3      <none>
+deploy4      <none>
+deploy5      <none>
+
+controlplane ~ ➜  
+
+imagem veio zerada, revisar
+
+
+
 
 ~~~~bash
 kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name' -n admin2406
