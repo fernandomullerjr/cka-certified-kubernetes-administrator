@@ -1750,8 +1750,655 @@ controlplane ~ ➜
 imagem veio zerada, revisar
 
 
+- Ajustando, a principio faltou "containers"
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image' -n admin2406
+~~~~
+
+assim foi
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image' -n admin2406
+DEPLOYMENT   CONTAINER_IMAGE
+deploy1      nginx
+deploy2      nginx:alpine
+deploy3      nginx:1.16
+deploy4      nginx:1.17
+deploy5      nginx:latest
+
+controlplane ~ ➜  date
+Sun Oct 13 04:36:52 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+- Obter READY_REPLICAS
+status.readyReplicas
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas' -n admin2406
+~~~~
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas' -n admin2406
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS
+deploy1      nginx             1
+deploy2      nginx:alpine      1
+deploy3      nginx:1.16        1
+deploy4      nginx:1.17        1
+deploy5      nginx:latest      1
+
+controlplane ~ ➜  
+
+
+
+- Obter o NAMESPACE
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406
+~~~~
+
+
+- Comando ajustado, trazendo TODAS AS COLUNAS:
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## dia 13/10/2024 - pt2
+nova tentativa
+
+### 1 / 7
+Weight: 15
+
+Upgrade the current version of kubernetes from 1.29.0 to 1.30.0 exactly using the kubeadm utility. Make sure that the upgrade is carried out one node at a time starting with the controlplane node. To minimize downtime, the deployment gold-nginx should be rescheduled on an alternate node before upgrading each node.
+
+Upgrade controlplane node first and drain node node01 before upgrading it. Pods for gold-nginx should run on the controlplane node subsequently.
+
+Cluster Upgraded?
+
+pods 'gold-nginx' running on controlplane?
+
+
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   90m   v1.30.0
+node01         Ready    <none>          90m   v1.30.0
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                          READY   STATUS    RESTARTS   AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+gold-nginx-65d94b4477-8djbs   1/1     Running   0          44s   10.244.0.10   controlplane   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
+### 2
+### Print the names of all deployments in the admin2406 namespace in the following format:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+
+<deployment name>   <container image used>   <ready replica count>   <Namespace>
+. The data should be sorted by the increasing order of the deployment name.
+
+Example:
+
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+deploy0   nginx:alpine   1   admin2406
+Write the result to the file /opt/admin2406_data.
+
+
+- Comando ajustado, trazendo TODAS AS COLUNAS:
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406
+~~~~
+
+
+- Enviando para o diretório /opt/admin2406_data:
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406 > /opt/admin2406_data
+~~~~
+
+
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406 > /opt/admin2406_data
+
+controlplane ~ ➜  kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406
+DEPLOYMENT   CONTAINER_IMAGE   READY_REPLICAS   NAMESPACE
+deploy1      nginx             1                admin2406
+deploy2      nginx:alpine      1                admin2406
+deploy3      nginx:1.16        1                admin2406
+deploy4      nginx:1.17        1                admin2406
+deploy5      nginx:latest      1                admin2406
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+### 3 / 7
+Weight: 8
+
+A kubeconfig file called admin.kubeconfig has been created in /root/CKA. There is something wrong with the configuration. Troubleshoot and fix it.
+
+Fix /root/CKA/admin.kubeconfig
+
+
+
+controlplane ~ ➜  cd 
+.cache/         CKA/            .config/        .kube/          .ssh/           .terminal_logs/ .vim/           
+
+controlplane ~ ➜  cd CKA/
+
+controlplane ~/CKA ➜  ls
+admin.kubeconfig
+
+controlplane ~/CKA ➜  cat admin.kubeconfig 
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJZmdOM2pvOEtOM0l3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TkRFd01UTXhPREE0TlRGYUZ3MHpOREV3TVRFeE9ERXpOVEZhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUNrRG9oVlh3T3ZocmcxRUxReWRhbzYvc3p1akpWUm02MzJRUzdndG13R2dWYnM2Tkt1Wkk5a1FtMUgKaHhlQ3dpMmw1SUFOTGFVTTRLdVJpaHBhV0pGbXVFN2w3K0lNcXFkRkFibDNsUGQxS1lITUNTUnRDWkltQlJuQQptOVhjMVRYakcvd1ZCaFphRnZvL21XQ3AwT29McVQrVC93aXFoVzQ0NW5yQ3dQU09iN1l5dklyWlNrNlByS0lGCjlCREpqOVBWcUZmbWIxT2UrSHZocHpNMGNsek5SMjFoSTBCL2YvMHZWUHhSbzhmUzlibS9aWDgwSWtLbklBakQKYVQ2RWk3MTB5MEszTml0MDdqZkFZM0hqaWpLcUdVSDROVVh6NUhBZkRsaDFLR2tiYjJUUXgvZTNEZkhFeEI3Zgo5ODZvRzIxS3pmbVRtMjJKV2ZheEl4MWh3ZUpQQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJUNzhGTEYwNkRjN3daN2txSDhXMzI0Tks5dGpUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQVdzMWJCVjcyOQpOWmJSK0ZSMThYaExkMG9IdURxTW9uMi84ZXNNNDFRbytPdUJrc2V6L3dCWkxzM1dsZy9tajhHbWh6dXRzbEdWClN2YjB2SnVUU0ZqMTR3MmxjMWd0dzc5VVZUc0o5SFpQMmdPdXhwUGRKaEU5b3B2b05vNlY3aWVxVU15MnJRNGgKTmloL0ZyZTFTVUo0Q1RTaE9Ia3dPL2VZdzZnOVNlTVByYjhydDhnbExEcHdhQlJXRkJIaU9VV3Y2M2k0Ri91Ywpac2NpT1VHR0toaVFhOWltNjVWMlZ0V0RaTmtNWUppQlliQXFDdjVPK0ZPalAwK0NudVhJR1VzbEVsWHdqaVJuCkxkSE9NOEg5dklZWVMrVGxqNjRodHZNRFU5THFoTjJrVmhNa1VCVVQ0SDhsTy84bkNReU1yenhjSXJqSXFoWXgKeEh4ckxwSzlLdmxRCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://controlplane:4380
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-admin@kubernetes
+current-context: kubernetes-admin@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLVENDQWhHZ0F3SUJBZ0lJYmxoNjdyTk5ZMll3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TkRFd01UTXhPREE0TlRGYUZ3MHlOVEV3TVRNeE9ERXpOVE5hTUR3eApIekFkQmdOVkJBb1RGbXQxWW1WaFpHMDZZMngxYzNSbGNpMWhaRzFwYm5NeEdUQVhCZ05WQkFNVEVHdDFZbVZ5CmJtVjBaWE10WVdSdGFXNHdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDV2NLMzMKK24xODlqTGhjcy9VWnN2WU4wZnRzN2JsWGhtdjVYekRjWGFiWVFteWZqZU1KZ0lXY2JyRVNPZlIzeERYTi9KeQp3TTMwcmdyeUJLdkhsQXRZc0dpaTZMYkJFZGk5NFBUSS9UU05zM2hlMUFPS1Nuc0V5VTg5a2lVZWZCL3VlNnM1CnBGQzZpdzFpTlN4TDBwNFhhUGNrTmx6WVdZZHBLNHpVQk1GUWlBRTZuazJvYURrd0RFajh2dDJrUkd5TU8waVUKSHdScGdZdzA0d1FzOXhLWklxUExiUnVmOHllVm5wK3JSakI1anFsSWR6bzFER1ZIV09jNXBkbjJlbmNWU2lSTQoxV3Q1a0MrSHpYK3FDekMvaHB6c3pzUU9zZXhZblczdEVRMitWV3lnaFVadlpZbjhiQXQ5c3R4cjl6MzB5N1N4ClA0bWlNUzlheGxoTDV5MWZBZ01CQUFHalZqQlVNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUsKQmdnckJnRUZCUWNEQWpBTUJnTlZIUk1CQWY4RUFqQUFNQjhHQTFVZEl3UVlNQmFBRlB2d1VzWFRvTnp2Qm51UwpvZnhiZmJnMHIyMk5NQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUE1bHFGeWJVek4rRFZVTzliL1ZZenYwNzR5CnhpcmxrVkJ0RWp1RlptSVJaOVFZTDRvZmF1YzZic2JxVHkyWEdFcXN6dEdBajgxNkg0a21TQVpIcjJvd2RwelMKOHhIMHZQV2JPZHE4TnBUT2lJSTdJanlaMzNWcDFNcy93M2tndXJhYXJCSGJtMTF1c1dMVXdJYlE0SmlBRFh6UwpOWldMK21CejdtUjJGYVZqT1drVUxRQU13L1ptZWE0MCszRlNMWlBSQmpKNysvVTY3dmlzeUk1dEREYnUvUnIrCmZodkRKanBWcThRZ2ZEa0F1bWRlMTZ5eStFN0ZnRnNqa1BqL04wTEVYMzNGVk9vSWExdzZadUhVQVd5QnRnVSsKdmJpNmYwdER6NkZxUTN1R1VRY0ZRY3hkWFhRYkU0WGV4RWRhQ2dMY3djVXdSTE43YmgrcnRMS1FIYlAzCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBbG5DdDkvcDlmUFl5NFhMUDFHYkwyRGRIN2JPMjVWNFpyK1Y4dzNGMm0yRUpzbjQzCmpDWUNGbkc2eEVqbjBkOFExemZ5Y3NETjlLNEs4Z1NyeDVRTFdMQm9vdWkyd1JIWXZlRDB5UDAwamJONFh0UUQKaWtwN0JNbFBQWklsSG53ZjdudXJPYVJRdW9zTllqVXNTOUtlRjJqM0pEWmMyRm1IYVN1TTFBVEJVSWdCT3A1TgpxR2c1TUF4SS9MN2RwRVJzakR0SWxCOEVhWUdNTk9NRUxQY1NtU0tqeTIwYm4vTW5sWjZmcTBZd2VZNnBTSGM2Ck5ReGxSMWpuT2FYWjlucDNGVW9rVE5WcmVaQXZoODEvcWdzd3Y0YWM3TTdFRHJIc1dKMXQ3UkVOdmxWc29JVkcKYjJXSi9Hd0xmYkxjYS9jOTlNdTBzVCtKb2pFdldzWllTK2N0WHdJREFRQUJBb0lCQUc0aGxTbnBoWDQ2bWVyegphdlA2UVJaSytld28yU2EycWFWY0llYk9KRjhCUGVFZWh6bWhCWHc2eTlndjZ3MTMrRk1sME9aekFSTXphaTNjCmY0aStkMFA0K05EeC9mLy9PYVZmanJPb3NaVmVvaXNCbUluZmxvbGRlaFgvN0E2U0hhb3ZmSnpaRG9SUmtYMm8Kb1lIc2NQR0FWUlI4ZTZHaWdQL2I4dCt2ajNtTXg4eGFvNE5ZeWd3Ymd2S1Z6NHdhYnFidHBpS042RHFKNThkbgpXVEZKWnpNYWhhUWpoM2pyd1c2OXplb1doSlhpbVloQUVxMmQrTllqbjdXcUtCajg0bUJKcVdsN21EQ0lURVQwCmk0M0NudmNCREhNdFQzK2JKc3l3VHQrZisxUWVLQW9nYzlkNGN6RzVmZ0NHTTNKWWwvTlFKMFNGM0ZBVnJtWmIKWTZ3c0xGa0NnWUVBeEJlVnJGNGVIV2hocXlwcXBCY0wwWnpZMzc3WUJuWGZMVFhKWXZxK2tSbUd0cm1ySzBmUwo5RVhndVBna2EzM1dFeWFUUDJZUGFieWE4all0TmVpR0lObXdVSzUwSEVhYUZJTEtlMG16REl3Z2tkejZXTm1oClBvU01RanlSZXY4L0Z1ZDZSeVVoaml1UGdDRWYydk5wZ1pGQ2U1YjhMbjRkeWJCeWlJOTZFaDBDZ1lFQXhHYWsKZHlXOHJidXNlbm5rckFjK0N6WUNOcmVrUE9MYUovYyt1THE1d29ZMkNJTi9Hb0xwdnV3aXJwVXZRVWZiblVYSgpoUGp2ZmJSL2pLQkJwU1JySzZiSVg0cDdpQnhxSkJBRDcvODRNUXA2UTRrakhUMWRSS29IeFdxelNKa3ZEMzdqCnlnM281WDZ5SUNHbzJ6c2pLUnVxbHpLSkQwUE5rYStzMGIxRkpLc0NnWUVBbUljRDNFU0ZSamlvSi96aFlHdXcKdk1ZMUI2MHAyYlNiK1UycUxUeC9PTnhUSmhTNzZQbUFSSk9LSGphZUZhS1cvdVIxaXMzM1ZUYm9pMWpLeC9EcgpTK2dvTmtuTWRTWVJ1YnlXaFZtcFZTdzJOVjlldC9mb2JYbXFvK2I2L21KR2o2bFVPcnpPSWdrT0lRc2kvU3R6Ck9ONWxpVDdEUCtMSGh0ZWg3MGt6R1owQ2dZRUF1em1KOFJjbFhZejU2Q3VKQlVGR01SUEVXbnNIOHc3aW5wVEEKMHdNV0VFMDI5emk3a3Y5WGFxemFod2txYWhYaFVuVHpuWEpkZzd6c2xwY3kzUVh4c0VRbTRZVTNLOUxDa0N4QQpSS3BNMjlzOElHTjcrT1RGbzY1ZkNDQW1Wci9Jc0FIcmpuTmlJRng5MjhtYW1ac3Zjb0d3UnNCakRnMDV5M2JuCnpXMmJtMDhDZ1lCcFVRVGZZWDUxdGlldWJiTFFzdkxNVWJoY2NPTDFycTFHUXRGTFJkY2JRdXdEK1NYcklKcTMKSEtobjhwbTU2bVZGTG5vK2FERkNvYlovN09makdFYTRJcHE1Wlk0VThMbHhCZ004ajI2KzVkYjAxQkpDc0pqTgpaUlNzandhbm00dHBmRFlTQ2crVWVKaDVkbFJVWW9ncUI4NmFDei90VUhQcFF6TmJOYis4cVE9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+
+controlplane ~/CKA ➜  
+
+
+controlplane ~/CKA ➜  ps -ef | grep api
+root        5849    5729  0 18:14 ?        00:00:03 /home/weave/weaver --port=6783 --datapath=datapath --name=5a:e3:63:f8:65:ae --http-addr=127.0.0.1:6784 --metrics-addr=0.0.0.0:6782 --docker-api= --no-dns --db-prefix=/weavedb/weave-net --ipalloc-range=10.244.0.0/16 --nickname=controlplane --ipalloc-init consensus=0 --conn-limit=200 --expect-npc --no-masq-local
+root       18594   17165  0 19:42 ?        00:00:14 kube-apiserver --advertise-address=192.28.254.6 --allow-privileged=true --authorization-mode=Node,RBAC --client-ca-file=/etc/kubernetes/pki/ca.crt --enable-admission-plugins=NodeRestriction --enable-bootstrap-token-auth=true --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key --etcd-servers=https://127.0.0.1:2379 --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-allowed-names=front-proxy-client --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User --secure-port=6443 --service-account-issuer=https://kubernetes.default.svc.cluster.local --service-account-key-file=/etc/kubernetes/pki/sa.pub --service-account-signing-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+root       24838   12385  0 19:47 pts/2    00:00:00 grep --color=auto api
+
+controlplane ~/CKA ➜  date
+Sun Oct 13 07:47:28 PM UTC 2024
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  ss -tulp
+Netid        State         Recv-Q         Send-Q                 Local Address:Port                     Peer Address:Port        Process                                            
+udp          UNCONN        0              0                      127.0.0.53%lo:domain                        0.0.0.0:*            users:(("systemd-resolve",pid=606,fd=13))         
+udp          UNCONN        0              0                            0.0.0.0:6783                          0.0.0.0:*            users:(("weaver",pid=5849,fd=15))                 
+udp          UNCONN        0              0                            0.0.0.0:6784                          0.0.0.0:*                                                              
+udp          UNCONN        0              0                         127.0.0.11:34333                         0.0.0.0:*                                                              
+udp          UNCONN        0              0                               [::]:6784                             [::]:*                                                              
+tcp          LISTEN        0              4096                       127.0.0.1:10248                         0.0.0.0:*            users:(("kubelet",pid=18821,fd=9))                
+tcp          LISTEN        0              4096                       127.0.0.1:10249                         0.0.0.0:*            users:(("kube-proxy",pid=15525,fd=9))             
+tcp          LISTEN        0              4096                    192.28.254.6:2379                          0.0.0.0:*            users:(("etcd",pid=18369,fd=9))                   
+tcp          LISTEN        0              4096                       127.0.0.1:2379                          0.0.0.0:*            users:(("etcd",pid=18369,fd=8))                   
+tcp          LISTEN        0              4096                    192.28.254.6:2380                          0.0.0.0:*            users:(("etcd",pid=18369,fd=7))                   
+tcp          LISTEN        0              4096                       127.0.0.1:2381                          0.0.0.0:*            users:(("etcd",pid=18369,fd=14))                  
+tcp          LISTEN        0              128                          0.0.0.0:http-alt                      0.0.0.0:*            users:(("ttyd",pid=1303,fd=12))                   
+tcp          LISTEN        0              4096                       127.0.0.1:10257                         0.0.0.0:*            users:(("kube-controller",pid=17631,fd=3))        
+tcp          LISTEN        0              4096                       127.0.0.1:10259                         0.0.0.0:*            users:(("kube-scheduler",pid=17616,fd=3))         
+tcp          LISTEN        0              4096                   127.0.0.53%lo:domain                        0.0.0.0:*            users:(("systemd-resolve",pid=606,fd=14))         
+tcp          LISTEN        0              128                          0.0.0.0:ssh                           0.0.0.0:*            users:(("sshd",pid=1268,fd=3))                    
+tcp          LISTEN        0              4096                      127.0.0.11:38591                         0.0.0.0:*                                                              
+tcp          LISTEN        0              4096                       127.0.0.1:6784                          0.0.0.0:*            users:(("weaver",pid=5849,fd=18))                 
+tcp          LISTEN        0              4096                       127.0.0.1:38373                         0.0.0.0:*            users:(("containerd",pid=1263,fd=15))             
+tcp          LISTEN        0              4096                               *:10250                               *:*            users:(("kubelet",pid=18821,fd=22))               
+tcp          LISTEN        0              4096                               *:6443                                *:*            users:(("kube-apiserver",pid=18594,fd=3))         
+tcp          LISTEN        0              4096                               *:10256                               *:*            users:(("kube-proxy",pid=15525,fd=8))             
+tcp          LISTEN        0              128                             [::]:ssh                              [::]:*            users:(("sshd",pid=1268,fd=4))                    
+tcp          LISTEN        0              4096                               *:8888                                *:*            users:(("kubectl",pid=4531,fd=3))                 
+tcp          LISTEN        0              4096                               *:6781                                *:*            users:(("weave-npc",pid=5536,fd=8))               
+tcp          LISTEN        0              4096                               *:6782                                *:*            users:(("weaver",pid=5849,fd=17))                 
+tcp          LISTEN        0              4096                               *:6783                                *:*            users:(("weaver",pid=5849,fd=16))                 
+
+controlplane ~/CKA ➜  
+
+
+- Editando a porta
+DE:
+4380
+PARA:
+6443
+
+
+controlplane ~/CKA ✖ cat admin.kubeconfig  | grep control
+    server: https://controlplane:6443
+
+controlplane ~/CKA ➜  
+
+
+
+
+
+
+
+
+
+
+
+### 4 / 7
+Weight: 12
+
+Create a new deployment called nginx-deploy, with image nginx:1.16 and 1 replica. Next upgrade the deployment to version 1.17 using rolling update.
+
+Image: nginx:1.16
+
+Task: Upgrade the version of the deployment to 1:17
 
 
 ~~~~bash
-kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name' -n admin2406
+
+controlplane ~/CKA ➜  kubectl create deployment --help
+Create a deployment with the specified name.
+
+Aliases:
+deployment, deploy
+
+Examples:
+  # Create a deployment named my-dep that runs the busybox image
+  kubectl create deployment my-dep --image=busybox
+  
+  # Create a deployment with a command
+  kubectl create deployment my-dep --image=busybox -- date
+  
+  # Create a deployment named my-dep that runs the nginx image with 3 replicas
+  kubectl create deployment my-dep --image=nginx --replicas=3
+  
+  # Create a deployment named my-dep that runs the busybox image and expose port 5701
+  kubectl create deployment my-dep --image=busybox --port=5701
+  
+  # Create a deployment named my-dep that runs multiple containers
+  kubectl create deployment my-dep --image=busybox:latest --image=ubuntu:latest --image=nginx
 ~~~~
+
+
+- Comando ajustado:
+
+
+~~~~bash
+kubectl create deployment nginx-deploy --image=nginx:1.16 --replicas=1
+~~~~
+
+
+
+controlplane ~/CKA ➜  kubectl create deployment nginx-deploy --image=nginx:1.16 --replicas=1
+deployment.apps/nginx-deploy created
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+gold-nginx     1/1     1            1           21m
+nginx-deploy   1/1     1            1           3s
+
+controlplane ~/CKA ➜  kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+gold-nginx-65d94b4477-8djbs     1/1     Running   0          12m
+nginx-deploy-858fb84d4b-hgtfs   1/1     Running   0          4s
+
+controlplane ~/CKA ➜  date
+Sun Oct 13 07:56:42 PM UTC 2024
+
+controlplane ~/CKA ➜  
+
+
+<https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/>
+
+
+kubectl edit deployment nginx-deploy
+
+controlplane ~/CKA ➜  kubectl edit deployment nginx-deploy
+deployment.apps/nginx-deploy edited
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  kubectl get pods -o wide
+NAME                          READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES
+gold-nginx-65d94b4477-8djbs   1/1     Running   0          14m   10.244.0.10    controlplane   <none>           <none>
+nginx-deploy-58f87d49-shdlz   1/1     Running   0          14s   10.244.192.2   node01         <none>           <none>
+
+controlplane ~/CKA ➜  
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 5 / 7
+Weight: 20
+
+A new deployment called alpha-mysql has been deployed in the alpha namespace. However, the pods are not running. Troubleshoot and fix the issue. The deployment should make use of the persistent volume alpha-pv to be mounted at /var/lib/mysql and should use the environment variable MYSQL_ALLOW_EMPTY_PASSWORD=1 to make use of an empty root password.
+
+Important: Do not alter the persistent volume.
+
+Troubleshoot and fix the issues
+
+
+
+controlplane ~/CKA ➜  kubectl get all -n alpha 
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/alpha-mysql-5b944d484-gbpr9   0/1     Pending   0          24m
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/alpha-mysql   0/1     1            0           24m
+
+NAME                                    DESIRED   CURRENT   READY   AGE
+replicaset.apps/alpha-mysql-5b944d484   1         1         0       24m
+
+controlplane ~/CKA ➜  
+controlplane ~/CKA ➜  kubectl get pv
+NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+alpha-pv   1Gi        RWO            Retain           Available           slow           <unset>                          25m
+
+controlplane ~/CKA ➜  kubectl get pv -A
+NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+alpha-pv   1Gi        RWO            Retain           Available           slow           <unset>                          25m
+
+controlplane ~/CKA ➜  
+
+controlplane ~/CKA ➜  kubectl get pvc
+No resources found in default namespace.
+
+controlplane ~/CKA ➜  
+
+
+
+controlplane ~/CKA ➜  kubectl describe deployment alpha-mysql -n alpha
+Name:                   alpha-mysql
+Namespace:              alpha
+CreationTimestamp:      Sun, 13 Oct 2024 19:35:18 +0000
+Labels:                 app=alpha-mysql
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=alpha-mysql
+Replicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=alpha-mysql
+  Containers:
+   mysql:
+    Image:      mysql:5.6
+    Port:       3306/TCP
+    Host Port:  0/TCP
+    Environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD:  1
+    Mounts:
+      /var/lib/mysql from mysql-data (rw)
+  Volumes:
+   mysql-data:
+    Type:          PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:     mysql-alpha-pvc
+    ReadOnly:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      False   MinimumReplicasUnavailable
+  Progressing    False   ProgressDeadlineExceeded
+OldReplicaSets:  <none>
+NewReplicaSet:   alpha-mysql-5b944d484 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  25m   deployment-controller  Scaled up replica set alpha-mysql-5b944d484 to 1
+
+controlplane ~/CKA ➜  
+
+
+Deployment já tem a variável
+a principio nao existe PVC
+
+
+
+
+controlplane ~/CKA ➜  kubectl get pod alpha-mysql-5b944d484-gbpr9 -n alpha
+NAME                          READY   STATUS    RESTARTS   AGE
+alpha-mysql-5b944d484-gbpr9   0/1     Pending   0          26m
+
+controlplane ~/CKA ➜  kubectl get pod alpha-mysql-5b944d484-gbpr9 -n alpha -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-10-13T19:35:18Z"
+  generateName: alpha-mysql-5b944d484-
+  labels:
+    app: alpha-mysql
+    pod-template-hash: 5b944d484
+  name: alpha-mysql-5b944d484-gbpr9
+  namespace: alpha
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: alpha-mysql-5b944d484
+    uid: 05bc252a-066a-4338-9797-d7ee3e2ba0d6
+  resourceVersion: "7387"
+  uid: 78febc2b-d103-423a-b168-fb6b80d0d202
+spec:
+  containers:
+  - env:
+    - name: MYSQL_ALLOW_EMPTY_PASSWORD
+      value: "1"
+    image: mysql:5.6
+    imagePullPolicy: Always
+    name: mysql
+    ports:
+    - containerPort: 3306
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: mysql-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-gk2rc
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: mysql-data
+    persistentVolumeClaim:
+      claimName: mysql-alpha-pvc
+  - name: kube-api-access-gk2rc
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-10-13T19:35:18Z"
+    message: '0/2 nodes are available: persistentvolumeclaim "mysql-alpha-pvc" not
+      found. preemption: 0/2 nodes are available: 2 Preemption is not helpful for
+      scheduling.'
+    reason: Unschedulable
+    status: "False"
+    type: PodScheduled
+  phase: Pending
+  qosClass: BestEffort
+
+controlplane ~/CKA ➜  
+
+
+controlplane ~/CKA ➜  kubectl create pvc --help
+Create a resource from a file or from stdin.
+
+ JSON and YAML formats are accepted.
+
+Examples:
+  # Create a pod using the data in pod.json
+  kubectl create -f ./pod.json
+  
+  # Create a pod based on the JSON passed into stdin
+  cat pod.json | kubectl create -f -
+  
+  # Edit the data in registry.yaml in JSON then create the resource using the edited data
+  kubectl create -f registry.yaml --edit -o json
+
+Available Commands:
+  clusterrole           Create a cluster role
+  clusterrolebinding    Create a cluster role binding for a particular cluster role
+  configmap             Create a config map from a local file, directory or literal value
+  cronjob               Create a cron job with the specified name
+  deployment            Create a deployment with the specified name
+  ingress               Create an ingress with the specified name
+  job                   Create a job with the specified name
+  namespace             Create a namespace with the specified name
+  poddisruptionbudget   Create a pod disruption budget with the specified name
+  priorityclass         Create a priority class with the specified name
+  quota                 Create a quota with the specified name
+  role                  Create a role with single rule
+  rolebinding           Create a role binding for a particular role or cluster role
+  secret                Create a secret using a specified subcommand
+  service               Create a service using a specified subcommand
+  serviceaccount        Create a service account with the specified name
+  token                 Request a service account token
+
+Options:
+    --allow-missing-template-keys=true:
+        If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to
+        golang and jsonpath output formats.
+
+    --dry-run='none':
+        Must be "none", "server", or "client". If client strategy, only print the object that would be sent, without
+        sending it. If server strategy, submit server-side request without persisting the resource.
+
+    --edit=false:
+        Edit the API resource before creating
+
+    --field-manager='kubectl-create':
+        Name of the manager used to track field ownership.
+
+    -f, --filename=[]:
+        Filename, directory, or URL to files to use to create the resource
+
+    -k, --kustomize='':
+        Process the kustomization directory. This flag can't be used together with -f or -R.
+
+    -o, --output='':
+        Output format. One of: (json, yaml, name, go-template, go-template-file, template, templatefile, jsonpath,
+        jsonpath-as-json, jsonpath-file).
+
+    --raw='':
+        Raw URI to POST to the server.  Uses the transport specified by the kubeconfig file.
+
+    -R, --recursive=false:
+        Process the directory used in -f, --filename recursively. Useful when you want to manage related manifests
+        organized within the same directory.
+
+    --save-config=false:
+        If true, the configuration of current object will be saved in its annotation. Otherwise, the annotation will
+        be unchanged. This flag is useful when you want to perform kubectl apply on this object in the future.
+
+    -l, --selector='':
+        Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching
+        objects must satisfy all of the specified label constraints.
+
+    --show-managed-fields=false:
+        If true, keep the managedFields when printing objects in JSON or YAML format.
+
+    --template='':
+        Template string or path to template file to use when -o=go-template, -o=go-template-file. The template format
+        is golang templates [http://golang.org/pkg/text/template/#pkg-overview].
+
+    --validate='strict':
+        Must be one of: strict (or true), warn, ignore (or false).              "true" or "strict" will use a schema to validate
+        the input and fail the request if invalid. It will perform server side validation if ServerSideFieldValidation
+        is enabled on the api-server, but will fall back to less reliable client-side validation if not.                "warn" will
+        warn about unknown or duplicate fields without blocking the request if server-side field validation is enabled
+        on the API server, and behave as "ignore" otherwise.            "false" or "ignore" will not perform any schema
+        validation, silently dropping any unknown or duplicate fields.
+
+    --windows-line-endings=false:
+        Only relevant if --edit=true. Defaults to the line ending native to your platform.
+
+Usage:
+  kubectl create -f FILENAME [options]
+
+Use "kubectl create <command> --help" for more information about a given command.
+Use "kubectl options" for a list of global command-line options (applies to all commands).
+
+controlplane ~/CKA ➜  

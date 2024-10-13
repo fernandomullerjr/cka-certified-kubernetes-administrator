@@ -39,7 +39,7 @@ kubectl uncordon controlplane
 
 ~~~~bash
 ssh node01
-
+# repo
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 sudo apt-get update
@@ -72,3 +72,57 @@ kubectl uncordon node01
 kubectl edit deploy gold-nginx
 nodeName: controlplane
 ~~~~
+
+
+
+
+
+
+
+
+
+### Questão 2
+
+
+- Comando ajustado, trazendo TODAS AS COLUNAS:
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406
+~~~~
+
+- Enviando para o diretório /opt/admin2406_data:
+
+~~~~bash
+kubectl get deployment -o custom-columns='DEPLOYMENT:.metadata.name,CONTAINER_IMAGE:.spec.template.spec.containers[*].image,READY_REPLICAS:status.readyReplicas,NAMESPACE:.metadata.namespace' -n admin2406 > /opt/admin2406_data
+~~~~
+
+
+
+
+
+
+
+
+### Questão 3
+
+- Editando a porta
+DE:
+4380
+PARA:
+6443
+
+
+controlplane ~/CKA ✖ cat admin.kubeconfig  | grep control
+    server: https://controlplane:6443
+
+controlplane ~/CKA ➜  
+
+
+
+
+
+
+
+### Questão 4
+kubectl create deployment nginx-deploy --image=nginx:1.16 --replicas=1
+kubectl edit deployment nginx-deploy
