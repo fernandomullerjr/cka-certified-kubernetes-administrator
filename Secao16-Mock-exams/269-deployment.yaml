@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hr-web-app
+  labels:
+    app: hr-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hr-web
+  template:
+    metadata:
+      labels:
+        app: hr-web
+    spec:
+      containers:
+      - name: hr-web
+        image: kodekloud/webapp-color
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
