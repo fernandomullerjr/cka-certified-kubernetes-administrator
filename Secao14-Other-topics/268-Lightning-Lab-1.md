@@ -2548,6 +2548,21 @@ controlplane ~/CKA ➜
 
 
 
+
+
+
+### 6 / 7
+Weight: 10
+
+Take the backup of ETCD at the location /opt/etcd-backup.db on the controlplane node.
+
+Troubleshoot and fix the issues
+
+
+
+
+
+
 ## PENDENTE
 - Tratar questão 4
 verificar porque o Pod mysql não sobe

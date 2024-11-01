@@ -126,3 +126,10 @@ controlplane ~/CKA ➜
 ### Questão 4
 kubectl create deployment nginx-deploy --image=nginx:1.16 --replicas=1
 kubectl edit deployment nginx-deploy
+
+
+### Questão 5
+criar pvc no ns alpha
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao14-Other-topics/268-pvc.yaml
+dizer para o pod usar ele
+kubectl edit deployment alpha-mysql -n alpha
