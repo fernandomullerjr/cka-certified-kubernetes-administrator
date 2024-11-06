@@ -78,7 +78,7 @@ Labels: tier=msg
 
 
 
-
+~~~~bash
 controlplane ~ ➜  k run --help
 Create and run a particular image in a pod.
 
@@ -238,9 +238,35 @@ Usage:
 Use "kubectl options" for a list of global command-line options (applies to all commands).
 
 controlplane ~ ➜  
+~~~~
+
+
+- Comando ajustado
+kubectl run messaging --image=redis:alpine --labels="tier=msg"
 
 
 
+
+
+
+
+
+### 3 / 12
+Weight: 4
+
+Create a namespace named apx-x9984574.
+
+Namespace: apx-x9984574
+
+
+k create ns apx-x9984574
+
+
+
+
+
+continua em:
+4:60
 
 
 
@@ -251,3 +277,10 @@ controlplane ~ ➜
 ### 1 / 12
 - Ideia é fornecer resposta rápida, usando comando imperativo:
 k run nginx-pod --image=nginx:alpine
+
+### 2 / 12
+- Comando ajustado
+kubectl run messaging --image=redis:alpine --labels="tier=msg"
+
+### 3 / 12
+k create ns apx-x9984574
