@@ -305,9 +305,6 @@ kubectl expose pod messaging --port=6379 --name messaging-service
 
 ~~~~bash
 
-controlplane ~ ➜  k get pod
-No resources found in default namespace.
-
 controlplane ~ ➜  k expose --help
 Expose a resource as a new Kubernetes service.
 
@@ -443,6 +440,114 @@ controlplane ~ ➜
 
 
 
+
+
+
+
+### 6 / 12
+Weight: 11
+
+Create a deployment named hr-web-app using the image kodekloud/webapp-color with 2 replicas.
+
+Name: hr-web-app
+
+Image: kodekloud/webapp-color
+
+Replicas: 2
+
+
+- Manifesto de base:
+
+~~~~yaml
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hr-web-app
+  name: hr-web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hr-web-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hr-web-app
+    spec:
+      containers:
+      - image: kodekloud/webapp-color
+        name: webapp-color
+        resources: {}
+status: {}
+~~~~
+
+In v1.19, we can add --replicas flag with kubectl create deployment command:
+kubectl create deployment hr-web-app --image=kodekloud/webapp-color --replicas=2
+
+
+
+
+
+
+
+
+
+
+
+### 7 / 12
+Weight: 8
+
+Create a static pod named static-busybox on the controlplane node that uses the busybox image and the command sleep 1000.
+
+Name: static-busybox
+
+Image: busybox
+
+
+To Create a static pod, copy it to the static pods directory. In this case, it is /etc/kubernetes/manifests. Apply below manifests:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: static-busybox
+  name: static-busybox
+spec:
+  containers:
+  - command:
+    - sleep
+    - "1000"
+    image: busybox
+    name: static-busybox
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+~~~~
+
+~~~~bash
+ 
+  # Start the nginx pod using a different command and custom arguments
+  kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
+
+~~~~
+
+- Comando ajustado:
+
+~~~~bash
+k run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
+~~~~
+
+OBS:
+Como é um Pod estático, cuidar para pegar só um dry-run e criar ele estático, na pasta ````/etc/kubernetes/manifests````.
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO
@@ -460,3 +565,9 @@ k create ns apx-x9984574
 
 ### 4 / 12
 k get nodes -o json > /opt/outputs/nodes-z3444kd9.json
+
+### 5 / 12
+k expose pod messaging --port=6379 --name messaging-service
+
+### 6 / 12
+k create deployment hr-web-app --image=kodekloud/webapp-color --replicas=2
