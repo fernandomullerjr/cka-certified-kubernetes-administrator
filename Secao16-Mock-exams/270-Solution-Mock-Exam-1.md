@@ -573,7 +573,7 @@ controlplane ~ ➜
 - Comando ajustado, já enviando para o diretório de Pods estáticos:
 
 ~~~~bash
-k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
+k run static-busybox --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
 ~~~~
 
 OBS:
@@ -581,7 +581,7 @@ Como é um Pod estático, cuidar para pegar só um dry-run e criar ele estático
 
 
 
-controlplane ~ ➜  k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
+controlplane ~ ➜  k run static-busybox --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
 
 controlplane ~ ➜  cat /etc/kubernetes/manifests/static-pod.yaml
 apiVersion: v1
@@ -589,21 +589,60 @@ kind: Pod
 metadata:
   creationTimestamp: null
   labels:
-    run: nginx
-  name: nginx
+    run: static-busybox
+  name: static-busybox
 spec:
   containers:
   - command:
     - sleep
     - "1000"
     image: busybox
-    name: nginx
+    name: static-busybox
     resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
 
 controlplane ~ ➜  
+
+controlplane ~ ➜  k get pod -A
+NAMESPACE      NAME                                   READY   STATUS    RESTARTS   AGE
+default        nginx-controlplane                     1/1     Running   0          4m54s
+default        static-busybox-controlplane            1/1     Running   0          15s
+kube-flannel   kube-flannel-ds-jrfzv                  1/1     Running   0          82m
+kube-system    coredns-77d6fd4654-jxc7p               1/1     Running   0          82m
+kube-system    coredns-77d6fd4654-w7ngf               1/1     Running   0          82m
+kube-system    etcd-controlplane                      1/1     Running   0          82m
+kube-system    kube-apiserver-controlplane            1/1     Running   0          82m
+kube-system    kube-controller-manager-controlplane   1/1     Running   0          82m
+kube-system    kube-proxy-tx4n2                       1/1     Running   0          82m
+kube-system    kube-scheduler-controlplane            1/1     Running   0          82m
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+
+
+
+### 8 / 12
+Weight: 12
+
+Create a POD in the finance namespace named temp-bus with the image redis:alpine.
+
+Name: temp-bus
+
+Image Name: redis:alpine
+
+k run temp-bus --image=redis:alpine -n finance
+
+
+
+
 
 
 
@@ -638,5 +677,8 @@ k create deployment hr-web-app --image=kodekloud/webapp-color --replicas=2
 
 ### 7 / 12
 ~~~~bash
-k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
+k run static-busybox --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
 ~~~~
+
+### 8 / 12
+k run temp-bus --image=redis:alpine -n finance
