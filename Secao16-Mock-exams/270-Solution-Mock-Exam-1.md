@@ -540,7 +540,40 @@ status: {}
 - Comando ajustado:
 
 ~~~~bash
-k run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
+k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000
+~~~~
+
+OBS:
+Como é um Pod estático, cuidar para pegar só um dry-run e criar ele estático, na pasta ````/etc/kubernetes/manifests````.
+
+~~~~yaml
+controlplane ~ ➜  k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nginx
+  name: nginx
+spec:
+  containers:
+  - command:
+    - sleep
+    - "1000"
+    image: busybox
+    name: nginx
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+controlplane ~ ➜  
+~~~~
+
+- Comando ajustado, já enviando para o diretório de Pods estáticos:
+
+~~~~bash
+k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
 ~~~~
 
 OBS:
@@ -548,6 +581,37 @@ Como é um Pod estático, cuidar para pegar só um dry-run e criar ele estático
 
 
 
+controlplane ~ ➜  k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/static-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nginx
+  name: nginx
+spec:
+  containers:
+  - command:
+    - sleep
+    - "1000"
+    image: busybox
+    name: nginx
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO
@@ -571,3 +635,8 @@ k expose pod messaging --port=6379 --name messaging-service
 
 ### 6 / 12
 k create deployment hr-web-app --image=kodekloud/webapp-color --replicas=2
+
+### 7 / 12
+~~~~bash
+k run nginx --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
+~~~~
