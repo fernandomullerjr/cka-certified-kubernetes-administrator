@@ -646,6 +646,135 @@ k run temp-bus --image=redis:alpine -n finance
 
 
 
+### 9 / 12
+Weight: 8
+
+A new application orange is deployed. There is something wrong with it. Identify and fix the issue.
+
+Issue fixed
+
+
+
+controlplane ~ ➜  kubectl get pods -A
+NAMESPACE      NAME                                   READY   STATUS                  RESTARTS      AGE
+default        hr-web-app-7db4688c6c-22jt9            1/1     Running                 0             5m39s
+default        hr-web-app-7db4688c6c-vlg45            1/1     Running                 0             5m39s
+default        messaging                              1/1     Running                 0             15m
+default        nginx-pod                              1/1     Running                 0             18m
+default        orange                                 0/1     Init:CrashLoopBackOff   1 (12s ago)   15s
+default        static-busybox-controlplane            0/1     CrashLoopBackOff        4 (48s ago)   2m23s
+finance        temp-bus                               1/1     Running                 0             38s
+kube-flannel   kube-flannel-ds-m5kjn                  1/1     Running                 0             75m
+kube-system    coredns-77d6fd4654-65pnt               1/1     Running                 0             75m
+kube-system    coredns-77d6fd4654-vst2t               1/1     Running                 0             75m
+kube-system    etcd-controlplane                      1/1     Running                 0             75m
+kube-system    kube-apiserver-controlplane            1/1     Running                 0             75m
+kube-system    kube-controller-manager-controlplane   1/1     Running                 0             75m
+kube-system    kube-proxy-784nm                       1/1     Running                 0             75m
+kube-system    kube-scheduler-controlplane            1/1     Running                 0             75m
+
+
+Run below command and troubleshoot step by step:
+
+     <details>
+
+     ```
+     kubectl describe pod orange
+     ```
+
+     Export the running pod using below command and correct the spelling of the command **`sleeeep`** to **`sleep`** 
+
+     ```
+     kubectl get pod orange -o yaml > orange.yaml
+     ```
+   
+     Delete the running Orange pod and recreate the pod using command.
+     
+     ```
+     kubectl delete pod orange
+     kubectl create -f orange.yaml
+     ```
+     </details>
+
+
+
+
+
+
+
+
+### 10 / 12
+Weight: 10
+
+Expose the hr-web-app created in the previous task as a service named hr-web-app-service, accessible on port 30082 on the nodes of the cluster.
+
+The web application listens on port 8080.
+
+Name: hr-web-app-service
+
+Type: NodePort
+
+Endpoints: 2
+
+Port: 8080
+
+NodePort: 30082
+
+
+
+
+
+
+
+
+
+### 11 / 12
+Weight: 6
+
+Use JSON PATH query to retrieve the osImages of all the nodes and store it in a file /opt/outputs/nodes_os_x43kj56.txt.
+
+The osImage are under the nodeInfo section under status of each node.
+
+Task Completed
+
+- Exemplo obtido do Kubectl Cheat Sheet
+~~~~bash
+# Obtém ExternalIPs de todos os nós
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+~~~~
+
+
+
+
+
+
+
+
+### 12 / 12
+Weight: 8
+
+Create a Persistent Volume with the given specification: -
+
+Volume name: pv-analytics
+
+Storage: 100Mi
+
+Access mode: ReadWriteMany
+
+Host path: /pv/data-analytics
+
+Is the volume name set?
+
+Is the storage capacity set?
+
+Is the accessMode set?
+
+Is the hostPath set?
+
+
+
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
@@ -690,3 +819,27 @@ Cuidar:
 
 ### 8 / 12
 k run temp-bus --image=redis:alpine -n finance
+
+### 9 / 12
+- Quando tem init na frente do CrashLoopBackOff
+Init:CrashLoopBackOff
+
+- Verificando logs do Container especifico no Pod:
+kubectl logs <nome-do-pod> <nome-do-container> 
+kubectl logs orange init-myservice
+
+- Editando
+kubectl edit pod orange
+kubectl replace --force -f /tmp/kubectl-edit-as87jhg7.yaml
+
+### 10 / 12
+- Criar o Service contendo o campo "NodePort" definido.
+
+### 11 / 12
+1. Pegar exemplo de jsonpath na documentação do Kubernetes em Kubectl Cheat Sheet.
+2. Comando ajustado:
+kubectl get nodes -o=jsonpath='{.items[0].status.nodeInfo.osImage}' > /opt/outputs/nodes_os_x43kj56.txt
+
+### 12 / 12
+1. Pegar modelo de manifesto na documentação do Kubernetes.
+2. Editar e aplicar.
