@@ -42,6 +42,7 @@ ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
 
 ETCDCTL_API=3 etcdctl snapshot save mysnapshot.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
 
+- OK
 ETCDCTL_API=3 etcdctl snapshot save /opt/etcd-backup.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
 
 
@@ -397,3 +398,901 @@ controlplane ~ ➜  date
 Sat Dec 14 04:26:37 PM UTC 2024
 
 controlplane ~ ➜  
+
+- Criando Pod com PVC:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: use-pv
+  name: use-pv
+spec:
+  containers:
+    - name: use-pv
+      image: nginx
+      volumeMounts:
+      - mountPath: "/data"
+        name: mypd
+  dnsPolicy: ClusterFirst
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: my-pvc
+~~~~
+
+
+
+controlplane ~ ➜  kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pv-1   10Mi       RWO            Retain           Bound    default/my-pvc                  <unset>                          58s
+
+controlplane ~ ➜  kubectl get pvc
+NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+my-pvc   Bound    pv-1     10Mi       RWO                           <unset>                 39s
+
+controlplane ~ ➜  kubectl get pods
+NAME             READY   STATUS    RESTARTS   AGE
+redis-storage    1/1     Running   0          99s
+super-user-pod   1/1     Running   0          68s
+use-pv           1/1     Running   0          11s
+
+controlplane ~ ➜  date
+Sat Dec 14 04:41:29 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+
+
+### 5 / 8
+Weight: 15
+
+Create a new deployment called nginx-deploy, with image nginx:1.16 and 1 replica. Next upgrade the deployment to version 1.17 using rolling update.
+
+Deployment : nginx-deploy. Image: nginx:1.16
+
+Image: nginx:1.16
+
+Task: Upgrade the version of the deployment to 1:17
+
+Task: Record the changes for the image upgrade
+
+
+https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+
+Creating a Deployment
+
+The following is an example of a Deployment. It creates a ReplicaSet to bring up three nginx Pods:
+controllers/nginx-deployment.yaml [Copy controllers/nginx-deployment.yaml to clipboard]
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+- Ajustado:
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16
+        ports:
+        - containerPort: 80
+~~~~
+
+
+controlplane ~ ➜  vi deployment.yaml
+
+controlplane ~ ➜  kubectl apply -f  deployment.yaml
+deployment.apps/nginx-deploy created
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   0/1     1            0           5s
+
+controlplane ~ ➜  date
+Sat Dec 14 04:44:39 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/
+
+
+kubectl set image deployments/nginx-deploy nginx:1.17
+
+
+controlplane ~ ➜  kubectl set image deployments/nginx-deploy nginx:1.17
+error: there is no need to specify a resource type as a separate argument when passing arguments in resource/name form (e.g. 'kubectl get resource/<resource_name>' instead of 'kubectl get resource resource/<resource_name>'
+
+controlplane ~ ✖ kubectl set image nginx-deploy nginx:1.17
+error: the server doesn't have a resource type "nginx-deploy"
+
+controlplane ~ ✖ kubectl set image deployment/nginx-deploy nginx:1.17
+error: there is no need to specify a resource type as a separate argument when passing arguments in resource/name form (e.g. 'kubectl get resource/<resource_name>' instead of 'kubectl get resource resource/<resource_name>'
+
+
+controlplane ~ ➜  kubectl set image deployments/nginx-deploy nginx:1.17
+error: there is no need to specify a resource type as a separate argument when passing arguments in resource/name form (e.g. 'kubectl get resource/<resource_name>' instead of 'kubectl get resource resource/<resource_name>'
+
+controlplane ~ ✖ kubectl set image nginx-deploy nginx:1.17
+error: the server doesn't have a resource type "nginx-deploy"
+
+controlplane ~ ✖ kubectl set image deployment/nginx-deploy nginx:1.17
+error: there is no need to specify a resource type as a separate argument when passing arguments in resource/name form (e.g. 'kubectl get resource/<resource_name>' instead of 'kubectl get resource resource/<resource_name>'
+
+Examples:
+  # Set a deployment's nginx container image to 'nginx:1.9.1', and its busybox container image to 'busybox'
+  kubectl set image deployment/nginx busybox=busybox nginx=nginx:1.9.1
+  
+  # Update all deployments' and rc's nginx container's image to 'nginx:1.9.1'
+  kubectl set image deployments,rc nginx=nginx:1.9.1 --all
+  
+  # Update image of all containers of daemonset abc to 'nginx:1.9.1'
+  kubectl set image daemonset abc *=nginx:1.9.1
+  
+  # Print result (in yaml format) of updating nginx container image from local file, without hitting the server
+  kubectl set image -f path/to/file.yaml nginx=nginx:1.9.1 --local -o yaml
+
+
+
+kubectl set image deployment/nginx-deploy nginx=nginx:1.17
+
+
+controlplane ~ ✖ kubectl set image deployment/nginx-deploy nginx=nginx:1.17
+deployment.apps/nginx-deploy image updated
+
+controlplane ~ ➜  date
+Sat Dec 14 04:48:56 PM UTC 2024
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/1     1            1           4m27s
+
+controlplane ~ ➜  date
+Sat Dec 14 04:49:02 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+### 6 / 8
+Weight: 15
+
+Create a new user called john. Grant him access to the cluster. John should have permission to create, list, get, update and delete pods in the development namespace . The private key exists in the location: /root/CKA/john.key and csr at /root/CKA/john.csr.
+
+Important Note: As of kubernetes 1.19, the CertificateSigningRequest object expects a signerName.
+
+Please refer the documentation to see an example. The documentation tab is available at the top right of terminal.
+
+CSR: john-developer Status:Approved
+
+Role Name: developer, namespace: development, Resource: Pods
+
+Access: User 'john' has appropriate permissions
+
+
+https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/#create-certificatesigningrequest
+Certificate signing authorization
+
+To allow creating a CertificateSigningRequest and retrieving any CertificateSigningRequest:
+
+    Verbs: create, get, list, watch, group: certificates.k8s.io, resource: certificatesigningrequests
+
+For example:
+access/certificate-signing-request/clusterrole-create.yaml [Copy access/certificate-signing-request/clusterrole-create.yaml to clipboard]
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: csr-creator
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+
+To allow approving a CertificateSigningRequest:
+
+    Verbs: get, list, watch, group: certificates.k8s.io, resource: certificatesigningrequests
+    Verbs: update, group: certificates.k8s.io, resource: certificatesigningrequests/approval
+    Verbs: approve, group: certificates.k8s.io, resource: signers, resourceName: <signerNameDomain>/<signerNamePath> or <signerNameDomain>/*
+
+For example:
+access/certificate-signing-request/clusterrole-approve.yaml [Copy access/certificate-signing-request/clusterrole-approve.yaml to clipboard]
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: csr-approver
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/approval
+  verbs:
+  - update
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - signers
+  resourceNames:
+  - example.com/my-signer-name # example.com/* can be used to authorize for all signers in the 'example.com' domain
+  verbs:
+  - approve
+
+To allow signing a CertificateSigningRequest:
+
+    Verbs: get, list, watch, group: certificates.k8s.io, resource: certificatesigningrequests
+    Verbs: update, group: certificates.k8s.io, resource: certificatesigningrequests/status
+    Verbs: sign, group: certificates.k8s.io, resource: signers, resourceName: <signerNameDomain>/<signerNamePath> or <signerNameDomain>/*
+
+access/certificate-signing-request/clusterrole-sign.yaml [Copy access/certificate-signing-request/clusterrole-sign.yaml to clipboard]
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: csr-signer
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/status
+  verbs:
+  - update
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - signers
+  resourceNames:
+  - example.com/my-signer-name # example.com/* can be used to authorize for all signers in the 'example.com' domain
+  verbs:
+  - sign
+
+Signers
+
+
+
+Create a CertificateSigningRequest
+
+Create a CertificateSigningRequest and submit it to a Kubernetes Cluster via kubectl. Below is a script to generate the CertificateSigningRequest.
+
+cat <<EOF | kubectl apply -f -
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: myuser
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZqQ0NBVDRDQVFBd0VURVBNQTBHQTFVRUF3d0dZVzVuWld4aE1JSUJJakFOQmdrcWhraUc5dzBCQVFFRgpBQU9DQVE4QU1JSUJDZ0tDQVFFQTByczhJTHRHdTYxakx2dHhWTTJSVlRWMDNHWlJTWWw0dWluVWo4RElaWjBOCnR2MUZtRVFSd3VoaUZsOFEzcWl0Qm0wMUFSMkNJVXBGd2ZzSjZ4MXF3ckJzVkhZbGlBNVhwRVpZM3ExcGswSDQKM3Z3aGJlK1o2MVNrVHF5SVBYUUwrTWM5T1Nsbm0xb0R2N0NtSkZNMUlMRVI3QTVGZnZKOEdFRjJ6dHBoaUlFMwpub1dtdHNZb3JuT2wzc2lHQ2ZGZzR4Zmd4eW8ybmlneFNVekl1bXNnVm9PM2ttT0x1RVF6cXpkakJ3TFJXbWlECklmMXBMWnoyalVnald4UkhCM1gyWnVVV1d1T09PZnpXM01LaE8ybHEvZi9DdS8wYk83c0x0MCt3U2ZMSU91TFcKcW90blZtRmxMMytqTy82WDNDKzBERHk5aUtwbXJjVDBnWGZLemE1dHJRSURBUUFCb0FBd0RRWUpLb1pJaHZjTgpBUUVMQlFBRGdnRUJBR05WdmVIOGR4ZzNvK21VeVRkbmFjVmQ1N24zSkExdnZEU1JWREkyQTZ1eXN3ZFp1L1BVCkkwZXpZWFV0RVNnSk1IRmQycVVNMjNuNVJsSXJ3R0xuUXFISUh5VStWWHhsdnZsRnpNOVpEWllSTmU3QlJvYXgKQVlEdUI5STZXT3FYbkFvczFqRmxNUG5NbFpqdU5kSGxpT1BjTU1oNndLaTZzZFhpVStHYTJ2RUVLY01jSVUyRgpvU2djUWdMYTk0aEpacGk3ZnNMdm1OQUxoT045UHdNMGM1dVJVejV4T0dGMUtCbWRSeEgvbUNOS2JKYjFRQm1HCkkwYitEUEdaTktXTU0xMzhIQXdoV0tkNjVoVHdYOWl4V3ZHMkh4TG1WQzg0L1BHT0tWQW9FNkpsYWFHdTlQVmkKdjlOSjVaZlZrcXdCd0hKbzZXdk9xVlA3SVFjZmg3d0drWm89Ci0tLS0tRU5EIENFUlRJRklDQVRFIFJFUVVFU1QtLS0tLQo=
+  signerName: kubernetes.io/kube-apiserver-client
+  expirationSeconds: 86400  # one day
+  usages:
+  - client auth
+EOF
+
+Some points to note:
+
+    usages has to be 'client auth'
+
+    expirationSeconds could be made longer (i.e. 864000 for ten days) or shorter (i.e. 3600 for one hour)
+
+    request is the base64 encoded value of the CSR file content. You can get the content using this command:
+
+    cat myuser.csr | base64 | tr -d "\n"
+
+Approve the CertificateSigningRequest
+
+Use kubectl to create a CSR and approve it.
+
+Get the list of CSRs:
+
+kubectl get csr
+
+Approve the CSR:
+
+kubectl certificate approve myuser
+
+Get the certificate
+
+Retrieve the certificate from the CSR:
+
+kubectl get csr/myuser -o yaml
+
+The certificate value is in Base64-encoded format under status.certificate.
+
+Export the issued certificate from the CertificateSigningRequest.
+
+kubectl get csr myuser -o jsonpath='{.status.certificate}'| base64 -d > myuser.crt
+
+Create Role and RoleBinding
+
+With the certificate created it is time to define the Role and RoleBinding for this user to access Kubernetes cluster resources.
+
+This is a sample command to create a Role for this new user:
+
+kubectl create role developer --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
+
+This is a sample command to create a RoleBinding for this new user:
+
+kubectl create rolebinding developer-binding-myuser --role=developer --user=myuser
+
+
+
+
+cat /root/CKA/john.csr | base64 | tr -d "\n"
+
+
+controlplane ~ ➜  date
+Sat Dec 14 04:49:02 PM UTC 2024
+
+controlplane ~ ➜  vi 271-clusterrole-create
+
+controlplane ~ ➜  mv 271-clusterrole-create 271-clusterrole-create.yaml
+
+controlplane ~ ➜  vi 271-clusterrole-approve.yaml
+
+controlplane ~ ➜  vi 271-clusterrole-sign.yaml
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  cat /root/CKA/john.csr | base64 | tr -d "\n"
+LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VhbTlvYmpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQU10MnJqWlhsYm80bmhTdUd3QnZvWmxxN21tc1A5Vm9vSjRFVTZIVDFReENKU293CnBXN0M4cUxnOE1oS3dQMkM5bG1UdzNldHhHek14b3FTU2pxNlpkRjZLNUxmM2tWRjJyc1hXbG8weVZDNVUwSlkKY2ErSHZmU1hPVVVzUjIrTWZHNkoybkwwelp3NDBPdjljSVRqQjN4aHNsQjlzbXFFcDBlZkxlb0RpclhIUmkwRQplenA4V2IzQ0lrdkEwWXBjcFhDVnJlcCtwVlkyZHBtbWU3S3B6bFlPTjZzSlQ2c3BoNXRMWWNWQ0h4ZWxOWU9aCmVldlU0MjliQVRRL21MZzBxMzcrNG1GWTZHbzBxWU51ZEdqTDlaNHIrY3BDZC9LZmpHbEV0KzRBMGIyUWlXQ2cKR2hpN2k5Qnd6MWZTSk9QL1lRWlpBdGNWNzRFUEZSbmxtVndxdUFFQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQ0NKT3pHSitLMmxIUXNVNnlzbnRLOWZ1RG1OMHFqR3d5SXBXWDI1cEpvNUxXWm5KSFdSa0xyClJJOG53Q1hrM3NsM1Q0S1Y1TTNWRDIrVlYxR3ZBWTFnUi9kdFM4VUFJbmI4bkt0RFBRU0Y2cEZJU0xodWxaSHQKWDVuajNqMGFDY210M3AvSU9EZVVZNmErYXVYbUZWUWt5YzJaaEloR0txZTFIVUZFWjhWT1A5QnBWK09Bc3NNbQpnOEgxWkhnYWFnaW5jN3lsRUhGQUlQejJYVEYydGEzc3cwWHhlNjQ2VkY5bkR0dFdoNDhjY0JpY3lubVJGSkNJCmFKdnFBUHQ0a0xyM3Jkd29ydThXWjVoakxGVWJqUmtocUVkNTIwQjJMamV0NWhyRVJpSDA0cWpHbzlYU2JVZFEKdjlsWUFVeGcvTUdHTEtSRVMrSnpGSG5VS0RqaDZzbGEKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+controlplane ~ ➜  
+
+
+- CSR ajustado
+
+~~~~yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: john
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VhbTlvYmpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQU10MnJqWlhsYm80bmhTdUd3QnZvWmxxN21tc1A5Vm9vSjRFVTZIVDFReENKU293CnBXN0M4cUxnOE1oS3dQMkM5bG1UdzNldHhHek14b3FTU2pxNlpkRjZLNUxmM2tWRjJyc1hXbG8weVZDNVUwSlkKY2ErSHZmU1hPVVVzUjIrTWZHNkoybkwwelp3NDBPdjljSVRqQjN4aHNsQjlzbXFFcDBlZkxlb0RpclhIUmkwRQplenA4V2IzQ0lrdkEwWXBjcFhDVnJlcCtwVlkyZHBtbWU3S3B6bFlPTjZzSlQ2c3BoNXRMWWNWQ0h4ZWxOWU9aCmVldlU0MjliQVRRL21MZzBxMzcrNG1GWTZHbzBxWU51ZEdqTDlaNHIrY3BDZC9LZmpHbEV0KzRBMGIyUWlXQ2cKR2hpN2k5Qnd6MWZTSk9QL1lRWlpBdGNWNzRFUEZSbmxtVndxdUFFQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQ0NKT3pHSitLMmxIUXNVNnlzbnRLOWZ1RG1OMHFqR3d5SXBXWDI1cEpvNUxXWm5KSFdSa0xyClJJOG53Q1hrM3NsM1Q0S1Y1TTNWRDIrVlYxR3ZBWTFnUi9kdFM4VUFJbmI4bkt0RFBRU0Y2cEZJU0xodWxaSHQKWDVuajNqMGFDY210M3AvSU9EZVVZNmErYXVYbUZWUWt5YzJaaEloR0txZTFIVUZFWjhWT1A5QnBWK09Bc3NNbQpnOEgxWkhnYWFnaW5jN3lsRUhGQUlQejJYVEYydGEzc3cwWHhlNjQ2VkY5bkR0dFdoNDhjY0JpY3lubVJGSkNJCmFKdnFBUHQ0a0xyM3Jkd29ydThXWjVoakxGVWJqUmtocUVkNTIwQjJMamV0NWhyRVJpSDA0cWpHbzlYU2JVZFEKdjlsWUFVeGcvTUdHTEtSRVMrSnpGSG5VS0RqaDZzbGEKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+  signerName: example.com/john-developer
+  expirationSeconds: 86400  # one day
+  usages:
+  - client auth
+~~~~
+
+
+
+controlplane ~ ➜  cat /root/CKA/john.csr | base64 | tr -d "\n"
+LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VhbTlvYmpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQU10MnJqWlhsYm80bmhTdUd3QnZvWmxxN21tc1A5Vm9vSjRFVTZIVDFReENKU293CnBXN0M4cUxnOE1oS3dQMkM5bG1UdzNldHhHek14b3FTU2pxNlpkRjZLNUxmM2tWRjJyc1hXbG8weVZDNVUwSlkKY2ErSHZmU1hPVVVzUjIrTWZHNkoybkwwelp3NDBPdjljSVRqQjN4aHNsQjlzbXFFcDBlZkxlb0RpclhIUmkwRQplenA4V2IzQ0lrdkEwWXBjcFhDVnJlcCtwVlkyZHBtbWU3S3B6bFlPTjZzSlQ2c3BoNXRMWWNWQ0h4ZWxOWU9aCmVldlU0MjliQVRRL21MZzBxMzcrNG1GWTZHbzBxWU51ZEdqTDlaNHIrY3BDZC9LZmpHbEV0KzRBMGIyUWlXQ2cKR2hpN2k5Qnd6MWZTSk9QL1lRWlpBdGNWNzRFUEZSbmxtVndxdUFFQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQ0NKT3pHSitLMmxIUXNVNnlzbnRLOWZ1RG1OMHFqR3d5SXBXWDI1cEpvNUxXWm5KSFdSa0xyClJJOG53Q1hrM3NsM1Q0S1Y1TTNWRDIrVlYxR3ZBWTFnUi9kdFM4VUFJbmI4bkt0RFBRU0Y2cEZJU0xodWxaSHQKWDVuajNqMGFDY210M3AvSU9EZVVZNmErYXVYbUZWUWt5YzJaaEloR0txZTFIVUZFWjhWT1A5QnBWK09Bc3NNbQpnOEgxWkhnYWFnaW5jN3lsRUhGQUlQejJYVEYydGEzc3cwWHhlNjQ2VkY5bkR0dFdoNDhjY0JpY3lubVJGSkNJCmFKdnFBUHQ0a0xyM3Jkd29ydThXWjVoakxGVWJqUmtocUVkNTIwQjJMamV0NWhyRVJpSDA0cWpHbzlYU2JVZFEKdjlsWUFVeGcvTUdHTEtSRVMrSnpGSG5VS0RqaDZzbGEKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+controlplane ~ ➜  vi 271-csr.yaml
+
+controlplane ~ ➜  kubectl get csr
+NAME        AGE   SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+csr-wv7gb   31m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+csr-xmcm5   30m   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:c0b5zg    <none>              Approved,Issued
+
+controlplane ~ ➜  kubectl get csr -A
+NAME        AGE   SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+csr-wv7gb   31m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+csr-xmcm5   30m   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:c0b5zg    <none>              Approved,Issued
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl apply 271-clusterrole-create.yaml 
+error: Unexpected args: [271-clusterrole-create.yaml]
+See 'kubectl apply -h' for help and examples
+
+controlplane ~ ✖ kubectl apply -f 271-clusterrole-create.yaml 
+clusterrole.rbac.authorization.k8s.io/john-developer created
+
+controlplane ~ ➜  kubectl apply -f 271-clusterrole-approve.yaml 
+clusterrole.rbac.authorization.k8s.io/csr-approver created
+
+controlplane ~ ➜  kubectl apply -f 271-clusterrole-sign.yaml 
+clusterrole.rbac.authorization.k8s.io/csr-signer created
+
+controlplane ~ ➜  kubectl apply -f 271-csr.yaml 
+certificatesigningrequest.certificates.k8s.io/john created
+
+controlplane ~ ➜  date
+Sat Dec 14 05:05:09 PM UTC 2024
+
+controlplane ~ ➜  kubectl get csr
+NAME        AGE   SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+csr-wv7gb   32m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+csr-xmcm5   31m   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:c0b5zg    <none>              Approved,Issued
+john        4s    example.com/john-developer                    kubernetes-admin           24h                 Pending
+
+controlplane ~ ➜  date
+Sat Dec 14 05:05:19 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+Approve the CSR:
+
+kubectl certificate approve john
+
+
+controlplane ~ ➜  kubectl certificate approve john
+certificatesigningrequest.certificates.k8s.io/john approved
+
+controlplane ~ ➜  kubectl get csr
+NAME        AGE   SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+csr-wv7gb   32m   kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+csr-xmcm5   32m   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:c0b5zg    <none>              Approved,Issued
+john        33s   example.com/john-developer                    kubernetes-admin           24h                 Approved
+
+controlplane ~ ➜  
+
+
+
+Create Role and RoleBinding
+
+With the certificate created it is time to define the Role and RoleBinding for this user to access Kubernetes cluster resources.
+
+This is a sample command to create a Role for this new user:
+
+kubectl create role developer -n development --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
+
+This is a sample command to create a RoleBinding for this new user:
+
+kubectl create rolebinding developer-binding-john -n development --role=developer --user=john
+
+
+
+controlplane ~ ➜  kubectl create role developer -n development --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
+role.rbac.authorization.k8s.io/developer created
+
+controlplane ~ ➜  kubectl create rolebinding developer-binding-john -n development --role=developer --user=john
+rolebinding.rbac.authorization.k8s.io/developer-binding-john created
+
+controlplane ~ ➜  kubectl get role
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get role -n development
+NAME        CREATED AT
+developer   2024-12-14T17:06:52Z
+
+controlplane ~ ➜  kubectl get rolebind -n development
+error: the server doesn't have a resource type "rolebind"
+
+controlplane ~ ✖ kubectl get rolebinding -n development
+NAME                     ROLE             AGE
+developer-binding-john   Role/developer   17s
+
+controlplane ~ ➜  date
+Sat Dec 14 05:07:41 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+### 7 / 8
+Weight: 15
+
+Create a nginx pod called nginx-resolver using image nginx, expose it internally with a service called nginx-resolver-service. Test that you are able to look up the service and pod names from within the cluster. Use the image: busybox:1.28 for dns lookup. Record results in /root/CKA/nginx.svc and /root/CKA/nginx.pod
+
+Pod: nginx-resolver created
+
+Service DNS Resolution recorded correctly
+
+Pod DNS resolution recorded correctly
+
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+
+
+
+- Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app.kubernetes.io/name: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+
+
+
+
+controlplane ~ ➜  vi pod-resolver.yaml
+
+controlplane ~ ➜  ^C
+
+controlplane ~ ✖ kubectl apply -f pod-resolver.yaml
+pod/nginx-resolver created
+
+controlplane ~ ➜  kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+nginx-deploy-678c6b9b69-wm2kd   1/1     Running   0          24m
+nginx-resolver                  1/1     Running   0          3s
+redis-storage                   1/1     Running   0          33m
+super-user-pod                  1/1     Running   0          33m
+use-pv                          1/1     Running   0          32m
+
+controlplane ~ ➜  kubectl get pod nginx-resolver
+NAME             READY   STATUS    RESTARTS   AGE
+nginx-resolver   1/1     Running   0          9s
+
+
+controlplane ~ ➜  vi service.yaml
+
+controlplane ~ ➜  kubectl apply -f service.yaml
+service/nginx-resolver-service created
+
+controlplane ~ ➜  kubectl get svc
+NAME                     TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+kubernetes               ClusterIP   10.96.0.1      <none>        443/TCP   42m
+nginx-resolver-service   ClusterIP   10.98.34.111   <none>        80/TCP    6s
+
+controlplane ~ ➜  date
+Sat Dec 14 05:15:06 PM UTC 2024
+
+controlplane ~ ➜  
+
+https://kubernetes.io/docs/concepts/services-networking/service/#discovering-services
+
+A cluster-aware DNS server, such as CoreDNS, watches the Kubernetes API for new Services and creates a set of DNS records for each one. If DNS has been enabled throughout your cluster then all Pods should automatically be able to resolve Services by their DNS name.
+
+For example, if you have a Service called my-service in a Kubernetes namespace my-ns, the control plane and the DNS Service acting together create a DNS record for my-service.my-ns. Pods in the my-ns namespace should be able to find the service by doing a name lookup for my-service (my-service.my-ns would also work).
+
+Pods in other namespaces must qualify the name as my-service.my-ns. These names will resolve to the cluster IP assigned for the Service.
+
+Kubernetes also supports DNS SRV (Service) records for named ports. If the my-service.my-ns Service has a port named http with the protocol set to TCP, you can do a DNS SRV query for _http._tcp.my-service.my-ns to discover the port number for http, as well as the IP address.
+
+The Kubernetes DNS server is the only way to access ExternalName Services. You can find more information about ExternalName resolution in DNS for Services and Pods.
+
+
+
+controlplane ~ ➜  nslookup nginx-resolver-service.default
+Server:         172.25.0.1
+Address:        172.25.0.1#53
+
+** server can't find nginx-resolver-service.default: NXDOMAIN
+
+
+controlplane ~ ✖ vi pod-busybox.yaml
+
+controlplane ~ ➜  kubectl apply -f pod-busybox.yaml
+pod/busybox created
+
+controlplane ~ ➜  kubectl get pods
+NAME                            READY   STATUS      RESTARTS   AGE
+busybox                         0/1     Completed   0          3s
+nginx-deploy-678c6b9b69-wm2kd   1/1     Running     0          28m
+nginx-resolver                  1/1     Running     0          4m13s
+redis-storage                   1/1     Running     0          38m
+super-user-pod                  1/1     Running     0          37m
+use-pv                          1/1     Running     0          36m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get pods
+NAME                            READY   STATUS             RESTARTS      AGE
+busybox                         0/1     CrashLoopBackOff   1 (11s ago)   13s
+
+
+https://discuss.kubernetes.io/t/deployment-with-image-busybox-always-fails-but-deos-work-with-any-others/28639
+
+fox-md
+Jun 15
+
+Hi,
+
+Busybox has no entrypoint/cmd by default. You need to tell busybox to do smth (ex: sleep 1d). Otherwise it will keep failing with exit code 0.
+
+
+https://kubernetes.io/pt-br/docs/reference/kubectl/cheatsheet/
+
+kubectl run -i --tty busybox --image=busybox:1.28 -- sh  # Executa pod como shell interativo
+
+
+controlplane ~ ➜  kubectl run -i --tty busybox --image=busybox:1.28 -- sh  # Executa pod como shell interativo
+Error from server (AlreadyExists): pods "busybox" already exists
+
+controlplane ~ ✖ kubectl run -i --tty busybox2 --image=busybox:1.28 -- sh  # Executa pod como shell interativo
+If you don't see a command prompt, try pressing enter.
+/ # 
+/ # 
+/ # 
+/ # nslookup nginx-resolver.default
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+nslookup: can't resolve 'nginx-resolver.default'
+/ # 
+
+
+controlplane ~ ➜  kubectl run -i --tty busybox --image=busybox:1.28 -- sh  # Executa pod como shell interativo
+Error from server (AlreadyExists): pods "busybox" already exists
+
+controlplane ~ ✖ kubectl run -i --tty busybox2 --image=busybox:1.28 -- sh  # Executa pod como shell interativo
+If you don't see a command prompt, try pressing enter.
+/ # 
+/ # 
+/ # 
+/ # nslookup nginx-resolver.default
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+nslookup: can't resolve 'nginx-resolver.default'
+/ # nslookup nginx-resolver.default.pod.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+nslookup: can't resolve 'nginx-resolver.default.pod.cluster.local'
+/ # nslookup nginx-resolver-service.default.svc.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      nginx-resolver-service.default.svc.cluster.local
+Address 1: 10.98.34.111 nginx-resolver-service.default.svc.cluster.local
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # 
+/ # nslookup nginx-resolver-service.default.svc.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      nginx-resolver-service.default.svc.cluster.local
+Address 1: 10.98.34.111 nginx-resolver-service.default.svc.cluster.local
+/ # 
+
+
+
+https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
+
+Services
+A/AAAA records
+
+"Normal" (not headless) Services are assigned DNS A and/or AAAA records, depending on the IP family or families of the Service, with a name of the form my-svc.my-namespace.svc.cluster-domain.example. This resolves to the cluster IP of the Service.
+
+Headless Services (without a cluster IP) Services are also assigned DNS A and/or AAAA records, with a name of the form my-svc.my-namespace.svc.cluster-domain.example. Unlike normal Services, this resolves to the set of IPs of all of the Pods selected by the Service. Clients are expected to consume the set or else use standard round-robin selection from the set.
+ 
+
+Pods
+A/AAAA records
+
+Kube-DNS versions, prior to the implementation of the DNS specification, had the following DNS resolution:
+
+pod-ipv4-address.my-namespace.pod.cluster-domain.example.
+
+For example, if a Pod in the default namespace has the IP address 172.17.0.3, and the domain name for your cluster is cluster.local, then the Pod has a DNS name:
+
+172-17-0-3.default.pod.cluster.local.
+
+Any Pods exposed by a Service have the following DNS resolution available:
+
+pod-ipv4-address.service-name.my-namespace.svc.cluster-domain.example.
+
+
+
+nslookup nginx-resolver-service.default.svc.cluster.local
+
+
+controlplane ~ ➜  kubectl get pod
+NAME                            READY   STATUS             RESTARTS      AGE
+busybox                         0/1     CrashLoopBackOff   6 (59s ago)   6m38s
+busybox2                        1/1     Running            0             4m6s
+nginx-deploy-678c6b9b69-wm2kd   1/1     Running            0             35m
+nginx-resolver                  1/1     Running            0             10m
+redis-storage                   1/1     Running            0             44m
+super-user-pod                  1/1     Running            0             44m
+use-pv                          1/1     Running            0             43m
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                            READY   STATUS             RESTARTS      AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         0/1     CrashLoopBackOff   6 (61s ago)   6m40s   10.244.192.6   node01   <none>           <none>
+busybox2                        1/1     Running            0             4m8s    10.244.192.7   node01   <none>           <none>
+nginx-deploy-678c6b9b69-wm2kd   1/1     Running            0             35m     10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running            0             10m     10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running            0             44m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running            0             44m     10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running            0             43m     10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
+nslookup 10-244-192-4.nginx-resolver-service.default.svc.cluster.local
+
+
+/ # 
+/ # nslookup 10-244-192-4.nginx-resolver-service.default.svc.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+nslookup: can't resolve '10-244-192-4.nginx-resolver-service.default.svc.cluster.local'
+/ # 
+
+
+nslookup 10-244-192-4.default.pod.cluster.local
+
+
+/ # 
+/ # nslookup 10-244-192-4.default.pod.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      10-244-192-4.default.pod.cluster.local
+Address 1: 10.244.192.4
+/ # 
+
+
+
+kubectl run -i --tty busybox --image=busybox:1.28 -- sh
+
+
+https://kubernetes.io/pt-br/docs/reference/kubectl/cheatsheet/
+
+kubectl exec my-pod -- ls /                         # Executa comando no pod existente (1 contêiner)
+
+
+kubectl exec busybox2 -- nslookup 10-244-192-4.nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+
+
+
+
+controlplane ~ ➜  kubectl exec busybox2 -- nslookup 10-244-192-4.nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+nslookup: can't resolve '10-244-192-4.nginx-resolver-service.default.svc.cluster.local'
+command terminated with exit code 1
+
+controlplane ~ ✖ date
+Sat Dec 14 05:32:35 PM UTC 2024
+
+controlplane ~ ➜  
+
+
+
+nslookup nginx-resolver-service.default.svc.cluster.local
+
+kubectl exec busybox2 -- nslookup nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+
+
+controlplane ~ ➜  kubectl exec busybox2 -- nslookup nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+
+controlplane ~ ➜  cat ^C
+
+controlplane ~ ✖ cat /root/CKA/
+john.csr     john.key     nginx.svc    use-pv.yaml  
+
+controlplane ~ ✖ cat /root/CKA/nginx.svc 
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      nginx-resolver-service.default.svc.cluster.local
+Address 1: 10.98.34.111 nginx-resolver-service.default.svc.cluster.local
+
+controlplane ~ ➜  
+
+
+
+nslookup 10-244-192-4.default.pod.cluster.local
+
+kubectl exec busybox2 -- nslookup 10-244-192-4.default.pod.cluster.local > /root/CKA/nginx.svc
+
+
+
+
+- Questão 6:
+
+REPROVADO NESTA TASK:
+CSR: john-developer Status:Approved
+
+APROVADO NESTAS TASKS:
+Role Name: developer, namespace: development, Resource: Pods
+Access: User 'john' has appropriate permissions
+
+
+- Questão 7:
+
+APROVADO NESTAS TASKS:
+Pod: nginx-resolver created
+Service DNS Resolution recorded correctly
+
+REPROVADO NESTA TASK, FALTOU A RESOLUÇÃO:
+Pod DNS resolution recorded correctly
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## PENDENTE
+
+- Organizar respostas OK.
+
+- Questões 6 e 7, revisar.
+
+- Refazer o teste.
