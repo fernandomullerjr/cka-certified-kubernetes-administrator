@@ -655,6 +655,10 @@ k run temp-bus --image=redis:alpine -n finance
 # ###################################################################################################################### 
 ## RESUMO
 
+- Procurar por "kubectl cheat" na documentação do Kubernetes, para pegar os comandos para ajustar:
+1. Autocomplete.
+2. Alias para o kubectl.
+
 ### 1 / 12
 - Ideia é fornecer resposta rápida, usando comando imperativo:
 k run nginx-pod --image=nginx:alpine
@@ -679,6 +683,10 @@ k create deployment hr-web-app --image=kodekloud/webapp-color --replicas=2
 ~~~~bash
 k run static-busybox --image=busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-pod.yaml
 ~~~~
+
+Cuidar:
+1. Dry-run precisa vir antes do command, porque é um utilitário do kubectl.
+2. No caso é um Pod estático, precisa ficar no diretório ````/etc/kubernetes/manifests/````.
 
 ### 8 / 12
 k run temp-bus --image=redis:alpine -n finance
