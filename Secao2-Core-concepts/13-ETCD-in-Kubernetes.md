@@ -30,7 +30,7 @@ git status
 • Others
 
 
-- Todas as informações obtidas a partir do comando "kubectl get" é obtida do ETCD server.
+- Todas as informações obtidas a partir do comando "kubectl get" são obtidas a partir do ETCD server.
 
 
 # ##############################################################################################################################################################
