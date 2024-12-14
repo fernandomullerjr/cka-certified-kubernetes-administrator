@@ -228,3 +228,172 @@ redis-storage    1/1     Running   0          4m15s
 super-user-pod   1/1     Running   0          3s
 
 controlplane ~ ➜  
+
+
+
+
+
+
+### 4 / 8
+Weight: 12
+
+A pod definition file is created at /root/CKA/use-pv.yaml. Make use of this manifest file and mount the persistent volume called pv-1. Ensure the pod is running and the PV is bound.
+
+mountPath: /data
+
+persistentVolumeClaim Name: my-pvc
+
+persistentVolume Claim configured correctly
+
+pod using the correct mountPath
+
+pod using the persistent volume claim?
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pv-1   10Mi       RWO            Retain           Available                          <unset>                          22s
+
+controlplane ~ ➜  kubectl get pvc
+No resources found in default namespace.
+
+controlplane ~ ➜  date
+Sat Dec 14 04:12:57 PM UTC 2024
+
+controlplane ~ ➜  kubectl get pvc -A
+No resources found
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  cat /root/CKA/use-pv.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: use-pv
+  name: use-pv
+spec:
+  containers:
+  - image: nginx
+    name: use-pv
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+controlplane ~ ➜  
+
+
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/#provisioning
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: foo-pvc
+  namespace: foo
+spec:
+  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  volumeName: foo-pv
+
+Claims As Volumes
+
+Pods access storage by using the claim as a volume. Claims must exist in the same namespace as the Pod using the claim. The cluster finds the claim in the Pod's namespace and uses it to get the PersistentVolume backing the claim. The volume is then mounted to the host and into the Pod.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+
+
+- Criando o pvc
+
+~~~~yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  volumeName: pv-1
+~~~~
+
+- ERRO:
+
+controlplane ~ ➜  vi pvc.yaml
+
+controlplane ~ ➜  kubectl apply -f pvc.yaml
+The PersistentVolumeClaim "my-pvc" is invalid: 
+* spec.accessModes: Required value: at least 1 access mode is required
+* spec.resources[storage]: Required value
+
+controlplane ~ ✖ 
+
+
+- Pegando exemplo mais completo
+
+PersistentVolumeClaims
+
+Each PVC contains a spec and status, which is the specification and status of the claim. The name of a PersistentVolumeClaim object must be a valid DNS subdomain name.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: slow
+  selector:
+    matchLabels:
+      release: "stable"
+    matchExpressions:
+      - {key: environment, operator: In, values: [dev]}
+
+- Ajustado:
+
+~~~~yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  volumeName: pv-1
+~~~~
+
+
+controlplane ~ ➜  kubectl apply -f pvc.yaml
+persistentvolumeclaim/my-pvc created
+
+controlplane ~ ➜  kubectl get pvc -A
+NAMESPACE   NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+default     my-pvc   Bound    pv-1     10Mi       RWO                           <unset>                 5s
+
+controlplane ~ ➜  date
+Sat Dec 14 04:26:37 PM UTC 2024
+
+controlplane ~ ➜  
