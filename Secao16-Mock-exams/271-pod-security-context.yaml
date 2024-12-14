@@ -1,0 +1,24 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: super-user-pod
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    supplementalGroups: [4000]
+  volumes:
+  - name: super-user-pod-ctx-vol
+    emptyDir: {}
+  containers:
+  - name: super-user-pod
+    image: busybox:1.28
+    command: [ "sh", "-c", "sleep 4800" ]
+    volumeMounts:
+    - name: super-user-pod-ctx-vol
+      mountPath: /data/demo
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN", "SYS_TIME"]
