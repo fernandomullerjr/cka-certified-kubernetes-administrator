@@ -1296,3 +1296,127 @@ Pod DNS resolution recorded correctly
 - Questões 6 e 7, revisar.
 
 - Refazer o teste.
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## dia 15/12/2024
+
+- Organizar respostas OK.
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESPOSTAS ORGANIZADAS
+
+
+### 1 / 8
+ETCDCTL_API=3 etcdctl snapshot save /opt/etcd-backup.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
+
+
+
+### 2 / 8
+
+- Ajustado
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-storage
+spec:
+  containers:
+  - image: redis:alpine
+    name: redis-storage
+    volumeMounts:
+    - mountPath: /data/redis
+      name: redis-storage-volume
+  volumes:
+  - name: redis-storage-volume
+    emptyDir:
+      sizeLimit: 500Mi
+~~~~
+
+
+
+### 3 / 8
+
+- Ajustado:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: super-user-pod
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    supplementalGroups: [4000]
+  volumes:
+  - name: super-user-pod-ctx-vol
+    emptyDir: {}
+  containers:
+  - name: super-user-pod
+    image: busybox:1.28
+    command: [ "sh", "-c", "sleep 4800" ]
+    volumeMounts:
+    - name: super-user-pod-ctx-vol
+      mountPath: /data/demo
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN", "SYS_TIME"]
+~~~~
+
+
+
+### 4 / 8
+
+- PVC Ajustado:
+
+~~~~yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  volumeName: pv-1
+~~~~
+
+- Criando Pod com PVC:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: use-pv
+  name: use-pv
+spec:
+  containers:
+    - name: use-pv
+      image: nginx
+      volumeMounts:
+      - mountPath: "/data"
+        name: mypd
+  dnsPolicy: ClusterFirst
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: my-pvc
+~~~~
