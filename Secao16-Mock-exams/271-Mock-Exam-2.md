@@ -1460,10 +1460,18 @@ spec:
 
 ### 6 / 8
 
+cat /root/CKA/john.csr | base64 | tr -d "\n"
+kubectl apply -f 271-csr.yaml 
+kubectl certificate approve john-developer
+kubectl get csr john-developer -o jsonpath='{.status.certificate}' | base64 -d > /root/CKA/john.crt
+
+kubectl apply -f 271-role-developer.yaml
+kubectl apply -f 271-rolebinding-john.yaml
+
+
 kubectl apply -f 271-clusterrole-create.yaml 
 kubectl apply -f 271-clusterrole-approve.yaml 
 kubectl apply -f 271-clusterrole-sign.yaml 
-kubectl apply -f 271-csr.yaml 
 kubectl get csr
 kubectl certificate approve john
 kubectl get csr

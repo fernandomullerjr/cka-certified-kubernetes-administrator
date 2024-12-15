@@ -154,3 +154,52 @@ kubectl apply -f rolebinding-john.yaml
   ```
 
 Com essas etapas, o usuário `john` terá as permissões solicitadas no cluster Kubernetes. Se precisar de mais explicações ou ajustes, avise!
+
+
+
+O valor `kubernetes.io/kube-apiserver-client` para o campo `signerName` **é necessário e adequado para autenticação de clientes no Kubernetes**. Ele é o padrão usado para indicar que o certificado será utilizado para autenticar um cliente, como um usuário ou uma aplicação, no cluster.
+
+---
+
+### **Cenários para o uso do `signerName`**
+No Kubernetes, o campo `signerName` define o tipo de assinatura que será usada para aprovar o CSR. A partir da versão 1.19, ele se tornou obrigatório e deve ser definido corretamente. O valor **`kubernetes.io/kube-apiserver-client`** é ideal para casos onde:
+
+1. **Autenticação de clientes**:
+   - O CSR é usado para gerar certificados de autenticação de clientes que interagem com a API do Kubernetes.
+   - Este é o caso mais comum para usuários, como no exemplo do usuário `john`.
+
+2. **Outros tipos de certificados**:
+   Se o certificado fosse para outros propósitos (como TLS para um servidor, ou autenticação entre componentes internos do cluster), seria necessário usar um `signerName` diferente.
+
+---
+
+### **Alternativas ao `kubernetes.io/kube-apiserver-client`**
+Aqui estão outras opções de `signerName` disponíveis para diferentes usos:
+
+1. **`kubernetes.io/kube-apiserver-client`**:
+   - Para autenticação de clientes.
+   - É o mais comum para usuários ou aplicações externas que acessam o cluster.
+
+2. **`kubernetes.io/kube-apiserver-client-kubelet`**:
+   - Usado especificamente para autenticação de kubelets (nós do cluster).
+   - Associado a certificados de kubelet renovados automaticamente pelo Kubernetes.
+
+3. **`kubernetes.io/kubelet-serving`**:
+   - Usado para TLS em servidores kubelet.
+   - Comum para comunicação segura entre componentes internos do cluster.
+
+4. **Custom `signerName`**:
+   - Você pode configurar um signer personalizado caso tenha um caso de uso específico e utilize uma CA (Certificate Authority) externa.
+
+---
+
+### **Validação do Uso**
+No caso do exemplo do usuário `john`, o valor `kubernetes.io/kube-apiserver-client` é exatamente o necessário porque o certificado será usado para:
+1. Autenticação de um cliente (o usuário `john`).
+2. Garantir que a API do Kubernetes reconheça o certificado como válido para operações de cliente.
+
+---
+
+Se o cluster utilizar um **CA personalizado** (por exemplo, para ambientes corporativos), o administrador pode configurar um `signerName` diferente. Porém, por padrão, `kubernetes.io/kube-apiserver-client` é a escolha correta.
+
+Caso você tenha alguma dúvida sobre um cenário mais específico, me avise para verificarmos juntos!
