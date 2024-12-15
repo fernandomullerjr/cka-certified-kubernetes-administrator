@@ -928,7 +928,72 @@ controlplane ~ ➜
 
 
 
+- Nova tentativa
 
+cat /root/CKA/john.csr | base64 | tr -d "\n"
+kubectl apply -f 271-csr.yaml
+kubectl certificate approve john-developer
+kubectl get csr john-developer -o jsonpath='{.status.certificate}' | base64 -d > /root/CKA/john.crt
+kubectl apply -f 271-role-developer.yaml
+kubectl apply -f 271-rolebinding-john.yaml
+kubectl apply -f 271-clusterrole-create.yaml 
+kubectl apply -f 271-clusterrole-approve.yaml 
+kubectl apply -f 271-clusterrole-sign.yaml
+kubectl get csr
+kubectl certificate approve john
+kubectl get csr
+
+controlplane ~ ➜  cat /root/CKA/john.csr | base64 | tr -d "\n"
+LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VhbTlvYmpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQU1CMEc0ZEJYZUdpRUgyaXVvWmp2VEtwaGZaaHVLSzJFaS9SU2RZWWlYTldwQTRNCjV1OG81T3BrYnIrWlBwWVUvd3FDMkJZalVMUGdCYzVGTTFqcElvYmdXd1IydGtlWXFCL2tGQlRGb0RQODQ0RWIKNUlJdk1nVmt4MjY1SGtub2RyRGpyZVZVZVZVdnoyMDlvRHN2akpTUzBROXBvMzlldHY3Qm1UUlFnK0dZYzlqbApJaU9sSm9wbHlHWE5FN3ZReHdEZnVqTzdhTXY3ZUhreWpRcEdOU1NaMXJqaHNDbmIyRTBBZjFwVW5lK1E1cEYvCkJ6dnJlNjlPWnBpaVRDaDFQYzZNQ3FnQzNMNnZYNFJHOTE2MEFpd2pEeENkRkFQMnlCUVVHODl2VGdtRkJMRC8KVFNkYng2cWY5R1RLTFU4QTJ4Vmoxb0N4VDJzeHR1NHFyb3FVQ1ZjQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQVRPNFZDREpxYVVWbFR3MGR1Z2kzMm5tcndNOUNDVlg2c1FaVU1RNFBKYngwWGxQMG42c3RMCmxxcFhSZ1hNZUN5TGxWeXdTOTRCWnp4Q3hyaE1zRER5cUthbUdqVUlER2d6R2FPRkVtMWd4bnQ4ZWJOTlhGR3IKU3pzMlpJa0hYNU02emxnSkxobG1ObHVJczE4NlpjRVlYZUpjOW4zNHVCZE00cFZ5NXpISkIvcUxiWk1vNCtLdwpSSEZPeDBrdFdkWjBCSkREcDFYbTZSV1ZjSzVJL1JZWEhuWGhyc0hmMlZ1ZUN0OU1FZnZIVk1tZHdmYUJUK1VYCnlWaFdGZzNvTWJ4V2dKZFhPc0MyeVFUd2k4SUlDYVhvMnBST2dkSVphTmN2VVVSYmg4SHNJK1NFNld1TXY1YSsKMXVId3V2a1RiTDNjTXpNcDh4azBXWW1pV0E2SEtXRlUKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+controlplane ~ ➜  vi 271-csr.yaml 
+
+controlplane ~ ➜  kubectl apply -f 271-csr.yaml
+certificatesigningrequest.certificates.k8s.io/john-developer created
+
+controlplane ~ ➜  kubectl certificate approve john-developer
+certificatesigningrequest.certificates.k8s.io/john-developer approved
+
+controlplane ~ ➜  kubectl get csr john-developer -o jsonpath='{.status.certificate}' | base64 -d > /root/CKA/john.crt
+
+controlplane ~ ➜  cat /root/CKA/john.crt 
+-----BEGIN CERTIFICATE-----
+[omitido]
+-----END CERTIFICATE-----
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  vi 271-role-developer.yaml
+
+controlplane ~ ➜  kubectl apply -f 271-role-developer.yaml
+role.rbac.authorization.k8s.io/developer created
+
+controlplane ~ ➜  vi 271-rolebinding-john.yaml
+
+controlplane ~ ➜  kubectl apply -f 271-rolebinding-john.yaml
+rolebinding.rbac.authorization.k8s.io/john-developer-binding created
+
+controlplane ~ ➜  vi 271-clusterrole-create.yaml 
+
+controlplane ~ ➜  kubectl apply -f 271-clusterrole-create.yaml 
+clusterrole.rbac.authorization.k8s.io/john-developer created
+
+controlplane ~ ➜  vi 271-clusterrole-approve.yaml 
+
+controlplane ~ ➜  kubectl apply -f 271-clusterrole-approve.yaml 
+clusterrole.rbac.authorization.k8s.io/csr-approver created
+
+controlplane ~ ➜  vi 271-clusterrole-sign.yaml
+
+controlplane ~ ➜  kubectl apply -f 271-clusterrole-sign.yaml
+clusterrole.rbac.authorization.k8s.io/csr-signer created
+
+controlplane ~ ➜  kubectl get csr
+NAME             AGE    SIGNERNAME                                    REQUESTOR                  REQUESTEDDURATION   CONDITION
+csr-g2swn        17m    kubernetes.io/kube-apiserver-client-kubelet   system:node:controlplane   <none>              Approved,Issued
+csr-jkhd7        16m    kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:sadorn    <none>              Approved,Issued
+john-developer   4m2s   kubernetes.io/kube-apiserver-client           kubernetes-admin           24h                 Approved,Issued
+
+controlplane ~ ➜  
 
 
 
@@ -1264,6 +1329,79 @@ nslookup 10-244-192-4.default.pod.cluster.local
 kubectl exec busybox2 -- nslookup 10-244-192-4.default.pod.cluster.local > /root/CKA/nginx.svc
 
 
+- Nova tentativa
+
+kubectl apply -f 271-pod-pra-expor.yaml
+kubectl apply -f 271-service.yaml
+
+kubectl run -i --tty busybox --image=busybox:1.28 -- sh
+kubectl exec busybox -- nslookup nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+AJUSTAR O ENDEREÇO IP DO POD:
+kubectl exec busybox -- nslookup 10-244-192-4.default.pod.cluster.local > /root/CKA/nginx.pod
+
+
+
+controlplane ~ ➜  kubectl exec busybox -- nslookup nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+
+controlplane ~ ➜  cat /root/CKA/nginx.svc 
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      nginx-resolver-service.default.svc.cluster.local
+Address 1: 10.103.113.147 nginx-resolver-service.default.svc.cluster.local
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          37s     10.244.192.6   node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          8m27s   10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          74s     10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          10m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          9m41s   10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          8m59s   10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  vi 271-pod-pra-expor.yaml
+
+controlplane ~ ➜  kubectl apply -f 271-pod-pra-expor.yaml
+pod/nginx-resolver created
+
+controlplane ~ ➜  vi 271-service.yaml
+
+controlplane ~ ➜  kubectl apply -f 271-service.yaml
+service/nginx-resolver-service created
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          37s     10.244.192.6   node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          8m27s   10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          74s     10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          10m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          9m41s   10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          8m59s   10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+kubectl exec busybox -- nslookup 10-244-192-4.default.pod.cluster.local > /root/CKA/nginx.pod
+
+controlplane ~ ➜  cat /root/CKA/nginx.pod
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      10-244-192-4.default.pod.cluster.local
+Address 1: 10.244.192.4
+
+controlplane ~ ➜  
+
+
 
 
 - Questão 6:
@@ -1310,6 +1448,163 @@ Pod DNS resolution recorded correctly
 
 
 
+8 / 8
+Weight: 15
+
+Create a static pod on node01 called nginx-critical with image nginx and make sure that it is recreated/restarted automatically in case of a failure.
+
+Use /etc/kubernetes/manifests as the Static Pod path for example.
+
+static pod configured under /etc/kubernetes/manifests ?
+
+Pod nginx-critical-node01 is up and running
+
+
+# Run this command on the node where kubelet is running
+mkdir -p /etc/kubernetes/manifests/
+cat <<EOF >/etc/kubernetes/manifests/static-web.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-web
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+EOF
+
+
+- Ajustado
+
+# Run this command on the node where kubelet is running
+mkdir -p /etc/kubernetes/manifests/
+cat <<EOF >/etc/kubernetes/manifests/nginx-critical.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-critical
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: nginx-critical
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+EOF
+
+
+controlplane ~ ✖ ssh node01
+Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.4.0-1106-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+node01 ~ ➜  
+
+node01 ~ ➜  
+
+node01 ~ ➜  
+
+
+
+node01 ~ ➜  ls /etc/kubernetes/manifests/
+
+node01 ~ ➜  
+
+criando:
+
+cat <<EOF >/etc/kubernetes/manifests/nginx-critical.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-critical
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: nginx-critical
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+EOF
+
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          6m57s   10.244.192.6   node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          14m     10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          7m34s   10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          16m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          16m     10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          15m     10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          7m34s   10.244.192.6   node01   <none>           <none>
+nginx-critical-node01           1/1     Running   0          10s     10.244.192.7   node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          15m     10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          8m11s   10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          17m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          16m     10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          15m     10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ✖ kubectl delete pod nginx-critical-node01
+pod "nginx-critical-node01" deleted
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          8m27s   10.244.192.6   node01   <none>           <none>
+nginx-critical-node01           0/1     Pending   0          3s      <none>         node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          16m     10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          9m4s    10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          18m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          17m     10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          16m     10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+busybox                         1/1     Running   0          8m30s   10.244.192.6   node01   <none>           <none>
+nginx-critical-node01           1/1     Running   0          6s      10.244.192.7   node01   <none>           <none>
+nginx-deploy-678c6b9b69-nwlms   1/1     Running   0          16m     10.244.192.5   node01   <none>           <none>
+nginx-resolver                  1/1     Running   0          9m7s    10.244.192.4   node01   <none>           <none>
+redis-storage                   1/1     Running   0          18m     10.244.192.1   node01   <none>           <none>
+super-user-pod                  1/1     Running   0          17m     10.244.192.2   node01   <none>           <none>
+use-pv                          1/1     Running   0          16m     10.244.192.3   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+- ok
+
+Your score
+100%
+Pass Percentage - 74% 
 
 
 
@@ -1326,7 +1621,7 @@ ETCDCTL_API=3 etcdctl snapshot save /opt/etcd-backup.db --endpoints=https://127.
 
 ### 2 / 8
 
-- Ajustado
+- Ajustado, Pod com EmptyDir:
 
 ~~~~yaml
 apiVersion: v1
@@ -1464,17 +1759,16 @@ cat /root/CKA/john.csr | base64 | tr -d "\n"
 kubectl apply -f 271-csr.yaml 
 kubectl certificate approve john-developer
 kubectl get csr john-developer -o jsonpath='{.status.certificate}' | base64 -d > /root/CKA/john.crt
-
 kubectl apply -f 271-role-developer.yaml
 kubectl apply -f 271-rolebinding-john.yaml
-
-
 kubectl apply -f 271-clusterrole-create.yaml 
 kubectl apply -f 271-clusterrole-approve.yaml 
 kubectl apply -f 271-clusterrole-sign.yaml 
 kubectl get csr
 kubectl certificate approve john
 kubectl get csr
+
+old
 kubectl create role developer -n development --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
 kubectl create rolebinding developer-binding-john -n development --role=developer --user=john
 kubectl get role -n development
@@ -1482,3 +1776,36 @@ kubectl get rolebinding -n development
 
 
 ### 7 / 8
+
+kubectl apply -f 271-pod-pra-expor.yaml
+kubectl apply -f 271-service.yaml
+
+kubectl run -i --tty busybox --image=busybox:1.28 -- sh
+kubectl exec busybox -- nslookup nginx-resolver-service.default.svc.cluster.local > /root/CKA/nginx.svc
+AJUSTAR O ENDEREÇO IP DO POD:
+kubectl exec busybox -- nslookup 10-244-192-4.default.pod.cluster.local > /root/CKA/nginx.pod
+
+
+### 8 / 8
+
+- Criando:
+
+cat <<EOF >/etc/kubernetes/manifests/nginx-critical.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-critical
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: nginx-critical
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+EOF
+
+- Testando:
+kubectl delete pod nginx-critical-node01
