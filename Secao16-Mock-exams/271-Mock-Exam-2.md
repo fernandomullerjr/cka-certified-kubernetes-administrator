@@ -910,6 +910,7 @@ controlplane ~ ➜  kubectl get role
 No resources found in default namespace.
 
 controlplane ~ ➜  kubectl get role -n development
+
 NAME        CREATED AT
 developer   2024-12-14T17:06:52Z
 
@@ -1420,3 +1421,56 @@ spec:
       persistentVolumeClaim:
         claimName: my-pvc
 ~~~~
+
+
+
+### 5 / 8
+
+- Deployment Ajustado:
+
+~~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16
+        ports:
+        - containerPort: 80
+~~~~
+
+- Setando nova imagem:
+ kubectl set image deployment/nginx-deploy nginx=nginx:1.17
+
+
+
+
+### 6 / 8
+
+kubectl apply -f 271-clusterrole-create.yaml 
+kubectl apply -f 271-clusterrole-approve.yaml 
+kubectl apply -f 271-clusterrole-sign.yaml 
+kubectl apply -f 271-csr.yaml 
+kubectl get csr
+kubectl certificate approve john
+kubectl get csr
+kubectl create role developer -n development --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
+kubectl create rolebinding developer-binding-john -n development --role=developer --user=john
+kubectl get role -n development
+kubectl get rolebinding -n development
+
+
+### 7 / 8
