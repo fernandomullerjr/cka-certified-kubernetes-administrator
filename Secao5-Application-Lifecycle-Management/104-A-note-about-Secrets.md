@@ -60,7 +60,7 @@ Having said that, there are other better ways of handling sensitive data like pa
 # RESUMO
 As Secrets do Kubernetes podem ser decodificadas por qualquer pessoa que tenha acesso ao manifesto utilizado para criar a Secret, certo?
 
-Sim, se alguém tiver acesso ao manifesto utilizado para criar uma Secret do Kubernetes, ele poderá decodificar a Secret e acessar os dados confidenciais contidos nela.
+    Sim, se alguém tiver acesso ao manifesto utilizado para criar uma Secret do Kubernetes, ele poderá decodificar a Secret e acessar os dados confidenciais contidos nela.
 
 As Secrets do Kubernetes são armazenadas em uma forma codificada base64, e não criptografada, no objeto Secret do Kubernetes. Isso significa que é relativamente fácil para alguém com acesso ao manifesto de decodificar a Secret e visualizar o seu conteúdo.
 
