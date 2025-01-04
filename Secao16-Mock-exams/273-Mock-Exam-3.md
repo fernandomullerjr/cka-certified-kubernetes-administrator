@@ -436,6 +436,310 @@ Task Completed
 
 
 
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+
+
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+
+controlplane ~ ✖ kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+192.9.200.3 192.9.200.6
+controlplane ~ ➜  
+
+
+- Comando ajustado:
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /root/CKA/node_ips
+
+controlplane ~ ➜  cat /root/CKA/node_ips 
+192.9.200.3 192.9.200.6
+controlplane ~ ➜  
+
+
+
+
+
+### 3 / 9
+Weight: 12
+
+Create a pod called multi-pod with two containers.
+Container 1: name: alpha, image: nginx
+Container 2: name: beta, image: busybox, command: sleep 4800
+
+Environment Variables:
+container 1:
+name: alpha
+
+Container 2:
+name: beta
+
+Pod Name: multi-pod
+
+Container 1: alpha
+
+Container 2: beta
+
+Container beta commands set correctly?
+
+Container 1 Environment Value Set
+
+Container 2 Environment Value Set
+
+
+
+
+
+controlplane ~ ➜  kubectl create deployment --help 
+Create a deployment with the specified name.
+
+Aliases:
+deployment, deploy
+
+Examples:
+  # Create a deployment named my-dep that runs the busybox image
+  kubectl create deployment my-dep --image=busybox
+  
+  # Create a deployment with a command
+  kubectl create deployment my-dep --image=busybox -- date
+  
+  # Create a deployment named my-dep that runs the nginx image with 3 replicas
+  kubectl create deployment my-dep --image=nginx --replicas=3
+  
+  # Create a deployment named my-dep that runs the busybox image and expose port 5701
+  kubectl create deployment my-dep --image=busybox --port=5701
+  
+  # Create a deployment named my-dep that runs multiple containers
+  kubectl create deployment my-dep --image=busybox:latest --image=ubuntu:latest --image=nginx
+
+Options:
+    --allow-missing-template-keys=true:
+        If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to
+        golang and jsonpath output formats.
+
+    --dry-run='none':
+        Must be "none", "server", or "client". If client strategy, only print the object that would be sent, without
+        sending it. If server strategy, submit server-side request without persisting the resource.
+
+    --field-manager='kubectl-create':
+        Name of the manager used to track field ownership.
+
+    --image=[]:
+        Image names to run. A deployment can have multiple images set for multi-container pod.
+
+    -o, --output='':
+        Output format. One of: (json, yaml, name, go-template, go-template-file, template, templatefile, jsonpath,
+        jsonpath-as-json, jsonpath-file).
+
+https://kubernetes.io/docs/concepts/workloads/pods/
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello
+spec:
+  template:
+    # This is the pod template
+    spec:
+      containers:
+      - name: hello
+        image: busybox:1.28
+        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+      restartPolicy: OnFailure
+    # The pod template ends here
+
+
+
+- Criando Pod com multiplos containers:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+spec:
+  containers:
+  - name: alpha
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: beta
+    image: busybox
+    command: ['sh', '-c', 'sleep 4800']
+    ports:
+    - containerPort: 80
+~~~~
+
+
+https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+
+
+Environment Variables:
+container 1:
+name: alpha
+
+Container 2:
+name: beta
+
+exemplo
+https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envar-demo
+  labels:
+    purpose: demonstrate-envars
+spec:
+  containers:
+  - name: envar-demo-container
+    image: gcr.io/google-samples/hello-app:2.0
+    env:
+    - name: DEMO_GREETING
+      value: "Hello from the environment"
+    - name: DEMO_FAREWELL
+      value: "Such a sweet sorrow"
+
+
+- Criando Pod com multiplos containers, com variaveis:
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+spec:
+  containers:
+  - name: alpha
+    image: nginx
+    env:
+    - name: name
+      value: "alpha"
+  - name: beta
+    image: busybox
+    env:
+    - name: name
+      value: "beta"
+    command: ['sh', '-c', 'sleep 4800']
+~~~~
+
+
+controlplane ~ ➜  kubectl apply -f pod-3.yaml
+pod/multi-pod created
+
+controlplane ~ ➜  
+
+
+
+
+
+### 4 / 9
+Weight: 8
+
+Create a Pod called non-root-pod , image: redis:alpine
+
+runAsUser: 1000
+
+fsGroup: 2000
+
+Pod non-root-pod fsGroup configured
+
+Pod non-root-pod runAsUser configured
+
+
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-root-pod
+spec:
+  containers:
+  - name: non-root-pod
+    image: redis:alpine
+~~~~
+
+https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    supplementalGroups: [4000]
+  volumes:
+  - name: sec-ctx-vol
+    emptyDir: {}
+  containers:
+  - name: sec-ctx-demo
+    image: busybox:1.28
+    command: [ "sh", "-c", "sleep 1h" ]
+    volumeMounts:
+    - name: sec-ctx-vol
+      mountPath: /data/demo
+    securityContext:
+      allowPrivilegeEscalation: false
+
+- Ajustado
+
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-root-pod
+spec:
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 2000
+  containers:
+  - name: non-root-pod
+    image: redis:alpine
+~~~~
+
+
+
+controlplane ~ ➜  vi pod-4.yaml
+
+controlplane ~ ➜  kubectl apply -f pod-4.yaml
+pod/non-root-pod created
+
+controlplane ~ ➜  
+
+
+
+
+
+### 5 / 9
+Weight: 14
+
+We have deployed a new pod called np-test-1 and a service called np-test-service. Incoming connections to this service are not working. Troubleshoot and fix it.
+Create NetworkPolicy, by the name ingress-to-nptest that allows incoming connections to the service over port 80.
+
+Important: Don't delete any current objects deployed.
+
+Important: Don't Alter Existing Objects!
+
+NetworkPolicy: Applied to All sources (Incoming traffic from all pods)?
+
+NetWorkPolicy: Correct Port?
+
+NetWorkPolicy: Applied to correct Pod?
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO - DICAS
