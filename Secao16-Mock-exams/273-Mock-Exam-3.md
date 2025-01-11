@@ -740,6 +740,79 @@ NetWorkPolicy: Applied to correct Pod?
 
 
 
+
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## RESPOSTAS
+
+### 1 / 9
+
+controlplane ~ ➜  kubectl create serviceaccount pvviewer
+serviceaccount/pvviewer created
+
+controlplane ~ ➜  kubectl create clusterrole pvviewer-role --verb=list --resource=persistentvolumes
+clusterrole.rbac.authorization.k8s.io/pvviewer-role created
+
+controlplane ~ ➜  kubectl create clusterrolebinding pvviewer-role-binding --clusterrole=pvviewer-role --serviceaccount=default:pvviewer
+clusterrolebinding.rbac.authorization.k8s.io/pvviewer-role-binding created
+
+controlplane ~ ➜  vi questao1-deployment.yaml
+
+controlplane ~ ➜  kubectl apply -f questao1-deployment.yaml
+deployment.apps/pvviewer created
+
+controlplane ~ ➜  cat questao1-deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: pvviewer
+  name: pvviewer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pvviewer
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pvviewer
+    spec:
+      serviceAccountName: pvviewer  # Corrigido: colocado dentro de spec.template.spec
+      containers:
+      - image: redis
+        name: redis
+        resources: {}
+
+controlplane ~ ➜  
+
+
+
+### 2 / 9
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /root/CKA/node_ips
+
+
+
+### 3 / 9
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao3--pod-multi-containers-variaveis.yaml
+
+controlplane ~ ➜  vi questao3-pod-multi-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f questao3-pod-multi-pod.yaml
+pod/multi-pod created
+
+controlplane ~ ➜  date
+Sat Jan 11 10:35:09 PM UTC 2025
+
+controlplane ~ ➜  
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO - DICAS
