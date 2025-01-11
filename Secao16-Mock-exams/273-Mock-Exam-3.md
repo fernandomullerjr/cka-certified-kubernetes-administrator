@@ -741,7 +741,567 @@ NetWorkPolicy: Applied to correct Pod?
 
 
 
+controlplane ~ ➜  kubectl get pod -A
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS      AGE
+default       multi-pod                              2/2     Running   0             106s
+default       non-root-pod                           1/1     Running   0             50s
+default       np-test-1                              1/1     Running   0             23s
+default       pvviewer-794bff5687-9cq77              1/1     Running   0             6m13s
+kube-system   coredns-77d6fd4654-gvtq8               1/1     Running   0             18m
+kube-system   coredns-77d6fd4654-xh9bl               1/1     Running   0             18m
+kube-system   etcd-controlplane                      1/1     Running   0             19m
+kube-system   kube-apiserver-controlplane            1/1     Running   0             19m
+kube-system   kube-controller-manager-controlplane   1/1     Running   0             19m
+kube-system   kube-proxy-54rx2                       1/1     Running   0             18m
+kube-system   kube-proxy-fbfsf                       1/1     Running   0             18m
+kube-system   kube-scheduler-controlplane            1/1     Running   0             19m
+kube-system   weave-net-ncgjs                        2/2     Running   0             18m
+kube-system   weave-net-v4r4n                        2/2     Running   1 (18m ago)   18m
 
+controlplane ~ ➜  
+
+https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/
+
+
+
+networkpolicies                     netpol       networking.k8s.io/v1              true         NetworkPolicy
+
+
+
+
+controlplane ~ ➜  kubectl get netpol
+NAME           POD-SELECTOR   AGE
+default-deny   <none>         5m7s
+
+controlplane ~ ➜  kubectl get netpol -A
+NAMESPACE   NAME           POD-SELECTOR   AGE
+default     default-deny   <none>         5m10s
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  kubectl get pod
+NAME                        READY   STATUS    RESTARTS   AGE
+multi-pod                   2/2     Running   0          7m28s
+non-root-pod                1/1     Running   0          6m32s
+np-test-1                   1/1     Running   0          6m5s
+pvviewer-794bff5687-9cq77   1/1     Running   0          11m
+
+controlplane ~ ➜  kubectl get svc
+NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+kubernetes        ClusterIP   10.96.0.1        <none>        443/TCP   24m
+np-test-service   ClusterIP   10.101.242.154   <none>        80/TCP    6m7s
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  curl np-test-service
+curl: (6) Could not resolve host: np-test-service
+
+controlplane ~ ✖ 
+
+controlplane ~ ✖ curl 10.101.242.154
+^C
+
+controlplane ~ ✖ kubectl describe pod np-test-1
+Name:             np-test-1
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             node01/192.15.140.6
+Start Time:       Sat, 11 Jan 2025 22:36:31 +0000
+Labels:           run=np-test-1
+Annotations:      <none>
+Status:           Running
+IP:               10.244.192.4
+
+
+
+controlplane ~ ➜  kubectl run busybox --rm -ti --image=busybox:1.28 -- /bin/sh
+If you don't see a command prompt, try pressing enter.
+/ # curl np-test-service
+/bin/sh: curl: not found
+/ # wget np-test-service
+Connecting to np-test-service (10.101.242.154:80)
+^C
+/ # 
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: access-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: "true"
+
+
+- Criando netpol:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: "true"
+    ports:
+    - protocol: TCP
+      port: 80
+~~~~
+
+
+controlplane ~ ➜  vi questao5-netpol.yaml
+
+controlplane ~ ➜  kubectl apply -f questao5-netpol.yaml
+networkpolicy.networking.k8s.io/ingress-to-nptest created
+
+controlplane ~ ➜  kubectl get netpol
+NAME                POD-SELECTOR    AGE
+default-deny        <none>          12m
+ingress-to-nptest   run=np-test-1   3s
+
+controlplane ~ ➜  
+
+
+- Não resolveu
+
+/ # wget np-test-service
+Connecting to np-test-service (10.101.242.154:80)
+wget: can't connect to remote host (10.101.242.154): Connection timed out
+
+- Ajustando
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          run: busybox
+    ports:
+    - protocol: TCP
+      port: 80
+~~~~
+
+
+controlplane ~ ➜  vi questao5-netpol.yaml 
+
+controlplane ~ ➜  kubectl apply -f questao5-netpol.yaml 
+networkpolicy.networking.k8s.io/ingress-to-nptest configured
+
+controlplane ~ ➜  kubectl get netpol
+NAME                POD-SELECTOR    AGE
+default-deny        <none>          17m
+ingress-to-nptest   run=np-test-1   4m46s
+
+controlplane ~ ➜  
+
+
+- Testando
+OK:
+
+/ # wget np-test-service
+Connecting to np-test-service (10.101.242.154:80)
+index.html           100% |***********************************************************************************************************************************|   615   0:00:00 ETA
+/ # 
+
+
+
+
+
+
+### 6 / 9
+Weight: 12
+
+Taint the worker node node01 to be Unschedulable. Once done, create a pod called dev-redis, image redis:alpine, to ensure workloads are not scheduled to this worker node. Finally, create a new pod called prod-redis and image: redis:alpine with toleration to be scheduled on node01.
+
+key: env_type, value: production, operator: Equal and effect: NoSchedule
+
+Key = env_type
+
+Value = production
+
+Effect = NoSchedule
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+Create a pod 'prod-redis' to run on node01
+
+
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   43m   v1.31.0
+node01         Ready    <none>          43m   v1.31.0
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ kubectl describe node node01
+Name:               node01
+Roles:              <none>
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=node01
+                    kubernetes.io/os=linux
+
+
+controlplane ~ ➜  kubectl taint --help
+Update the taints on one or more nodes.
+
+  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.
+  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to
+253 characters.
+  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app.
+  *  The value is optional. If given, it must begin with a letter or number, and may contain letters, numbers, hyphens,
+dots, and underscores, up to 63 characters.
+  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.
+  *  Currently taint can only apply to node.
+
+Examples:
+  # Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'
+  # If a taint with that key and effect already exists, its value is replaced as specified
+  kubectl taint nodes foo dedicated=special-user:NoSchedule
+  
+  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists
+  kubectl taint nodes foo dedicated:NoSchedule-
+  
+  # Remove from node 'foo' all the taints with key 'dedicated'
+  kubectl taint nodes foo dedicated-
+  
+  # Add a taint with key 'dedicated' on nodes having label myLabel=X
+  kubectl taint node -l myLabel=X  dedicated=foo:PreferNoSchedule
+  
+  # Add to node 'foo' a taint with key 'bar' and no value
+  kubectl taint nodes foo bar:NoSchedule
+
+
+kubectl taint nodes node01 kubernetes.io/hostname=node01:NoSchedule
+
+
+
+controlplane ~ ✖ kubectl taint nodes node01 kubernetes.io/hostname=node01:NoSchedule
+node/node01 tainted
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl run --help
+Create and run a particular image in a pod.
+
+Examples:
+  # Start a nginx pod
+  kubectl run nginx --image=nginx
+  
+  # Start a hazelcast pod and let the container expose port 5701
+  kubectl run hazelcast --image=hazelcast/hazelcast --port=5701
+  
+  # Start a hazelcast pod and set environment variables "DNS_DOMAIN=cluster" and "POD_NAMESPACE=default" in the
+container
+  kubectl run hazelcast --image=hazelcast/hazelcast --env="DNS_DOMAIN=cluster" --env="POD_NAMESPACE=default"
+  
+  # Start a hazelcast pod and set labels "app=hazelcast" and "env=prod" in the container
+  kubectl run hazelcast --image=hazelcast/hazelcast --labels="app=hazelcast,env=prod"
+  
+  # Dry run; print the corresponding API objects without creating them
+  kubectl run nginx --image=nginx --dry-run=client
+  
+  # Start a nginx pod, but overload the spec with a partial set of values parsed from JSON
+  kubectl run nginx --image=nginx --overrides='{ "apiVersion": "v1", "spec": { ... } }'
+  
+  # Start a busybox pod and keep it in the foreground, don't restart it if it exits
+  kubectl run -i -t busybox --image=busybox --restart=Never
+  
+  # Start the nginx pod using the default command, but use custom arguments (arg1 .. argN) for that command
+  kubectl run nginx --image=nginx -- <arg1> <arg2> ... <argN>
+  
+  # Start the nginx pod using a different command and custom arguments
+  kubectl run nginx --image=nginx --command -- <cmd> <arg1> ... <argN>
+
+kubectl run dev-redis --image=redis:alpine
+
+
+controlplane ~ ➜  kubectl run dev-redis --image=redis:alpine
+pod/dev-redis created
+
+controlplane ~ ➜  
+
+
+
+https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+Here's an example of a pod that has some tolerations defined:
+pods/pod-with-toleration.yaml [Copy pods/pod-with-toleration.yaml to clipboard]
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "example-key"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+
+kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
+
+
+controlplane ~ ➜  kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: prod-redis
+  name: prod-redis
+spec:
+  containers:
+  - image: redis:alpine
+    name: prod-redis
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+controlplane ~ ➜  
+
+
+
+
+kubectl taint nodes node01 env_type=production:NoSchedule
+
+
+controlplane ~ ➜  kubectl taint nodes node01 env_type=production:NoSchedule
+node/node01 tainted
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  vi questao6-pod-toleration.yaml
+
+controlplane ~ ➜  kubectl apply -f questao6-pod-toleration.yaml
+The Pod "prod-redis" is invalid: spec.tolerations[0].operator: Invalid value: core.Toleration{Key:"env_type", Operator:"Exists", Value:"production", Effect:"NoSchedule", TolerationSeconds:(*int64)(nil)}: value must be empty when `operator` is 'Exists'
+
+controlplane ~ ✖ 
+
+
+- Ajustando
+
+~~~~yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: prod-redis
+  name: prod-redis
+spec:
+  containers:
+  - image: redis:alpine
+    name: prod-redis
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  tolerations:
+  - key: "env_type"
+    operator: "Equal"
+    value: "production"
+    effect: "NoSchedule"
+status: {}
+~~~~
+
+
+controlplane ~ ✖ vi questao6-pod-toleration.yaml
+
+controlplane ~ ➜  kubectl apply -f questao6-pod-toleration.yaml
+pod/prod-redis created
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   54m   v1.31.0
+node01         Ready    <none>          54m   v1.31.0
+
+controlplane ~ ➜  kubectl get pod
+NAME                        READY   STATUS    RESTARTS   AGE
+busybox                     1/1     Running   0          27m
+dev-redis                   1/1     Running   0          7m56s
+multi-pod                   2/2     Running   0          37m
+non-root-pod                1/1     Running   0          36m
+np-test-1                   1/1     Running   0          36m
+prod-redis                  1/1     Running   0          32s
+pvviewer-794bff5687-9cq77   1/1     Running   0          41m
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                        READY   STATUS    RESTARTS   AGE    IP             NODE           NOMINATED NODE   READINESS GATES
+busybox                     1/1     Running   0          27m    10.244.192.5   node01         <none>           <none>
+dev-redis                   1/1     Running   0          8m3s   10.244.0.4     controlplane   <none>           <none>
+multi-pod                   2/2     Running   0          37m    10.244.192.2   node01         <none>           <none>
+non-root-pod                1/1     Running   0          36m    10.244.192.3   node01         <none>           <none>
+np-test-1                   1/1     Running   0          36m    10.244.192.4   node01         <none>           <none>
+prod-redis                  1/1     Running   0          39s    10.244.0.5     controlplane   <none>           <none>
+pvviewer-794bff5687-9cq77   1/1     Running   0          42m    10.244.192.1   node01         <none>           <none>
+
+controlplane ~ ➜  
+
+
+- Pod nao subiu no node01
+pode ser devido 2 taints
+e como só tem 1 toleration
+
+
+controlplane ~ ✖ kubectl describe node node01
+Name:               node01
+Roles:              <none>
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=node01
+                    kubernetes.io/os=linux
+Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Sat, 11 Jan 2025 22:18:17 +0000
+Taints:             env_type=production:NoSchedule
+                    kubernetes.io/hostname=node01:NoSchedule
+
+
+https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+For example, imagine you taint a node like this
+
+kubectl taint nodes node1 key1=value1:NoSchedule
+kubectl taint nodes node1 key1=value1:NoExecute
+kubectl taint nodes node1 key2=value2:NoSchedule
+
+And a pod has two tolerations:
+
+tolerations:
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoSchedule"
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoExecute"
+
+In this case, the pod will not be able to schedule onto the node, because there is no toleration matching the third taint. But it will be able to continue running if it is already running on the node when the taint is added, because the third taint is the only one of the three that is not tolerated by the pod.
+
+
+
+
+controlplane ~ ➜  kubectl taint --help
+Update the taints on one or more nodes.
+
+  *  A taint consists of a key, value, and effect. As an argument here, it is expressed as key=value:effect.
+  *  The key must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to
+253 characters.
+  *  Optionally, the key can begin with a DNS subdomain prefix and a single '/', like example.com/my-app.
+  *  The value is optional. If given, it must begin with a letter or number, and may contain letters, numbers, hyphens,
+dots, and underscores, up to 63 characters.
+  *  The effect must be NoSchedule, PreferNoSchedule or NoExecute.
+  *  Currently taint can only apply to node.
+
+Examples:
+  # Update node 'foo' with a taint with key 'dedicated' and value 'special-user' and effect 'NoSchedule'
+  # If a taint with that key and effect already exists, its value is replaced as specified
+  kubectl taint nodes foo dedicated=special-user:NoSchedule
+  
+  # Remove from node 'foo' the taint with key 'dedicated' and effect 'NoSchedule' if one exists
+  kubectl taint nodes foo dedicated:NoSchedule-
+
+
+kubectl taint nodes node01 kubernetes.io/hostname=node01:NoSchedule-
+
+controlplane ~ ➜  kubectl taint nodes node01 kubernetes.io/hostname=node01:NoSchedule-
+node/node01 untainted
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                        READY   STATUS    RESTARTS   AGE     IP             NODE           NOMINATED NODE   READINESS GATES
+busybox                     1/1     Running   0          32m     10.244.192.5   node01         <none>           <none>
+dev-redis                   1/1     Running   0          13m     10.244.0.4     controlplane   <none>           <none>
+multi-pod                   2/2     Running   0          42m     10.244.192.2   node01         <none>           <none>
+non-root-pod                1/1     Running   0          41m     10.244.192.3   node01         <none>           <none>
+np-test-1                   1/1     Running   0          41m     10.244.192.4   node01         <none>           <none>
+prod-redis                  1/1     Running   0          5m38s   10.244.0.5     controlplane   <none>           <none>
+pvviewer-794bff5687-9cq77   1/1     Running   0          47m     10.244.192.1   node01         <none>           <none>
+
+controlplane ~ ➜  kubectl delete -f questao
+questao1-deployment.yaml      questao3-pod-multi-pod.yaml   questao4-pod.yaml             questao5-netpol.yaml          questao6-pod-toleration.yaml
+
+controlplane ~ ➜  kubectl delete -f questao6-pod-toleration.yaml 
+pod "prod-redis" deleted
+
+controlplane ~ ➜  kubectl apply -f questao6-pod-toleration.yaml 
+pod/prod-redis created
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES
+busybox                     1/1     Running   0          32m   10.244.192.5   node01         <none>           <none>
+dev-redis                   1/1     Running   0          13m   10.244.0.4     controlplane   <none>           <none>
+multi-pod                   2/2     Running   0          43m   10.244.192.2   node01         <none>           <none>
+non-root-pod                1/1     Running   0          42m   10.244.192.3   node01         <none>           <none>
+np-test-1                   1/1     Running   0          41m   10.244.192.4   node01         <none>           <none>
+prod-redis                  1/1     Running   0          2s    10.244.192.6   node01         <none>           <none>
+pvviewer-794bff5687-9cq77   1/1     Running   0          47m   10.244.192.1   node01         <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+
+
+
+### 7 / 9
+Weight: 8
+
+Create a pod called hr-pod in hr namespace belonging to the production environment and frontend tier .
+image: redis:alpine
+
+Use appropriate labels and create all the required objects if it does not exist in the system already.
+
+hr-pod labeled with environment production?
+
+hr-pod labeled with tier frontend?
 
 
 
@@ -813,6 +1373,32 @@ Sat Jan 11 10:35:09 PM UTC 2025
 controlplane ~ ➜  
 
 
+
+
+### 4 / 9
+
+controlplane ~ ➜  vi questao4-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f questao4-pod.yaml
+pod/non-root-pod created
+
+controlplane ~ ➜  
+
+
+
+### 5 / 9
+Secao16-Mock-exams/273-x--questao5-netpol.yaml
+
+
+
+### 6 / 9
+kubectl run dev-redis --image=redis:alpine
+kubectl taint nodes node01 env_type=production:NoSchedule
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao7-pod-toleration.yaml
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO - DICAS
@@ -821,3 +1407,5 @@ controlplane ~ ➜
 kubectl api-resources
 fonte:
 <https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-resources/>
+
+

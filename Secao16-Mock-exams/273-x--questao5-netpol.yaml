@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          run: busybox
+    ports:
+    - protocol: TCP
+      port: 80
