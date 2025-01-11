@@ -1305,6 +1305,65 @@ hr-pod labeled with tier frontend?
 
 
 
+controlplane ~ ➜  kubectl run --help
+Create and run a particular image in a pod.
+
+Examples:
+  # Start a nginx pod
+  kubectl run nginx --image=nginx
+  
+  # Start a hazelcast pod and let the container expose port 5701
+  kubectl run hazelcast --image=hazelcast/hazelcast --port=5701
+  
+  # Start a hazelcast pod and set environment variables "DNS_DOMAIN=cluster" and "POD_NAMESPACE=default" in the
+container
+  kubectl run hazelcast --image=hazelcast/hazelcast --env="DNS_DOMAIN=cluster" --env="POD_NAMESPACE=default"
+  
+  # Start a hazelcast pod and set labels "app=hazelcast" and "env=prod" in the container
+  kubectl run hazelcast --image=hazelcast/hazelcast --labels="app=hazelcast,env=prod"
+
+
+kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
+
+
+
+### 8 / 9
+Weight: 8
+
+A kubeconfig file called super.kubeconfig has been created under /root/CKA. There is something wrong with the configuration. Troubleshoot and fix it.
+
+Fix /root/CKA/super.kubeconfig
+
+
+
+controlplane ~ ➜  cat /root/CKA/super.kubeconfig
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTUQ0ZXdCbjdWc0V3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1URXlNekl5TWpoYUZ3MHpOVEF4TURreU16STNNamhhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURxZzRpbXc4MFMxVWZQcUZ1Q0tIVHFvQWFRN0lQOXpaUHg4VW1zbERiZ1gvOEZlMXplRDJ5ZXFjL1MKSjEzeXFFS05nVWlEdHlOdkpLQ0xFRlFPZ0VEbmRFUkpHZUpPREpvL0ZuL291VmZJdmVkT1Y3bXZQN0RVOWIxQwp3K1dEbkdzUVAvQkxybnlQZ0MzZm9ja0g1SWJOZVg3RmxKeTJ4UHFFQkp4RU1vLzNjaW1lczFYeWhrcmV5NzY1Ckgrc1Aycm5FdlZjZVRnTDZyTG9WaXA2MTZlYjdFeDlSTHBHTEgzdGYzNHNoZjdMNmZqdHdmcHpQVWwzOUVpQUwKSFQzZlBRcWMwcEhHS2ozZ3YyaWNyTkMyblZ0UVR3bFFQUUNJN3NmdkthTnUvb2ZHVTUzVksvdXZiVUtDRndRbwphalAzYUVYNGRwaFo3TXhEVkUwejdVdVV4dDZsQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRY0txV3cxUWE2WDFLbUtaYWhkUmZnQk14YTJUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQ0QzOXl0cHczZwpaVkh2VlVnbHRqT1I5bllYVWhBK1RKbmxBWW5WMXNpc2NFU3hteWhzSWpuN2FHUmtVMk1SYW0xd0o5Vm9SK2xPCnV0clFxSUdTbmFiaDB4WU1FaDhvOVg3QTlVSXRNbXhVMXlGUjlxQ2RWRXI2cmhJM0Z2aGVXT1VrUlBNbVFLRG8KSHRUN3J5ZVRQT0pReHNjNEJ6alhkdEU5U05uZUtFZXZVWlpOK1EwQ1I0TFJkMHJRZTQrSmpLb2ZuZ2hzb1RQZQoxc3NlVFA2K2twa1RwM1M4MFBveVJHcUtQTHRRckFaSXFhbFZYZnhjVmM4UmY2UlJPdHZITFBSTDh0M1JBOWdUCk9mL3FvOE0xbXcyMFVMbWdXZlBTK1pwTkVUQTZqT3NaRjlqUHYyWUZtL3QySStLZEFjdlNQZ0txQU5jNnVES0cKZnE2cldpeU5wZFo2Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://controlplane:9999
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-admin@kubernetes
+current-context: kubernetes-admin@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLVENDQWhHZ0F3SUJBZ0lJQnJyTXBKOW1wTGd3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1URXlNekl5TWpoYUZ3MHlOakF4TVRFeU16STNNamhhTUR3eApIekFkQmdOVkJBb1RGbXQxWW1WaFpHMDZZMngxYzNSbGNpMWhaRzFwYm5NeEdUQVhCZ05WQkFNVEVHdDFZbVZ5CmJtVjBaWE10WVdSdGFXNHdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEQS8wbjEKNHRZT3lLQjRiVnYvSWhsRUNpNFY4ZVgwV2RxQ3FNbUFoVEgvUU4wTC8rV0hYVkZsbmZZdEU0VXg1MStXU1RHVgpwcE9ZTkpaQk1zNmtBbDFpREU2c0NzbXgvK2Q5dVVSME5zWVlSYW5XaFI4MVk5ODc1NVNuSGxXUHBTbXdlT2l2CmpCL1BrYzhRSnJ5Ym1oSVlERUZieHNPRnNKMzJMQnFOaG1NWjdYVDd1cm9Bakk2ZW4yLzZBaXMxbUNiaEwrdXEKb1pGK2syM0Z6LzhDdEkycWM1UzBLMm1HcitrR0pEbnBWYlpkbmdoa2dtUkZqVjhlM2poTklTNlVOSm1OUitLbwpSNUp0T3dhRUJhdjFlT1dZdWg1Qm1QZlp0aDgwS0ZCc2tSYWZzQXlQV3EybDZaVU8vVko4dHVWcW1rYVY1RTlUCjhvY2NLS0ZsWFhXRDNrYU5BZ01CQUFHalZqQlVNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUsKQmdnckJnRUZCUWNEQWpBTUJnTlZIUk1CQWY4RUFqQUFNQjhHQTFVZEl3UVlNQmFBRkJ3cXBiRFZCcnBmVXFZcApscUYxRitBRXpGclpNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUJ2OVYzRERVN3QzQ040VzRCdVVQRHU1OU1FClVvUEZxdlpsUHJBazdPNTdPeS90c3pQTklXbG9kcTFHczhaUlliRVpqckwvZEVsYVJDNE44V2svaG5SY3U3WFcKcnI2Q0JzS2VpdFo3V0dna05FWjlDcGdLSElUdkhnNko5N25UQWhjY1FjOEZOeWgrc0FZZy83aStTbUVqc3NuTwp6clhVNUtHL3MwK1RBeGlJRnRiR2tncVBORkp2UCtTTHN0WmNyanZSVXZPZG1abEp0TUwxdXFpeGZSN0FJaElZCjJIQW94VEF1M0M1Zk1XeExscTFSdFFwaTZEaDQxVm1xQkcyVU44NGg5c0k3eTN2T1A1aDZJZlc1cFllTit5ZnQKUjlRU3FxMWxCd2xmdG51YVVkOS9hK3ZZTUtyNlJaQTlKTnJnRVk3TjcxN3I0UWZWdzZNMUVYVlN2enVGCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBd1A5SjllTFdEc2lnZUcxYi95SVpSQW91RmZIbDlGbmFncWpKZ0lVeC8wRGRDLy9sCmgxMVJaWjMyTFJPRk1lZGZsa2t4bGFhVG1EU1dRVExPcEFKZFlneE9yQXJKc2YvbmZibEVkRGJHR0VXcDFvVWYKTldQZk8rZVVweDVWajZVcHNIam9yNHdmejVIUEVDYThtNW9TR0F4Qlc4YkRoYkNkOWl3YWpZWmpHZTEwKzdxNgpBSXlPbnA5ditnSXJOWmdtNFMvcnFxR1JmcE50eGMvL0FyU05xbk9VdEN0cGhxL3BCaVE1NlZXMlhaNElaSUprClJZMWZIdDQ0VFNFdWxEU1pqVWZpcUVlU2JUc0doQVdyOVhqbG1Mb2VRWmozMmJZZk5DaFFiSkVXbjdBTWoxcXQKcGVtVkR2MVNmTGJsYXBwR2xlUlBVL0tISENpaFpWMTFnOTVHalFJREFRQUJBb0lCQVFDVTdLbWF0bll0SkQxSAprRU9jQlNqdjZ0Y1RFZjA2NTVjSW1jd2JneXhJWmpuc0I0T0xSOFFHb0xTVXBlcHl6ckpnMm93TGlXVjgzcDlQCklqQjRPR2Jzd01oNFV6NitQdFRYbS8ycG01YVNwamJmRlF3Mis2RUhyYlIwbktDelhtUmtDM2lwOVh1YWhVMzkKalphZWoyNEU1bmdNcEx5OVRjTW1jWFB2MzFKYmJ4eDBZanJWcXM1bjJiWGhIRFRsUVJKQmdURFA5eVg2bk9BLwpJSVUyaWFFVWpPRDRDM3g3MGFHY0VMbHVqMUtCMU5Ga3FZU2w2NmY3dGk4VWwybUhCZWU5QTVtQzVxM2liYzNlCjZ6c1BRODA1ZkU0UVVVVDJ2cDVJRTFUQ21nR3BpbkNZTFl0USs4TElnR1c5VjJmVWRWNE5BYUgyVHAyMFlpMEoKUCtyYjJSMTFBb0dCQU51d21uOVpyK3BYQkdLZ0VIcE5EQnJtai93cDlGenV2Kzlhbi9kckVQb3VIb0Zhamg2agptNmU3czdXN25ZYldoeTNLUTJNQUY5NER2USsxTVozNkFNV1pjRUdVbXFHcTZBQmRmRjI3SDlHL0dmZkN4VHhJClpUeElVeitDQjZzRTRraFV3N3c5eE41Zk9yOG5ERWNjeU1OeWcxQmlkeVN5L3hhTUJXbXVTWjBQQW9HQkFPRGwKU0FNQ1BIbENCWUJSMURnTkpFeTRzK0VFMkhKak5ydlQveEpOdTFjSU4wMWVRbHVVb1RtSUw3a0w4aDlBZ1dsdwpuWGdMRTBJQkFMSWZ6Q09ZbEpLWm5MUGhYeUZ4RFd3bVppOG9wQ0NJMUpKV1VBeHJ2YzgxNmhIblZCdnNUZlNtCmtML2EvU24ySDZNNTVrNUlGUHFCLzNVdnJGRERsVzVDdXBUSnVGcWpBb0dBZTlvVlQ2UnRZMnlKUVZ6QnpXRXcKYU40QTRJVjZpUVhrV1BrN1k4NE5kUzJZN3czeFAxNjNPeG03MThHY3JrNjFTT0JWbXpPTFFSUFVlMDJJV21wKwpFdWhNKy92ZUxUUmZ0UXovTnd4dWhOMzZzczR3U2FyNnY4QjZoancxUEhuMVpCZTlmWnRKS0tDQlN4Q2xnRlcrCjdVamF0TysrQVllVC9jOFVvaDZxeTRzQ2dZRUFoY21BSkdJUkxhV0w5a0UzdVR5QUtxLzZPbE9TbThIUHpyOFgKejRDMGdOcmZZMFErdjVKVXN4QUVLOVlpYkZzSVlYeGdBUWk5cFJkSm5hMXkySDR0YkdTN3B2cmNoOTFrT2NGQwpLcTNIclo4WXJoRnd2MkxjNE1iVy8xMlpXSjhqNVBXdHlLUnkxS0taUVpYeEh3S2NrRVlEZldnbDMwbnF2RlF3CkFORmJ2WGNDZ1lFQXRYZEp1Q1QwRmhFZlJzS1lqenRjZnhHbHZPM1plYnhLMjhTV0k0VzF5elNia1V4WFR1S3MKT0VlSXFpR3JhYmQ3bHphUGY4Um9iOG8wT080VjRzcUJRNnBRZU9yQlRLV0YrWHJPdHhRd3hNT1JBVVB1TzJUVQpSVS82N296cVlYSG1Ec0JucGczYmQvbFhjaTlONkE2QmdhdksvS2NNVGR2ams4MTFyM3UybmFFPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+
+controlplane ~ ➜  
+
+
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESPOSTAS
@@ -1394,10 +1453,12 @@ Secao16-Mock-exams/273-x--questao5-netpol.yaml
 ### 6 / 9
 kubectl run dev-redis --image=redis:alpine
 kubectl taint nodes node01 env_type=production:NoSchedule
+kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao7-pod-toleration.yaml
 
 
-
+### 7 / 9
+kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
