@@ -1727,6 +1727,867 @@ REVISION  CHANGE-CAUSE
 controlplane ~ ➜  
 
 
+controlplane ~ ➜  kubectl edit deployment/nginx-deploy
+deployment.apps/nginx-deploy edited
+
+controlplane ~ ➜  kubectl get pods
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          24m
+multi-pod                      2/2     Running   0          25m
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          22m
+non-root-pod                   1/1     Running   0          25m
+np-test-1                      1/1     Running   0          25m
+prod-redis                     1/1     Running   0          23m
+pvviewer-794bff5687-7xzpf      1/1     Running   0          26m
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           22m
+pvviewer       1/1     1            1           26m
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-db7c4d999   1         1         1       22m
+pvviewer-794bff5687      1         1         1       26m
+
+controlplane ~ ➜  kubectl delete rs nginx-deploy-db7c4d999
+replicaset.apps "nginx-deploy-db7c4d999" deleted
+
+controlplane ~ ➜  kubectl get rs
+NAME                  DESIRED   CURRENT   READY   AGE
+pvviewer-794bff5687   1         1         1       27m
+
+controlplane ~ ➜  kubectl get rs
+NAME                  DESIRED   CURRENT   READY   AGE
+pvviewer-794bff5687   1         1         1       27m
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           22m
+pvviewer       1/1     1            1           27m
+
+controlplane ~ ➜  kubectl get rs
+NAME                  DESIRED   CURRENT   READY   AGE
+pvviewer-794bff5687   1         1         1       27m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ✖ kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   32m   v1.31.0
+node01         Ready    <none>          31m   v1.31.0
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+dev-redis                      1/1     Running   0          27m   10.244.192.5   node01   <none>           <none>
+multi-pod                      2/2     Running   0          28m   10.244.192.2   node01   <none>           <none>
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          25m   10.244.192.7   node01   <none>           <none>
+non-root-pod                   1/1     Running   0          28m   10.244.192.3   node01   <none>           <none>
+np-test-1                      1/1     Running   0          28m   10.244.192.4   node01   <none>           <none>
+prod-redis                     1/1     Running   0          26m   10.244.192.6   node01   <none>           <none>
+pvviewer-794bff5687-7xzpf      1/1     Running   0          29m   10.244.192.1   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ✖ kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   32m   v1.31.0
+node01         Ready    <none>          31m   v1.31.0
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+dev-redis                      1/1     Running   0          27m   10.244.192.5   node01   <none>           <none>
+multi-pod                      2/2     Running   0          28m   10.244.192.2   node01   <none>           <none>
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          25m   10.244.192.7   node01   <none>           <none>
+non-root-pod                   1/1     Running   0          28m   10.244.192.3   node01   <none>           <none>
+np-test-1                      1/1     Running   0          28m   10.244.192.4   node01   <none>           <none>
+prod-redis                     1/1     Running   0          26m   10.244.192.6   node01   <none>           <none>
+pvviewer-794bff5687-7xzpf      1/1     Running   0          29m   10.244.192.1   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  kubectl get deployment/nginx-deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/13    1            1           26m
+
+controlplane ~ ➜  kubectl get deployment/nginx-deploy -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2025-01-12T14:47:56Z"
+  generation: 4
+  labels:
+    app: nginx-deploy
+  name: nginx-deploy
+  namespace: default
+  resourceVersion: "2617"
+  uid: 48b66eda-fa11-4ac7-bd1a-39666852c002
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 13
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx-deploy
+  strategy:
+    rollingUpdate:
+      maxSurge: 75%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-deploy
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: env_type
+        operator: Equal
+        value: production
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-01-12T14:47:57Z"
+    lastUpdateTime: "2025-01-12T14:47:57Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2025-01-12T14:47:56Z"
+    lastUpdateTime: "2025-01-12T14:47:57Z"
+    message: ReplicaSet "nginx-deploy-db7c4d999" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
+
+Não exatamente. A lógica de **taints** e **tolerations** em Kubernetes funciona assim:
+
+1. **Taints nos nodes**:  
+   Uma taint adicionada a um node impede que qualquer pod que **não tenha uma toleration correspondente** seja agendado nesse node. Ou seja, o node "repele" pods que não sejam explicitamente tolerantes àquela taint.
+
+2. **Tolerations nos pods**:  
+   Quando um pod possui uma toleration, ele pode ser agendado em um node que tenha a taint correspondente. Porém, **ter uma toleration não obriga o pod a ser agendado naquele node**, apenas permite que ele seja.
+
+### Respostas para suas perguntas:
+
+1. **Pod com toleration só sobe em node com a taint?**  
+   Não. O pod com a toleration **pode ser agendado em qualquer node**, desde que o node não tenha restrições adicionais (como taints que o pod não tolera). A toleration apenas permite que ele ignore a "repulsão" de um node com a taint correspondente.
+
+2. **Node sem a taint impede o pod de subir?**  
+   Não. Um node sem taints não tem restrições adicionais, então qualquer pod pode ser agendado nele, mesmo que o pod tenha tolerations. A toleration simplesmente não será utilizada nesse caso.
+
+---
+
+### Exemplos práticos:
+
+#### Exemplo 1: Taint + Toleration
+- **Node:** `taint=example:NoSchedule`
+- **Pod:** tem a toleration correspondente.
+
+Resultado:  
+O pod pode ser agendado nesse node porque ele "tolera" a taint.
+
+#### Exemplo 2: Sem Taint
+- **Node:** não tem nenhuma taint.
+- **Pod:** tem uma toleration.
+
+Resultado:  
+O pod pode ser agendado nesse node sem problemas, pois a toleration não restringe o agendamento a nodes com taints.
+
+#### Exemplo 3: Taint sem Toleration
+- **Node:** `taint=example:NoSchedule`
+- **Pod:** não tem nenhuma toleration.
+
+Resultado:  
+O pod **não será agendado** nesse node, porque ele não tolera a taint presente.
+
+---
+
+Se precisar de mais detalhes ou exemplos sobre como configurar isso, é só avisar! 😊
+
+
+
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl describe node controlplane
+Name:               controlplane
+Roles:              control-plane
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=controlplane
+                    kubernetes.io/os=linux
+                    node-role.kubernetes.io/control-plane=
+                    node.kubernetes.io/exclude-from-external-load-balancers=
+Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Sun, 12 Jan 2025 14:40:41 +0000
+Taints:             <none>
+Unschedulable:      false
+Lease:
+  HolderIdentity:  controlplane
+  AcquireTime:     <unset>
+  RenewTime:       Sun, 12 Jan 2025 15:18:42 +0000
+Conditions:
+  Type                 Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----                 ------  -----------------                 ------------------                ------                       -------
+  NetworkUnavailable   False   Sun, 12 Jan 2025 14:40:56 +0000   Sun, 12 Jan 2025 14:40:56 +0000   WeaveIsUp                    Weave pod has set this
+  MemoryPressure       False   Sun, 12 Jan 2025 15:18:28 +0000   Sun, 12 Jan 2025 14:40:38 +0000   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure         False   Sun, 12 Jan 2025 15:18:28 +0000   Sun, 12 Jan 2025 14:40:38 +0000   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure          False   Sun, 12 Jan 2025 15:18:28 +0000   Sun, 12 Jan 2025 14:40:38 +0000   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready                True    Sun, 12 Jan 2025 15:18:28 +0000   Sun, 12 Jan 2025 14:40:51 +0000   KubeletReady                 kubelet is posting ready status
+Addresses:
+  InternalIP:  192.10.228.6
+  Hostname:    controlplane
+Capacity:
+  cpu:                36
+  ephemeral-storage:  1016057248Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             214587048Ki
+  pods:               110
+Allocatable:
+  cpu:                36
+  ephemeral-storage:  936398358207
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             214484648Ki
+  pods:               110
+System Info:
+  Machine ID:                 132e3d2451f947fe9214456160254717
+  System UUID:                94b55166-4127-739c-a835-d74215feb39c
+  Boot ID:                    257c4359-855e-4a22-83a8-a3192aade72c
+  Kernel Version:             5.4.0-1106-gcp
+  OS Image:                   Ubuntu 22.04.4 LTS
+  Operating System:           linux
+  Architecture:               amd64
+  Container Runtime Version:  containerd://1.6.26
+  Kubelet Version:            v1.31.0
+  Kube-Proxy Version:         
+PodCIDR:                      10.244.0.0/24
+PodCIDRs:                     10.244.0.0/24
+Non-terminated Pods:          (9 in total)
+  Namespace                   Name                                    CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+  ---------                   ----                                    ------------  ----------  ---------------  -------------  ---
+  hr                          hr-pod                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         31m
+  kube-system                 coredns-77d6fd4654-b6fk6                100m (0%)     0 (0%)      70Mi (0%)        170Mi (0%)     37m
+  kube-system                 coredns-77d6fd4654-drl2c                100m (0%)     0 (0%)      70Mi (0%)        170Mi (0%)     37m
+  kube-system                 etcd-controlplane                       100m (0%)     0 (0%)      100Mi (0%)       0 (0%)         38m
+  kube-system                 kube-apiserver-controlplane             250m (0%)     0 (0%)      0 (0%)           0 (0%)         38m
+  kube-system                 kube-contro1ler-manager-controlplane    200m (0%)     0 (0%)      0 (0%)           0 (0%)         30m
+  kube-system                 kube-proxy-cksrl                        0 (0%)        0 (0%)      0 (0%)           0 (0%)         37m
+  kube-system                 kube-scheduler-controlplane             100m (0%)     0 (0%)      0 (0%)           0 (0%)         38m
+  kube-system                 weave-net-hn7nn                         100m (0%)     0 (0%)      200Mi (0%)       0 (0%)         37m
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests    Limits
+  --------           --------    ------
+  cpu                950m (2%)   0 (0%)
+  memory             440Mi (0%)  340Mi (0%)
+  ephemeral-storage  0 (0%)      0 (0%)
+  hugepages-1Gi      0 (0%)      0 (0%)
+  hugepages-2Mi      0 (0%)      0 (0%)
+Events:
+  Type     Reason                   Age   From             Message
+  ----     ------                   ----  ----             -------
+  Normal   Starting                 37m   kube-proxy       
+  Normal   Starting                 38m   kubelet          Starting kubelet.
+  Warning  CgroupV1                 38m   kubelet          Cgroup v1 support is in maintenance mode, please migrate to Cgroup v2.
+  Warning  InvalidDiskCapacity      38m   kubelet          invalid capacity 0 on image filesystem
+  Normal   NodeAllocatableEnforced  38m   kubelet          Updated Node Allocatable limit across pods
+  Normal   NodeHasSufficientMemory  38m   kubelet          Node controlplane status is now: NodeHasSufficientMemory
+  Normal   NodeHasNoDiskPressure    38m   kubelet          Node controlplane status is now: NodeHasNoDiskPressure
+  Normal   NodeHasSufficientPID     38m   kubelet          Node controlplane status is now: NodeHasSufficientPID
+  Normal   RegisteredNode           37m   node-controller  Node controlplane event: Registered Node controlplane in Controller
+  Normal   NodeReady                37m   kubelet          Node controlplane status is now: NodeReady
+
+
+
+controlplane ~ ➜  kubectl get pod -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+dev-redis                      1/1     Running   0          34m   10.244.192.5   node01   <none>           <none>
+multi-pod                      2/2     Running   0          35m   10.244.192.2   node01   <none>           <none>
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          32m   10.244.192.7   node01   <none>           <none>
+non-root-pod                   1/1     Running   0          35m   10.244.192.3   node01   <none>           <none>
+np-test-1                      1/1     Running   0          35m   10.244.192.4   node01   <none>           <none>
+prod-redis                     1/1     Running   0          33m   10.244.192.6   node01   <none>           <none>
+pvviewer-794bff5687-7xzpf      1/1     Running   0          36m   10.244.192.1   node01   <none>           <none>
+
+controlplane ~ ➜  
+
+
+kubectl get deployment/nginx-deploy -o yaml
+
+kubectl edit deployment/nginx-deploy
+
+removendo strategy
+
+kubectl rollout restart deployment <NOME_DO_DEPLOYMENT>
+kubectl rollout restart deployment nginx-deploy
+
+controlplane ~ ➜  kubectl rollout restart deployment nginx-deploy
+deployment.apps/nginx-deploy restarted
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  kubectl get rs
+NAME                  DESIRED   CURRENT   READY   AGE
+pvviewer-794bff5687   1         1         1       43m
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           38m
+pvviewer       1/1     1            1           43m
+
+controlplane ~ ➜  
+
+7. Certifique-se de que o controlador do Deployment está funcionando
+
+O controlador do Deployment é responsável por gerenciar a atualização. Verifique se o cluster está em bom estado:
+
+kubectl get componentstatuses
+
+Se algo estiver Unhealthy, pode haver problemas no cluster que estão afetando o Deployment.
+
+controlplane ~ ➜  kubectl get componentstatuses
+Warning: v1 ComponentStatus is deprecated in v1.19+
+NAME                 STATUS      MESSAGE                                                                                        ERROR
+controller-manager   Unhealthy   Get "https://127.0.0.1:10257/healthz": dial tcp 127.0.0.1:10257: connect: connection refused   
+scheduler            Healthy     ok                                                                                             
+etcd-0               Healthy     ok                                                                                             
+
+controlplane ~ ➜  
+8. Logs do Controller Manager
+
+Se nada resolver, você pode verificar os logs do controlador do Kubernetes (caso tenha acesso ao cluster):
+
+kubectl -n kube-system logs <NOME_DO_POD_DO_CONTROLLER_MANAGER>
+
+O status **Unhealthy** do `controller-manager` indica um problema no **controlador central do Kubernetes**, que é responsável por gerenciar operações como escalonamento de `Deployments`, controle de réplicas, e atualizações.
+
+### **Causa provável**
+O erro:  
+`Get "https://127.0.0.1:10257/healthz": dial tcp 127.0.0.1:10257: connect: connection refused`  
+indica que o Kubernetes está tentando acessar o endpoint `/healthz` do `controller-manager`, mas não consegue se conectar a ele. Isso geralmente ocorre por problemas de configuração ou falhas no serviço do `controller-manager`.
+
+---
+
+### **Como resolver?**
+
+#### **1. Verifique os pods no namespace `kube-system`**
+Liste os pods para ver se o `controller-manager` está ativo e funcionando:
+
+```bash
+kubectl get pods -n kube-system
+```
+
+Procure pelo pod relacionado ao `kube-controller-manager`. Ele geralmente tem um nome como `kube-controller-manager-<NOME_DO_NODE>`.
+
+- **Se o pod está em erro ou CrashLoopBackOff:**
+  Verifique os logs do pod:
+  ```bash
+  kubectl logs -n kube-system <NOME_DO_POD_DO_CONTROLLER_MANAGER>
+  ```
+
+#### **2. Verifique o status dos nodes**
+Certifique-se de que todos os nodes estão operacionais:
+
+```bash
+kubectl get nodes
+```
+
+Se o node mestre estiver **NotReady**, o problema pode ser mais geral, relacionado à conectividade, recursos insuficientes, ou configuração incorreta.
+
+#### **3. Diagnóstico do processo do `kube-controller-manager`**
+O `controller-manager` pode não estar rodando corretamente no node mestre.
+
+- **Se você está usando um cluster configurado manualmente (não gerenciado):**  
+  Verifique o status do serviço no node mestre:
+
+  ```bash
+  systemctl status kube-controller-manager
+  ```
+
+  - **Se o serviço não está rodando**, tente reiniciá-lo:
+    ```bash
+    systemctl restart kube-controller-manager
+    ```
+
+- **Se você está usando um cluster gerenciado (como AKS, EKS, ou GKE):**  
+  Entre em contato com o suporte do provedor, pois a manutenção do plano de controle geralmente é responsabilidade deles.
+
+#### **4. Verifique as configurações do arquivo de manifest**
+Se o `controller-manager` é gerenciado por um **manifest estático** (em `/etc/kubernetes/manifests/`), verifique o arquivo correspondente (`kube-controller-manager.yaml`):
+
+```bash
+cat /etc/kubernetes/manifests/kube-controller-manager.yaml
+```
+
+Procure por problemas como:
+- Caminhos errados para certificados ou arquivos.
+- Configurações incorretas de endpoints.
+
+#### **5. Problemas de rede**
+Certifique-se de que o `controller-manager` consegue se comunicar com outros componentes, como o **etcd**. No node mestre, teste a conectividade com o etcd:
+
+```bash
+curl -k https://127.0.0.1:2379/health
+```
+
+Deve retornar algo como:
+```json
+{"health":"true"}
+```
+
+#### **6. Logs adicionais**
+Verifique os logs do sistema no node mestre para mensagens de erro relevantes:
+
+```bash
+journalctl -u kube-controller-manager
+```
+
+#### **7. Valide a configuração geral do cluster**
+Certifique-se de que os componentes estão configurados corretamente. Ferramentas como o `kubeadm` podem ajudar a verificar problemas de configuração:
+
+```bash
+kubeadm config view
+```
+
+---
+
+### **Soluções temporárias (workarounds)**
+1. **Reinicie os componentes do master node:**
+   ```bash
+   systemctl restart kubelet
+   ```
+
+2. **Force a recriação do pod estático do `controller-manager`:**  
+   Delete o arquivo de manifest temporariamente e reaponte:
+   ```bash
+   mv /etc/kubernetes/manifests/kube-controller-manager.yaml /tmp/
+   mv /tmp/kube-controller-manager.yaml /etc/kubernetes/manifests/
+   ```
+
+---
+
+Se mesmo assim o problema persistir, envie os logs do `kube-controller-manager` ou o conteúdo do arquivo `kube-controller-manager.yaml` para que eu possa ajudar com mais detalhes! 😊
+
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS             RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running            0             48m
+coredns-77d6fd4654-drl2c               1/1     Running            0             48m
+etcd-controlplane                      1/1     Running            0             48m
+kube-apiserver-controlplane            1/1     Running            0             48m
+kube-contro1ler-manager-controlplane   0/1     ImagePullBackOff   0             40m
+kube-proxy-2wvbl                       1/1     Running            0             48m
+kube-proxy-cksrl                       1/1     Running            0             48m
+kube-scheduler-controlplane            1/1     Running            0             48m
+weave-net-hn7nn                        2/2     Running            1 (48m ago)   48m
+weave-net-vbdgh                        2/2     Running            0             48m
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/
+etcd.yaml                     kube-apiserver.yaml           kube-controller-manager.yaml  .kubelet-keep                 kube-scheduler.yaml
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-contro1ler-manager
+    tier: control-plane
+  name: kube-contro1ler-manager
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-contro1ler-manager
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-cidr=10.244.0.0/16
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --leader-elect=true
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-contro1ler-manager:v1.31.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-contro1ler-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  vi /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running   0             50m
+coredns-77d6fd4654-drl2c               1/1     Running   0             50m
+etcd-controlplane                      1/1     Running   0             50m
+kube-apiserver-controlplane            1/1     Running   0             50m
+kube-controller-manager-controlplane   0/1     Running   0             2s
+kube-proxy-2wvbl                       1/1     Running   0             50m
+kube-proxy-cksrl                       1/1     Running   0             50m
+kube-scheduler-controlplane            1/1     Running   0             50m
+weave-net-hn7nn                        2/2     Running   1 (50m ago)   50m
+weave-net-vbdgh                        2/2     Running   0             50m
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running   0             51m
+coredns-77d6fd4654-drl2c               1/1     Running   0             51m
+etcd-controlplane                      1/1     Running   0             51m
+kube-apiserver-controlplane            1/1     Running   0             51m
+kube-controller-manager-controlplane   0/1     Running   0             8s
+kube-proxy-2wvbl                       1/1     Running   0             50m
+kube-proxy-cksrl                       1/1     Running   0             51m
+kube-scheduler-controlplane            1/1     Running   0             51m
+weave-net-hn7nn                        2/2     Running   1 (50m ago)   51m
+weave-net-vbdgh                        2/2     Running   0             50m
+
+controlplane ~ ➜  date
+Sun Jan 12 03:31:51 PM UTC 2025
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running   0             51m
+coredns-77d6fd4654-drl2c               1/1     Running   0             51m
+etcd-controlplane                      1/1     Running   0             51m
+kube-apiserver-controlplane            1/1     Running   0             51m
+kube-controller-manager-controlplane   1/1     Running   0             11s
+kube-proxy-2wvbl                       1/1     Running   0             50m
+kube-proxy-cksrl                       1/1     Running   0             51m
+kube-scheduler-controlplane            1/1     Running   0             51m
+weave-net-hn7nn                        2/2     Running   1 (51m ago)   51m
+weave-net-vbdgh                        2/2     Running   0             50m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get pods
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          46m
+multi-pod                      2/2     Running   0          47m
+nginx-deploy-86576fdbb-477dh   1/1     Running   0          8s
+nginx-deploy-86576fdbb-8fj8j   1/1     Running   0          8s
+nginx-deploy-86576fdbb-lx9k4   1/1     Running   0          8s
+non-root-pod                   1/1     Running   0          47m
+np-test-1                      1/1     Running   0          47m
+prod-redis                     1/1     Running   0          45m
+pvviewer-794bff5687-7xzpf      1/1     Running   0          48m
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   3/3     3            3           44m
+pvviewer       1/1     1            1           48m
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-86576fdbb   3         3         3       15s
+pvviewer-794bff5687      1         1         1       48m
+
+controlplane ~ ➜  
+
+
+
+
+
+- Questoes
+resultados
+
+Your score
+62%
+Pass Percentage - 74% 
+
+
+erradas:
+
+### q1
+
+erradas:
+"Pod: pvviewer
+
+Pod configured to use ServiceAccount pvviewer ?
+"
+
+Task
+
+Create a new service account with the name pvviewer. Grant this Service account access to list all PersistentVolumes in the cluster by creating an appropriate cluster role called pvviewer-role and ClusterRoleBinding called pvviewer-role-binding.
+Next, create a pod called pvviewer with the image: redis and serviceAccount: pvviewer in the default namespace.
+Solution
+
+Pods authenticate to the API Server using ServiceAccounts. If the serviceAccount name is not specified, the default service account for the namespace is used during a pod creation.
+
+Reference: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+
+Now, create a service account pvviewer:
+
+kubectl create serviceaccount pvviewer
+
+To create a clusterrole:
+
+kubectl create clusterrole pvviewer-role --resource=persistentvolumes --verb=list
+
+To create a clusterrolebinding:
+
+kubectl create clusterrolebinding pvviewer-role-binding --clusterrole=pvviewer-role --serviceaccount=default:pvviewer
+
+Solution manifest file to create a new pod called pvviewer as follows:
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: pvviewer
+  name: pvviewer
+spec:
+  containers:
+  - image: redis
+    name: pvviewer
+  # Add service account name
+  serviceAccountName: pvviewer
+
+Details
+
+ServiceAccount: pvviewer
+
+ClusterRole: pvviewer-role
+
+ClusterRoleBinding: pvviewer-role-binding
+
+Pod: pvviewer
+
+Pod configured to use ServiceAccount pvviewer ?
+
+
+### q5
+
+errada: "NetworkPolicy: Applied to All sources (Incoming traffic from all pods)?"
+
+Task
+
+We have deployed a new pod called np-test-1 and a service called np-test-service. Incoming connections to this service are not working. Troubleshoot and fix it.
+Create NetworkPolicy, by the name ingress-to-nptest that allows incoming connections to the service over port 80.
+
+Important: Don't delete any current objects deployed.
+Solution
+
+Solution manifest file to create a network policy ingress-to-nptest as follows:
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 80
+
+Details
+
+Important: Don't Alter Existing Objects!
+
+NetworkPolicy: Applied to All sources (Incoming traffic from all pods)?
+
+NetWorkPolicy: Correct Port?
+
+NetWorkPolicy: Applied to correct Pod?
+
+
+
+
+### q6
+
+errada: "pod 'dev-redis' (no tolerations) is not scheduled on node01?"
+
+Task
+
+Taint the worker node node01 to be Unschedulable. Once done, create a pod called dev-redis, image redis:alpine, to ensure workloads are not scheduled to this worker node. Finally, create a new pod called prod-redis and image: redis:alpine with toleration to be scheduled on node01.
+
+key: env_type, value: production, operator: Equal and effect: NoSchedule
+Solution
+
+To add taints on the node01 worker node:
+
+kubectl taint node node01 env_type=production:NoSchedule
+
+Now, deploy dev-redis pod and to ensure that workloads are not scheduled to this node01 worker node.
+
+kubectl run dev-redis --image=redis:alpine
+
+To view the node name of recently deployed pod:
+
+kubectl get pods -o wide
+
+Solution manifest file to deploy new pod called prod-redis with toleration to be scheduled on node01 worker node.
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prod-redis
+spec:
+  containers:
+  - name: prod-redis
+    image: redis:alpine
+  tolerations:
+  - effect: NoSchedule
+    key: env_type
+    operator: Equal
+    value: production     
+
+To view only prod-redis pod with less details:
+
+kubectl get pods -o wide | grep prod-redis
+
+Details
+
+Key = env_type
+
+Value = production
+
+Effect = NoSchedule
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+Create a pod 'prod-redis' to run on node01
+
 
 
 # ###################################################################################################################### 
@@ -1857,14 +2718,26 @@ vi /root/CKA/super.kubeconfig
 
 
 
+### 9 / 9
+kubectl get deployment/nginx-deploy -o yaml
+
+kubectl edit deployment/nginx-deploy
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## PENDENTE
 
-- TSHOOT da questão 9
+- Questoes
+resultados
 
+Your score
+62%
+Pass Percentage - 74% 
 
-
+- TSHOOT questoes erradas
+erradas
 
 
 
