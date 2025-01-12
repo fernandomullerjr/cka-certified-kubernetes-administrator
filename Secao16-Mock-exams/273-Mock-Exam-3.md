@@ -1335,7 +1335,6 @@ A kubeconfig file called super.kubeconfig has been created under /root/CKA. Ther
 Fix /root/CKA/super.kubeconfig
 
 
-
 controlplane ~ ➜  cat /root/CKA/super.kubeconfig
 apiVersion: v1
 clusters:
@@ -1360,8 +1359,318 @@ users:
 controlplane ~ ➜  
 
 
+controlplane ~ ➜  ss -tulp | grep apiserver
+tcp   LISTEN 0      4096               *:6443                *:*    users:(("kube-apiserver",pid=3668,fd=3)) 
+
+controlplane ~ ➜  
 
 
+- Ajustando porta
+de
+9999
+para
+6443
+
+vi /root/CKA/super.kubeconfig
+
+
+
+
+
+### 9 / 9
+Weight: 14
+
+We have created a new deployment called nginx-deploy. scale the deployment to 3 replicas. Has the replica's increased? Troubleshoot the issue and fix it.
+
+deployment has 3 replicas
+
+
+controlplane ~ ➜  kubectl scale --help
+Set a new size for a deployment, replica set, replication controller, or stateful set.
+
+ Scale also allows users to specify one or more preconditions for the scale action.
+
+ If --current-replicas or --resource-version is specified, it is validated before the scale is attempted, and it is
+guaranteed that the precondition holds true when the scale is sent to the server.
+
+Examples:
+  # Scale a replica set named 'foo' to 3
+  kubectl scale --replicas=3 rs/foo
+  
+  # Scale a resource identified by type and name specified in "foo.yaml" to 3
+  kubectl scale --replicas=3 -f foo.yaml
+  
+  # If the deployment named mysql's current size is 2, scale mysql to 3
+  kubectl scale --current-replicas=2 --replicas=3 deployment/mysql
+  
+  # Scale multiple replication controllers
+  kubectl scale --replicas=5 rc/example1 rc/example2 rc/example3
+  
+  # Scale stateful set named 'web' to 3
+  kubectl scale --replicas=3 statefulset/web
+
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/1     1            1           10m
+pvviewer       1/1     1            1           14m
+
+controlplane ~ ➜  
+
+kubectl scale --replicas=3 deployment/nginx-deploy
+
+
+controlplane ~ ➜  kubectl scale --replicas=3 deployment/nginx-deploy
+deployment.apps/nginx-deploy scaled
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           11m
+pvviewer       1/1     1            1           15m
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           11m
+pvviewer       1/1     1            1           15m
+
+controlplane ~ ➜  kubectl get pods
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          12m
+multi-pod                      2/2     Running   0          14m
+nginx-deploy-db7c4d999-hpcmq   1/1     Running   0          11m
+non-root-pod                   1/1     Running   0          14m
+np-test-1                      1/1     Running   0          14m
+prod-redis                     1/1     Running   0          12m
+pvviewer-794bff5687-vgg4l      1/1     Running   0          15m
+
+controlplane ~ ➜  
+
+
+ficou só com 1 Pod
+analisando
+
+
+
+controlplane ~ ✖ kubectl get deployment nginx-deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/3     1            1           22m
+
+controlplane ~ ➜  kubectl describe deployment nginx-deploy
+Name:                   nginx-deploy
+Namespace:              default
+CreationTimestamp:      Sat, 11 Jan 2025 23:40:25 +0000
+Labels:                 app=nginx-deploy
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx-deploy
+Replicas:               3 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=nginx-deploy
+  Containers:
+   nginx:
+    Image:         nginx
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     env_type=production:NoSchedule
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   nginx-deploy-db7c4d999 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  23m   deployment-controller  Scaled up replica set nginx-deploy-db7c4d999 to 1
+
+controlplane ~ ➜  kubectl get deployment nginx-deploy -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2025-01-11T23:40:25Z"
+  generation: 2
+  labels:
+    app: nginx-deploy
+  name: nginx-deploy
+  namespace: default
+  resourceVersion: "2607"
+  uid: e7e080f7-ac37-4072-b6a5-eaa31c8b4565
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx-deploy
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-deploy
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: env_type
+        operator: Equal
+        value: production
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-01-11T23:40:30Z"
+    lastUpdateTime: "2025-01-11T23:40:30Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2025-01-11T23:40:25Z"
+    lastUpdateTime: "2025-01-11T23:40:30Z"
+    message: ReplicaSet "nginx-deploy-db7c4d999" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+controlplane ~ ➜  
+
+
+
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-db7c4d999   1         1         1       25m
+pvviewer-794bff5687      1         1         1       29m
+
+controlplane ~ ➜  
+
+
+kubectl scale --replicas=3 rs/nginx-deploy-db7c4d999
+
+
+controlplane ~ ➜  kubectl scale --replicas=3 rs/nginx-deploy-db7c4d999
+replicaset.apps/nginx-deploy-db7c4d999 scaled
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-db7c4d999   3         1         1       38m
+pvviewer-794bff5687      1         1         1       42m
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-db7c4d999   3         1         1       38m
+pvviewer-794bff5687      1         1         1       42m
+
+controlplane ~ ➜  kubectl get pod
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          40m
+multi-pod                      2/2     Running   0          42m
+nginx-deploy-db7c4d999-hpcmq   1/1     Running   0          39m
+non-root-pod                   1/1     Running   0          41m
+np-test-1                      1/1     Running   0          41m
+prod-redis                     1/1     Running   0          40m
+pvviewer-794bff5687-vgg4l      1/1     Running   0          42m
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get node
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   52m   v1.31.0
+node01         Ready    <none>          51m   v1.31.0
+
+controlplane ~ ➜  
+
+
+
+controlplane ~ ➜  kubectl get hpa
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get hpa -A
+No resources found
+
+controlplane ~ ➜  
+
+
+controlplane ~ ➜  kubectl describe rs nginx-deploy-db7c4d999
+Name:           nginx-deploy-db7c4d999
+Namespace:      default
+Selector:       app=nginx-deploy,pod-template-hash=db7c4d999
+Labels:         app=nginx-deploy
+                pod-template-hash=db7c4d999
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/nginx-deploy
+Replicas:       1 current / 3 desired
+Pods Status:    1 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=nginx-deploy
+           pod-template-hash=db7c4d999
+  Containers:
+   nginx:
+    Image:         nginx
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     env_type=production:NoSchedule
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  40m   replicaset-controller  Created pod: nginx-deploy-db7c4d999-hpcmq
+
+
+- Ajustados os Annotations:
+
+controlplane ~ ➜  kubectl edit rs nginx-deploy-db7c4d999
+replicaset.apps/nginx-deploy-db7c4d999 edited
+
+controlplane ~ ➜  
+
+
+- Segue com poucos:
+
+
+controlplane ~ ➜  kubectl get rs
+NAME                     DESIRED   CURRENT   READY   AGE
+nginx-deploy-db7c4d999   3         1         1       41m
+pvviewer-794bff5687      1         1         1       45m
+
+controlplane ~ ➜  
 
 
 # ###################################################################################################################### 
@@ -1459,6 +1768,16 @@ kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
 
 ### 7 / 9
 kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
+
+
+### 8 / 9
+- Ajustando porta
+de
+9999
+para
+6443
+
+vi /root/CKA/super.kubeconfig
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
