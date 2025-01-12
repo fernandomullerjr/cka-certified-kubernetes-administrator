@@ -1673,6 +1673,62 @@ pvviewer-794bff5687      1         1         1       45m
 controlplane ~ ➜  
 
 
+
+- Dia 12/01/2025:
+
+tshoot
+
+
+controlplane ~ ➜  kubectl get pods
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          12m
+multi-pod                      2/2     Running   0          13m
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          10m
+non-root-pod                   1/1     Running   0          13m
+np-test-1                      1/1     Running   0          13m
+prod-redis                     1/1     Running   0          11m
+pvviewer-794bff5687-7xzpf      1/1     Running   0          14m
+
+controlplane ~ ➜  kubectl get deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/1     1            1           10m
+pvviewer       1/1     1            1           14m
+
+controlplane ~ ➜  
+
+
+
+kubectl scale --replicas=3 deployment/nginx-deploy
+
+
+https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kubectl rollout status deployment/nginx-deploy
+
+controlplane ~ ➜  kubectl rollout status deployment/nginx-deploy
+Waiting for deployment spec update to be observed...
+
+kubectl get pods --show-labels
+controlplane ~ ✖ kubectl get pods --show-labels
+NAME                           READY   STATUS    RESTARTS   AGE   LABELS
+dev-redis                      1/1     Running   0          15m   run=dev-redis
+multi-pod                      2/2     Running   0          16m   <none>
+nginx-deploy-db7c4d999-qtqrp   1/1     Running   0          13m   app=nginx-deploy,pod-template-hash=db7c4d999
+
+
+kubectl rollout history deployment/nginx-deploy
+
+
+controlplane ~ ➜  kubectl rollout history deployment/nginx-deploy
+deployment.apps/nginx-deploy 
+REVISION  CHANGE-CAUSE
+1         <none>
+
+
+controlplane ~ ➜  
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESPOSTAS
@@ -1757,6 +1813,13 @@ controlplane ~ ➜
 ### 5 / 9
 Secao16-Mock-exams/273-x--questao5-netpol.yaml
 
+controlplane ~ ➜  vi questao5-netpol.yaml
+
+controlplane ~ ➜  kubectl apply -f questao5-netpol.yaml
+networkpolicy.networking.k8s.io/ingress-to-nptest created
+
+controlplane ~ ➜  
+
 
 
 ### 6 / 9
@@ -1765,10 +1828,23 @@ kubectl taint nodes node01 env_type=production:NoSchedule
 kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao7-pod-toleration.yaml
 
+controlplane ~ ➜  vi questao7.yaml
+
+controlplane ~ ➜  kubectl apply -f questao7.yaml
+pod/prod-redis created
+
 
 ### 7 / 9
+kubectl create ns hr
 kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
 
+controlplane ~ ➜  kubectl create ns hr
+namespace/hr created
+
+controlplane ~ ➜  kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
+pod/hr-pod created
+
+controlplane ~ ➜  
 
 ### 8 / 9
 - Ajustando porta
@@ -1778,6 +1854,19 @@ para
 6443
 
 vi /root/CKA/super.kubeconfig
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## PENDENTE
+
+- TSHOOT da questão 9
+
+
+
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
