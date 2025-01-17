@@ -2590,6 +2590,88 @@ Create a pod 'prod-redis' to run on node01
 
 
 
+
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
+## Dia 17/01/2025
+
+- Questoes
+resultados
+
+Your score
+62%
+Pass Percentage - 74% 
+
+- TSHOOT questoes erradas
+erradas
+
+
+### 1 / 9
+Weight: 12
+
+Create a new service account with the name pvviewer. Grant this Service account access to list all PersistentVolumes in the cluster by creating an appropriate cluster role called pvviewer-role and ClusterRoleBinding called pvviewer-role-binding.
+Next, create a pod called pvviewer with the image: redis and serviceAccount: pvviewer in the default namespace.
+
+ServiceAccount: pvviewer
+
+ClusterRole: pvviewer-role
+
+ClusterRoleBinding: pvviewer-role-binding
+
+Pod: pvviewer
+
+Pod configured to use ServiceAccount pvviewer ?
+
+
+kubectl create serviceaccount pvviewer
+kubectl create clusterrole pvviewer-role --resource=persistentvolumes --verb=list
+kubectl create clusterrolebinding pvviewer-role-binding --clusterrole=pvviewer-role --serviceaccount=default:pvviewer
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pvviewer
+  name: pvviewer
+spec:
+  containers:
+  - image: redis
+    name: pvviewer
+    resources: {}
+  serviceAccountName: pvviewer
+
+
+- Criar um Deployment é diferente de criar um Pod, no caso da questão1, eu havia criado um Deployment para criar o Pod, então computou como erro.
+atenção!
+
+
+controlplane ~ ➜  kubectl create serviceaccount pvviewer
+kubectl create clusterrole pvviewer-role --resource=persistentvolumes --verb=list
+kubectl create clusterrolebinding pvviewer-role-binding --clusterrole=pvviewer-role --serviceaccount=default:pvviewer
+serviceaccount/pvviewer created
+clusterrole.rbac.authorization.k8s.io/pvviewer-role created
+clusterrolebinding.rbac.authorization.k8s.io/pvviewer-role-binding created
+
+controlplane ~ ➜  vi questao1-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f questao1-pod.yaml
+pod/pvviewer created
+
+controlplane ~ ➜  date
+Fri Jan 17 11:39:15 AM UTC 2025
+
+controlplane ~ ➜  
+
+
+
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESPOSTAS
@@ -2723,6 +2805,9 @@ kubectl get deployment/nginx-deploy -o yaml
 
 kubectl edit deployment/nginx-deploy
 
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao9-kube-controller.yaml
+https://www.illumine.tw/xkldimedn11/kubernetes-waiting-for-deployment-spec-update-to-be-observed
+
 
 
 # ###################################################################################################################### 
@@ -2744,6 +2829,9 @@ erradas
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO - DICAS
+
+- Criar um Deployment é diferente de criar um Pod, no caso da questão1, eu havia criado um Deployment para criar o Pod, então computou como erro.
+atenção!
 
 - Usar o comando abaixo para descobrir resources
 kubectl api-resources
