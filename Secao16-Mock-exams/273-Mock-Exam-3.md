@@ -2789,6 +2789,56 @@ spec:
 ~~~~
 
 
+- Exemplo da documentação do Kubernetes:
+
+https://kubernetes.io/docs/concepts/services-networking/network-policies/
+<https://kubernetes.io/docs/concepts/services-networking/network-policies/>
+
+An example NetworkPolicy might look like this:
+service/networking/networkpolicy.yaml
+[Copy service/networking/networkpolicy.yaml to clipboard]
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 172.17.0.0/16
+        except:
+        - 172.17.1.0/24
+    - namespaceSelector:
+        matchLabels:
+          project: myproject
+    - podSelector:
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 5978
+
+policyTypes: Each NetworkPolicy includes a policyTypes list which may include either Ingress, Egress, or both. 
+The policyTypes field indicates whether or not the given policy applies to ingress traffic to selected pod, egress traffic from selected pods, or both. 
+If no policyTypes are specified on a NetworkPolicy then by default Ingress will always be set and Egress will be set if the NetworkPolicy has any egress rules.
+
+
+- Correção a ser aplicada:
 
 5. Run the below command for solution:  
  
