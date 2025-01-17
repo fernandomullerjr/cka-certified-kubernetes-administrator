@@ -2670,6 +2670,148 @@ controlplane ~ ➜
 
 
 
+### 2 / 9
+Weight: 12
+
+List the InternalIP of all nodes of the cluster. Save the result to a file /root/CKA/node_ips.
+
+Answer should be in the format: InternalIP of controlplane<space>InternalIP of node01 (in a single line)
+
+Task Completed
+
+
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /root/CKA/node_ips
+
+controlplane ~ ➜  kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /root/CKA/node_ips
+
+controlplane ~ ➜  
+
+
+
+
+### 3 / 9
+Weight: 12
+
+Create a pod called multi-pod with two containers.
+Container 1: name: alpha, image: nginx
+Container 2: name: beta, image: busybox, command: sleep 4800
+
+Environment Variables:
+container 1:
+name: alpha
+
+Container 2:
+name: beta
+
+Pod Name: multi-pod
+
+Container 1: alpha
+
+Container 2: beta
+
+Container beta commands set correctly?
+
+Container 1 Environment Value Set
+
+Container 2 Environment Value Set
+
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao3--pod-multi-containers-variaveis.yaml
+
+controlplane ~ ➜  vi questao3-pod-multi-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f questao3-pod-multi-pod.yaml
+pod/multi-pod created
+
+
+
+
+
+### 4 / 9
+Weight: 8
+
+Create a Pod called non-root-pod , image: redis:alpine
+
+runAsUser: 1000
+
+fsGroup: 2000
+
+Pod non-root-pod fsGroup configured
+
+Pod non-root-pod runAsUser configured
+
+
+controlplane ~ ➜  vi questao4-pod.yaml
+
+controlplane ~ ➜  kubectl apply -f questao4-pod.yaml
+pod/non-root-pod created
+
+controlplane ~ ➜  
+
+
+
+### 5 / 9
+Weight: 14
+
+We have deployed a new pod called np-test-1 and a service called np-test-service. Incoming connections to this service are not working. Troubleshoot and fix it.
+Create NetworkPolicy, by the name ingress-to-nptest that allows incoming connections to the service over port 80.
+
+Important: Don't delete any current objects deployed.
+
+Important: Don't Alter Existing Objects!
+
+NetworkPolicy: Applied to All sources (Incoming traffic from all pods)?
+
+NetWorkPolicy: Correct Port?
+
+NetWorkPolicy: Applied to correct Pod?
+
+
+O que eu havia aplicado antes:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          run: busybox
+    ports:
+    - protocol: TCP
+      port: 80
+~~~~
+
+
+
+5. Run the below command for solution:  
+ 
+     <details>
+ 
+     ```
+     apiVersion: networking.k8s.io/v1
+     kind: NetworkPolicy
+     metadata:
+       name: ingress-to-nptest
+       namespace: default
+     spec:
+       podSelector:
+         matchLabels:
+           run: np-test-1
+       policyTypes:
+       - Ingress
+       ingress:
+       - ports:
+         - protocol: TCP
+           port: 80
+     ```
+     </details>
 
 
 # ###################################################################################################################### 
@@ -2832,6 +2974,11 @@ erradas
 
 - Criar um Deployment é diferente de criar um Pod, no caso da questão1, eu havia criado um Deployment para criar o Pod, então computou como erro.
 atenção!
+
+- Para Network Policy, cuidar o trecho "policyTypes"
+  policyTypes:
+  - Ingress
+  - Egress
 
 - Usar o comando abaixo para descobrir resources
 kubectl api-resources
