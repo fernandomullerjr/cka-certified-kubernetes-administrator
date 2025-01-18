@@ -2864,6 +2864,345 @@ If no policyTypes are specified on a NetworkPolicy then by default Ingress will 
      </details>
 
 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 80
+
+controlplane ~ ➜  vi questao5-netpol.yaml
+
+controlplane ~ ➜  kubectl apply -f questao5-netpol.yaml
+networkpolicy.networking.k8s.io/ingress-to-nptest created
+
+controlplane ~ ➜  
+
+controlplane ~ ➜  
+
+
+
+
+### 6 / 9
+Weight: 12
+
+Taint the worker node node01 to be Unschedulable. Once done, create a pod called dev-redis, image redis:alpine, to ensure workloads are not scheduled to this worker node. Finally, create a new pod called prod-redis and image: redis:alpine with toleration to be scheduled on node01.
+
+key: env_type, value: production, operator: Equal and effect: NoSchedule
+
+Key = env_type
+
+Value = production
+
+Effect = NoSchedule
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+Create a pod 'prod-redis' to run on node01
+
+
+
+### 9 / 9
+Weight: 14
+
+We have created a new deployment called nginx-deploy. scale the deployment to 3 replicas. Has the replica's increased? Troubleshoot the issue and fix it.
+
+deployment has 3 replicas
+
+
+sed -i 's/kube-contro1ler-manager/kube-controller-manager/g' kube-controller-manager.yaml
+
+
+
+controlplane ~ ➜  ls /etc/kubernetes/manifests/kube-controller-manager.yaml 
+/etc/kubernetes/manifests/kube-controller-manager.yaml
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-contro1ler-manager
+    tier: control-plane
+  name: kube-contro1ler-manager
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-contro1ler-manager
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-cidr=10.244.0.0/16
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --leader-elect=true
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-contro1ler-manager:v1.31.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-contro1ler-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane ~ ➜  
+
+sed -i 's/kube-contro1ler-manager/kube-controller-manager/g' /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+
+controlplane ~ ➜  cat /etc/kubernetes/manifests/kube-controller-manager.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-controller-manager
+    tier: control-plane
+  name: kube-controller-manager
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-controller-manager
+    - --allocate-node-cidrs=true
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-cidr=10.244.0.0/16
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+    - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --leader-elect=true
+    - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+    - --root-ca-file=/etc/kubernetes/pki/ca.crt
+    - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+    - --service-cluster-ip-range=10.96.0.0/12
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-controller-manager:v1.31.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    name: kube-controller-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 15
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /etc/kubernetes/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  hostNetwork: true
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /etc/kubernetes/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status: {}
+
+controlplane ~ ➜  
+
+
+kubectl scale --replicas=3 deployment/nginx-deploy
+
+controlplane ~ ➜  kubectl scale --replicas=3 deployment/nginx-deploy
+
+
+controlplane ~ ➜  kubectl get pods
+NAME                           READY   STATUS    RESTARTS   AGE
+dev-redis                      1/1     Running   0          6m21s
+multi-pod                      2/2     Running   0          33m
+nginx-deploy-db7c4d999-4zbbz   1/1     Running   0          6s
+nginx-deploy-db7c4d999-kh5d6   1/1     Running   0          6s
+nginx-deploy-db7c4d999-sgg5j   1/1     Running   0          4m56s
+non-root-pod                   1/1     Running   0          30m
+np-test-1                      1/1     Running   0          30m
+prod-redis                     1/1     Running   0          5m35s
+pvviewer                       1/1     Running   0          35m
+
+controlplane ~ ➜  date
+Sat Jan 18 09:16:22 PM UTC 2025
+
+controlplane ~ ➜  
+
+
+
+
+- Finalizando
+
+- Resultado:
+
+Your score
+88%
+Pass Percentage - 74% 
+
+
+- Questão 6 só esta parte:
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESPOSTAS
@@ -2961,11 +3300,11 @@ controlplane ~ ➜
 kubectl run dev-redis --image=redis:alpine
 kubectl taint nodes node01 env_type=production:NoSchedule
 kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
-/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao7-pod-toleration.yaml
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao6-pod-toleration.yaml
 
-controlplane ~ ➜  vi questao7.yaml
+controlplane ~ ➜  vi questao6.yaml
 
-controlplane ~ ➜  kubectl apply -f questao7.yaml
+controlplane ~ ➜  kubectl apply -f questao6.yaml
 pod/prod-redis created
 
 
@@ -3000,7 +3339,11 @@ kubectl edit deployment/nginx-deploy
 /home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao9-kube-controller.yaml
 https://www.illumine.tw/xkldimedn11/kubernetes-waiting-for-deployment-spec-update-to-be-observed
 
+sed -i 's/kube-contro1ler-manager/kube-controller-manager/g' /etc/kubernetes/manifests/kube-controller-manager.yaml 
 
+
+kubectl scale --replicas=3 deployment/nginx-deploy
+kubectl get pods
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
@@ -3015,6 +3358,20 @@ Pass Percentage - 74%
 
 - TSHOOT questoes erradas
 erradas
+
+
+- Hoje - dia 18/01/2025
+
+- Resultado:
+
+Your score
+88%
+Pass Percentage - 74% 
+
+
+- Questão 6 só esta parte:
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
 
 
 
