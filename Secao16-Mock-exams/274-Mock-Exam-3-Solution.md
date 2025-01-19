@@ -264,6 +264,27 @@ kubectl get nodes -o json | grep -i internalip -B 100
 ~~~~
 
 
+No comando fornecido:
+
+```bash
+kubectl get nodes -o json | grep -i internalip -B 100
+```
+
+O parâmetro `-B` da ferramenta `grep` significa **"before context"** (contexto anterior). Ele faz com que o `grep` exiba **linhas anteriores** àquela que contém o padrão de busca.
+
+No caso específico do comando:
+
+- **`kubectl get nodes -o json`**: Obtém os nós do cluster Kubernetes em formato JSON.
+- **`grep -i internalip`**: Procura (ignorando maiúsculas e minúsculas, por causa do `-i`) pelo termo **`internalip`** no JSON de saída.
+- **`-B 100`**: Exibe **as 100 linhas anteriores** a cada linha onde o termo `internalip` foi encontrado.
+
+### Resumo do que o comando faz:
+1. Lista os nós do Kubernetes em formato JSON.
+2. Procura pelo termo `internalip`.
+3. Inclui 100 linhas anteriores a cada ocorrência do termo `internalip` na saída.
+
+Isso é útil para obter o contexto em torno da linha que contém `internalip`, especialmente porque o JSON gerado pelo `kubectl` pode ser extenso e hierárquico.
+
 
 - Trazendo os "saltos"
 kubectl get nodes -o json | jq -c 'paths'
@@ -383,3 +404,24 @@ pegar dicas de jq, jsonpath, grep,
    - **Descrição**: O **`jq`** é uma ferramenta de manipulação de JSON. 
    - A opção **`-c`** compacta a saída (uma única linha para cada caminho).
    - **`paths`**: Este filtro do `jq` retorna **todos os caminhos possíveis** dentro da estrutura do JSON. Um caminho é basicamente a sequência de chaves ou índices que levam a cada valor no JSON.
+
+
+- Filtrando o JSON do Kubernetes:
+
+```bash
+kubectl get nodes -o json | grep -i internalip -B 100
+```
+
+O parâmetro `-B` da ferramenta `grep` significa **"before context"** (contexto anterior). Ele faz com que o `grep` exiba **linhas anteriores** àquela que contém o padrão de busca.
+- **`-B 100`**: Exibe **as 100 linhas anteriores** a cada linha onde o termo `internalip` foi encontrado.
+
+
+
+- Filtrando com o 'paths' do jq, e deixando a saída mais limpa sacando fora os conditions com o grep -v que é o oposto de filtrar:
+kubectl get nodes -o json | jq -c 'paths' | grep type | grep -v conditions
+
+~~~~bash
+> kubectl get nodes -o json | jq -c 'paths' | grep type | grep -v conditions
+["items",0,"status","addresses",0,"type"]
+["items",0,"status","addresses",1,"type"]
+~~~~
