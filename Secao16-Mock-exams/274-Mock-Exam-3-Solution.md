@@ -325,6 +325,41 @@ kubectl get nodes -o json | jq -c 'paths' | grep type | grep -v conditions
 ~~~~
 
 
+- Pegando estes caminhos
+fazendo alguns testes
+
+
+kubectl get nodes -o jsonpath='{.items[0].status.addresses}' | jq
+
+>
+> kubectl get nodes -o jsonpath='{.items[0].status.addresses}' | jq
+[
+  {
+    "address": "192.168.0.102",
+    "type": "InternalIP"
+  },
+  {
+    "address": "wsl2",
+    "type": "Hostname"
+  }
+]
+
+
+- Teste:
+kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+
+> kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+192.168.0.102%
+
+
+
+- Comando final para resposta:
+
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+
+
+
+
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
