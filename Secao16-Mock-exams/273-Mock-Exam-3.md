@@ -3388,7 +3388,7 @@ atenção!
   - Egress
 
 - Usar o comando abaixo para descobrir resources
-kubectl api-resources
+```kubectl api-resources```
 fonte:
 <https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-resources/>
 
