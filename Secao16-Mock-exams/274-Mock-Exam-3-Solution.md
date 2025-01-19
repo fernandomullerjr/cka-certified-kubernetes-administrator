@@ -1,4 +1,4 @@
-#
+# ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 #  push
@@ -12,6 +12,8 @@ git push
 git status
 
 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ##  274. Mock Exam - 3 - Solution
@@ -197,15 +199,20 @@ git status
 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 ##  274. Mock Exam - 3 - Solution
 
 
+
+# ###################################################################################################################### 
 ### 1 / 9
 - Revisado como criar os ServiceAccount, ClusterRole, ClusterRoleBinding, etc, via comando imperativo.
 - Revisado como criar o Pod com ServiceAccountName.
 
 
 
+# ###################################################################################################################### 
 ### 2 / 9
 kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /root/CKA/node_ips
 
@@ -382,6 +389,184 @@ kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP
 
 
 
+
+# ###################################################################################################################### 
+### 3 / 9
+
+Weight: 12
+
+Create a pod called multi-pod with two containers.
+Container 1: name: alpha, image: nginx
+Container 2: name: beta, image: busybox, command: sleep 4800
+
+Environment Variables:
+container 1:
+name: alpha
+
+Container 2:
+name: beta
+
+Pod Name: multi-pod
+
+Container 1: alpha
+
+Container 2: beta
+
+Container beta commands set correctly?
+
+Container 1 Environment Value Set
+
+Container 2 Environment Value Set
+
+
+
+3. Run the below command for solution:  
+ 
+     <details>
+ 
+     ```
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: multi-pod
+     spec:
+       containers:
+       - image: nginx
+         name: alpha
+         env:
+         - name: name
+           value: alpha
+       - image: busybox
+         name: beta
+         command: ["sleep", "4800"]
+         env:
+         - name: name
+           value: beta
+     status: {}
+     ```
+     </details>
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+### 4 / 9
+Weight: 8
+
+Create a Pod called non-root-pod , image: redis:alpine
+
+runAsUser: 1000
+
+fsGroup: 2000
+
+Pod non-root-pod fsGroup configured
+
+Pod non-root-pod runAsUser configured
+
+
+4. Run the below command for solution:
+ 
+     <details>
+     
+     ```
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: non-root-pod
+     spec:
+       securityContext:
+         runAsUser: 1000
+         fsGroup: 2000
+       containers:
+       - name: non-root-pod
+         image: redis:alpine
+     ```
+     </details>
+
+
+
+
+
+# ###################################################################################################################### 
+### 5 / 9
+Weight: 14
+
+We have deployed a new pod called np-test-1 and a service called np-test-service. Incoming connections to this service are not working. Troubleshoot and fix it.
+Create NetworkPolicy, by the name ingress-to-nptest that allows incoming connections to the service over port 80.
+
+Important: Don't delete any current objects deployed.
+
+Important: Don't Alter Existing Objects!
+
+NetworkPolicy: Applied to All sources (Incoming traffic from all pods)?
+
+NetWorkPolicy: Correct Port?
+
+NetWorkPolicy: Applied to correct Pod?
+
+
+5. Run the below command for solution:  
+ 
+     <details>
+ 
+     ```
+     apiVersion: networking.k8s.io/v1
+     kind: NetworkPolicy
+     metadata:
+       name: ingress-to-nptest
+       namespace: default
+     spec:
+       podSelector:
+         matchLabels:
+           run: np-test-1
+       policyTypes:
+       - Ingress
+       ingress:
+       - ports:
+         - protocol: TCP
+           port: 80
+     ```
+     </details>
+   
+
+
+- Poderia ter sido utilizado o comando para mostrar Labels do Pod:
+
+kubectl get pods --show-labels
+
+NAME         READY   STATUS    RESTARTS   AGE   LABELS
+nginx-123    1/1     Running   0          5m    app=nginx,env=prod
+nginx-456    1/1     Running   0          3m    app=nginx,env=dev
+
+
+
+- Para responder a questão sobre Network Policy e liberar o sentido ingress, pode ser utilizada uma versão simplificada, sem conter o "from" e tendo apenas a parte do "ports", por exemplo:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 80
+~~~~
+
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## PENDENTE
@@ -396,6 +581,10 @@ pegar dicas de jq, jsonpath, grep,
 - Questões de comandos e paths do JSON,
 
 
+
+
+# ###################################################################################################################### 
+# ###################################################################################################################### 
 # ###################################################################################################################### 
 # ###################################################################################################################### 
 ## RESUMO - DICAS
@@ -424,4 +613,31 @@ kubectl get nodes -o json | jq -c 'paths' | grep type | grep -v conditions
 > kubectl get nodes -o json | jq -c 'paths' | grep type | grep -v conditions
 ["items",0,"status","addresses",0,"type"]
 ["items",0,"status","addresses",1,"type"]
+~~~~
+
+
+
+- Comando para mostrar as Labels do Pod:
+```kubectl get pods --show-labels```
+
+
+
+- Para responder a questão sobre Network Policy e liberar o sentido ingress, pode ser utilizada uma versão simplificada, sem conter o "from" e tendo apenas a parte do "ports", por exemplo:
+
+~~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 80
 ~~~~
