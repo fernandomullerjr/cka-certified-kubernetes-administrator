@@ -581,6 +581,50 @@ pegar dicas de jq, jsonpath, grep,
 - Questões de comandos e paths do JSON,
 
 
+- continua em
+25:11
+na questão 6
+
+
+
+
+# ###################################################################################################################### 
+### 6 / 9
+Weight: 12
+
+Taint the worker node node01 to be Unschedulable. Once done, create a pod called dev-redis, image redis:alpine, to ensure workloads are not scheduled to this worker node. Finally, create a new pod called prod-redis and image: redis:alpine with toleration to be scheduled on node01.
+
+key: env_type, value: production, operator: Equal and effect: NoSchedule
+
+Key = env_type
+
+Value = production
+
+Effect = NoSchedule
+
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+Create a pod 'prod-redis' to run on node01
+
+
+- Na minha questão 6 original
+errei parte da questão 6
+
+- Questão 6 só esta parte:
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+- Utilizei os comandos:
+kubectl run dev-redis --image=redis:alpine
+kubectl taint nodes node01 env_type=production:NoSchedule
+kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao6-pod-toleration.yaml
+
+- Possível que seja porque o pod dev-redis subiu no node01 antes de ter aplicado a Taint.
+- Possível solução:
+Aplicar a Taint primeiro.
+
+
+
 
 
 # ###################################################################################################################### 
@@ -641,3 +685,22 @@ spec:
     - protocol: TCP
       port: 80
 ~~~~
+
+
+
+
+- Na minha questão 6 original
+errei parte da questão 6
+
+- Questão 6 só esta parte:
+pod 'dev-redis' (no tolerations) is not scheduled on node01?
+
+- Utilizei os comandos:
+kubectl run dev-redis --image=redis:alpine
+kubectl taint nodes node01 env_type=production:NoSchedule
+kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao6-pod-toleration.yaml
+
+- Possível que seja porque o pod dev-redis subiu no node01 antes de ter aplicado a Taint.
+- Possível solução:
+Aplicar a Taint primeiro.
