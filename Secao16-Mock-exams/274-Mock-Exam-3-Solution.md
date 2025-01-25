@@ -607,6 +607,49 @@ pod 'dev-redis' (no tolerations) is not scheduled on node01?
 Create a pod 'prod-redis' to run on node01
 
 
+
+- solução da kodekloud:
+
+6. Run the below command for solution: 
+ 
+     <details>
+ 
+     ```
+     kubectl taint node node01 env_type=production:NoSchedule
+     ```
+
+     Deploy `dev-redis` pod and to ensure that workloads are not scheduled to this `node01` worker node.
+     ```
+     kubectl run dev-redis --image=redis:alpine
+
+     kubectl get pods -owide
+     ```
+
+     Deploy new pod `prod-redis` with toleration to be scheduled on `node01` worker node.
+     ```
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: prod-redis
+     spec:
+       containers:
+       - name: prod-redis
+         image: redis:alpine
+       tolerations:
+       - effect: NoSchedule
+         key: env_type
+         operator: Equal
+         value: production     
+     ```
+
+     View the pods with short details: 
+     ```
+     kubectl get pods -owide | grep prod-redis
+     ```
+     </details>
+
+
+
 - Na minha questão 6 original
 errei parte da questão 6
 
@@ -622,6 +665,156 @@ kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
 - Possível que seja porque o pod dev-redis subiu no node01 antes de ter aplicado a Taint.
 - Possível solução:
 Aplicar a Taint primeiro.
+
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+### 7 / 9
+Weight: 8
+
+Create a pod called hr-pod in hr namespace belonging to the production environment and frontend tier .
+image: redis:alpine
+
+Use appropriate labels and create all the required objects if it does not exist in the system already.
+
+hr-pod labeled with environment production?
+
+hr-pod labeled with tier frontend?
+
+
+- Solução da Kodekloud:
+7. Run the below command for solution: 
+ 
+     <details>
+ 
+     ```
+     kubectl create namespace hr
+     kubectl run hr-pod --image=redis:alpine --namespace=hr --labels=environment=production,tier=frontend
+     ```
+     </details>
+
+
+- Minha solução tá ok:
+
+### 7 / 9
+kubectl create ns hr
+kubectl run hr-pod --namespace=hr --image=redis:alpine --labels="environment=production,tier=frontend"
+
+
+
+
+
+# ###################################################################################################################### 
+### 8 / 9
+Weight: 8
+
+A kubeconfig file called super.kubeconfig has been created under /root/CKA. There is something wrong with the configuration. Troubleshoot and fix it.
+
+Fix /root/CKA/super.kubeconfig
+
+
+- Solução da KodeKloud:
+
+8. Run the below command for solution:
+
+     <details>
+
+     ```
+     vi /root/CKA/super.kubeconfig
+
+     Change the 2379 port to 6443 and run the below command to verify
+     
+     kubectl cluster-info --kubeconfig=/root/CKA/super.kubeconfig     
+     ```
+     </details>
+
+
+- Minha solução tá ok:
+
+### 8 / 9
+- Ajustando porta
+de
+9999
+para
+6443
+
+vi /root/CKA/super.kubeconfig
+
+- Pode ser utilizado o comando kubectl get nodes para ver com um kubeconfig personalizado e tomar o erro sobre a porta incorreta no Kubeconfig.
+kubectl get nodes --kubeconfig=/root/CKA/super.kubeconfig   
+ou pode ser usado este comando também:
+kubectl cluster-info --kubeconfig=/root/CKA/super.kubeconfig   
+
+
+
+
+
+
+
+
+
+# ###################################################################################################################### 
+### 9 / 9
+Weight: 14
+
+We have created a new deployment called nginx-deploy. scale the deployment to 3 replicas. Has the replica's increased? Troubleshoot the issue and fix it.
+
+deployment has 3 replicas
+
+
+
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS             RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running            0             48m
+coredns-77d6fd4654-drl2c               1/1     Running            0             48m
+etcd-controlplane                      1/1     Running            0             48m
+kube-apiserver-controlplane            1/1     Running            0             48m
+kube-contro1ler-manager-controlplane   0/1     ImagePullBackOff   0             40m
+kube-proxy-2wvbl                       1/1     Running            0             48m
+kube-proxy-cksrl                       1/1     Running            0             48m
+kube-scheduler-controlplane            1/1     Running            0             48m
+weave-net-hn7nn                        2/2     Running            1 (48m ago)   48m
+weave-net-vbdgh                        2/2     Running            0             48m
+
+controlplane ~ ➜  
+
+
+
+- Solução da KodeKloud:
+
+9. Run the below command for solution:
+   
+     <details>
+     
+     ```
+     sed -i 's/kube-contro1ler-manager/kube-controller-manager/g' kube-controller-manager.yaml
+     ```
+     </details>
+
+
+
+- Minha solução:
+
+### 9 / 9
+kubectl get deployment/nginx-deploy -o yaml
+
+kubectl edit deployment/nginx-deploy
+
+/home/fernando/cursos/cka-certified-kubernetes-administrator/Secao16-Mock-exams/273-x--questao9-kube-controller.yaml
+https://www.illumine.tw/xkldimedn11/kubernetes-waiting-for-deployment-spec-update-to-be-observed
+
+sed -i 's/kube-contro1ler-manager/kube-controller-manager/g' /etc/kubernetes/manifests/kube-controller-manager.yaml 
+
+
+kubectl scale --replicas=3 deployment/nginx-deploy
+kubectl get pods
+
 
 
 
@@ -704,3 +897,24 @@ kubectl run prod-redis --image=redis:alpine -o yaml --dry-run=client
 - Possível que seja porque o pod dev-redis subiu no node01 antes de ter aplicado a Taint.
 - Possível solução:
 Aplicar a Taint primeiro.
+
+
+
+
+- Pode ser utilizado o comando kubectl get nodes para ver com um kubeconfig personalizado e tomar o erro sobre a porta incorreta no Kubeconfig.
+kubectl get nodes --kubeconfig=/root/CKA/super.kubeconfig   
+ou pode ser usado este comando também:
+kubectl cluster-info --kubeconfig=/root/CKA/super.kubeconfig   
+
+
+
+
+- Em caso de problemas de escala/criação de replicas, conferir o kube-controller-manager via comando ````kubectl get pods -n kube-system````
+
+~~~~bash
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS             RESTARTS      AGE
+coredns-77d6fd4654-b6fk6               1/1     Running            0             48m
+etcd-controlplane                      1/1     Running            0             48m
+kube-contro1ler-manager-controlplane   0/1     ImagePullBackOff   0             40m
+~~~~
