@@ -412,3 +412,4 @@ RHEL	overlay2	devicemapper¹, vfs
 - Caso um container seja criado passando o parametro -v, para criar o volume, o Docker cria o volume automaticamente, caso ele não exista.
 - Para os "Mount Bind", antes era usado o -v, porém atualmente é utilizado o --mount preferencialmente.
 -  AuFS storage driver has been deprecated
+

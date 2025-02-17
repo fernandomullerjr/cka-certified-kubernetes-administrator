@@ -199,3 +199,5 @@ No caso ele utiliza o "kubernetes.io/no-provisioner"
 ## RESUMO
 
 - O Provisioner define se o Storage Class suporta Dynamic Provisioning.
+
+- O local-storage não suporta provisionamento dinamico.
